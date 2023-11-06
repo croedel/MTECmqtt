@@ -1,0 +1,18 @@
+---
+# MODBUS Server
+MODBUS_IP : "xx.xx.xx.xx"   # IP address of "espressif" modbus server
+MODBUS_PORT : 5743          # Port (usually no change required)
+MODBUS_SLAVE : 252          # Modbus slave id (usually no change required)
+
+# MQTT
+MQTT_SERVER : "localhost"   # MQTT server 
+MQTT_PORT : 1883            # MQTT server port
+MQTT_LOGIN  : " "           # MQTT Login
+MQTT_PASSWORD : ""          # MQTT Password  
+MQTT_TOPIC : "MTEC"         # MQTT topic name  
+
+POLL_FREQUENCY : 10         # query data every N seconds
+DEBUG : False               # Set to True to get verbose debug messages
+
+MQTT_FLOAT_FORMAT : "{:.2f}"    # Defines how to format float values
+ 

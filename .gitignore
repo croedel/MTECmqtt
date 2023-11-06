@@ -4,7 +4,7 @@ __pycache__/
 *$py.class
 
 # Private config file
-config.yaml
+/config.yaml
 
 # others
 .vscode/launch.json
