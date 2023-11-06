@@ -105,7 +105,7 @@ def write_to_MQTT( pvdata, base_topic ):
       else:
         payload = data  
     logging.info("- {}: {}".format(topic, str(payload)))
-#    mqtt_publish( topic, payload )
+    mqtt_publish( topic, payload )
 
 #==========================================
 def main():
