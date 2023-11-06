@@ -93,28 +93,10 @@ register_map = {
   '33013':	[	'Max Cell Voltage',	                          1, 'U16', 'V',	  1000	],
   '33015':	[	'Min Cell Voltage',	                          1, 'U16', 'V',	  1000	],
 }
-
-#--------------------------------
-def read_modbus_data_raw(ip_addr, port, slave, start, stop):
-  client = ModbusTcpClient(ip_addr, port, framer=ModbusRtuFramer, timeout=2 )
-
-  if client.connect():
-    for addr in range(start, stop):
-      try:
-        result = client.read_holding_registers(address=addr, count=1, slave=slave)
-      except ModbusException as ex:
-        logging.error("ModbusException while reading address {} from pymodbus: {}".format(addr, ex))
-
-      if result.isError():
-        logging.error("Error while reading address {} from pymodbus".format(addr))
-      else:
-        print("- {}: {}".format(addr, result.registers))
-    client.close()  
-  else:
-    logging.error("Couldn't connect to server {}:{}".format(ip_addr, port))
-    return None
  
 #--------------------------------
+# This is the main API function
+# It either fetches all addresses or a list of given addresses
 def read_modbus_data(ip_addr, port, slave, addresses=None):
   data = {}
   # Connect to Modbus server
@@ -176,27 +158,25 @@ def read_address(client, address, slave, item):
   return data
   
 #--------------------------------
+# The main() function is just a demo code how to use the API
 def main():
   logging.basicConfig()
   if cfg['DEBUG'] == True:
     logging.getLogger().setLevel(logging.DEBUG)
 
   # fetch all available data
-#  logging.info("Fetching all data")
-#  data = read_modbus_data(ip_addr=cfg['MODBUS_IP'], slave=cfg['MODBUS_SLAVE'], port=cfg['MODBUS_PORT'])
-#  for param, val in data.items():
-#    logging.info("- {} : {}".format(param, val))
+  logging.info("Fetching all data")
+  data = read_modbus_data(ip_addr=cfg['MODBUS_IP'], slave=cfg['MODBUS_SLAVE'], port=cfg['MODBUS_PORT'])
+  for param, val in data.items():
+    logging.info("- {} : {}".format(param, val))
 
   # fetch selected addresses
-#  logging.info("Fetching selected data")
-#  addresses = [ '10105', '11000', '11016', '11018', '11020', '11028', '30258', '33000', '10000' ]
-#  data = read_modbus_data(ip_addr=cfg['MODBUS_IP'], port=cfg['MODBUS_PORT'], slave=cfg['MODBUS_SLAVE'], addresses=addresses)
-#  for param, val in data.items():
-#    logging.info("- {} : {}".format(param, val))
+  logging.info("Fetching selected data")
+  addresses = [ '10105', '11000', '11016', '11018', '11020', '11028', '30258', '33000', '10000' ]
+  data = read_modbus_data(ip_addr=cfg['MODBUS_IP'], port=cfg['MODBUS_PORT'], slave=cfg['MODBUS_SLAVE'], addresses=addresses)
+  for param, val in data.items():
+    logging.info("- {} : {}".format(param, val))
 
-
-  read_modbus_data_raw(ip_addr=cfg['MODBUS_IP'], slave=cfg['MODBUS_SLAVE'], port=cfg['MODBUS_PORT'],
-                                start=25111 , stop=25200)
 
 #--------------------------------------------      
 if __name__ == '__main__':
