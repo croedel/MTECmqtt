@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """
 Modbus API for M-TEC Energybutler
+(c) 2023 by Christian Rödel 
 """
 from config import cfg
 from pymodbus.client import ModbusTcpClient

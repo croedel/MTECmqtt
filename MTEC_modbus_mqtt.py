@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """
 MQTT server for M-TEC Energybutler reading modbus data
+(c) 2023 by Christian Rödel 
 """
 from config import cfg
 import logging
