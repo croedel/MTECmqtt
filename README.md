@@ -8,10 +8,10 @@ After more research, I am happy to proudly present my second approach!
 
 The highlights are:
 * No additional hardware or modifications of your Inverter required
-* Uses the standard communication protocol 'Modbus RTU over TCP' 
 * Enables to read out more than 70 parameters from your Inverter
 * Works within you LAN - no internet connection required
 * Enables fast polling of essential data (e.g. every 10s)
+* Uses the standard communication protocol 'Modbus RTU over TCP' 
 * Easy to use commandline-tool and MQTT broker integration, enabling an easy integration into almost any EMS or home automation tool
 
 I hope you like it and it will help you with for your EMS or home automation project :-) !
@@ -45,8 +45,8 @@ The actual API can be found in `MTECmodbusAPI.py`. It offers functionality to:
 * Connect to the Modbus RTU server of your inverter 
 * Retrieve current status and usage data
 
-The main function of the API is `read_modbus_data(ip_addr, port, slave, addresses=None)`.
-It either fetches all known addresses (addresses=None) or you can specify a list of addresses (e.g. addresses=['10105', '11000']) and returns a map, containing the nicely formatted data.
+The main function of the API is `read_modbus_data(ip_addr, port, slave, registers=None)`.
+It either fetches all known registers (registers=None) or you can specify a list of registers (e.g. registers=['10105', '11000']) and returns a map, containing the nicely formatted data.
 
 The map should be self-explaining and looks like this:
 ```
@@ -93,17 +93,18 @@ In order to connect to your individual device, you need the IP Address of your `
 MODBUS_IP : "xx.xx.xx.xx"   # IP address of "espressif" modbus server
 MODBUS_PORT : 5743          # Port (usually no change required)
 MODBUS_SLAVE : 252          # Modbus slave id (usually no change required)
+MODBUS_TIMEOUT : 2          # Timeout for Modbus server (s)
 ```
 
 That's all you need to do!
 
 ## Commandline tool
 Having done the setup, you already should be able to start the command line tool `MTEC_tool.py`.
-As default, it will connect to your device and retrieve a list of all known parameters in human readable format.
+As default, it will connect to your device and retrieve a list of all known Modbus registers in a human readable format.
 
 By specifying commandline parameters, you can:
-* Toggle between a full export of all parameters `-t full` or a subset of the essential ones `-t essential`
-* Provide a customize list of addresses (=parameter id's) which you would like to retrieve, e.g. `-a 33000,10105,11000`
+* Toggle between a full export of all registers `-t all` or a subset of the essential ones `-t essential`
+* Provide a customize list of Modbus registers which you would like to retrieve, e.g. `-r 33000,10105,11000`
 * Request to export CSV instead of human readable (`-c`) 
 * Write output to a file (`-f FILENAME`)
 
@@ -156,11 +157,11 @@ PV  -------  inverter  ------- power connector ------- grid
 Battery ---------                     --------- house
 </pre>
 
-## Supported addresses
+## Supported registers
 
-The API currently supports following addresses:
+The API currently supports following Modbus registers:
 
-| Address |  Description 
+| Register |  Description 
 |------- | ---------------------------------------------- 
 | 10000  | Inverter serial number |  
 | 10008  | Equipment Info	    |
@@ -246,4 +247,4 @@ The API currently supports following addresses:
 | 33013  | Max Cell Voltage |	                          
 | 33015  | Min Cell Voltage |	                          
 
-Many thanks to https://smarthome.exposed/wattsonic-hybrid-inverter-gen3-modbus-rtu-protocol/ for the fabulous collection of the addresses!
+Many thanks to https://smarthome.exposed/wattsonic-hybrid-inverter-gen3-modbus-rtu-protocol/ for the fabulous collection of the registers!

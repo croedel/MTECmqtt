@@ -10,10 +10,10 @@ import MTECmodbusAPI
 
 #-----------------------------
 def parse_options():
-  parser = argparse.ArgumentParser(description='MTEC data command line tool. Exports data from a MTEC device.', 
+  parser = argparse.ArgumentParser(description='MTEC Modbus data command line tool. Allows to read and export Modbus registers from an MTEC inverter.', 
                                    formatter_class=argparse.RawDescriptionHelpFormatter)
-  parser.add_argument( '-t', '--type', choices=["full", "essential"], default="full", help='Defines which parameters to export' )
-  parser.add_argument( '-a', '--addresses', help='Custom list of addresses to export' )
+  parser.add_argument( '-t', '--type', choices=["all", "essential"], default="all", help='Defines set of registers to export.' )
+  parser.add_argument( '-r', '--registers', help='Comma separated list of registers which shall be retrieved' )
   parser.add_argument( '-c', '--csv', action='store_true', help='Export as CSV')
   parser.add_argument( '-f', '--file', help='Write data to <FILE> instead of stdout')
   return parser.parse_args()
@@ -32,26 +32,26 @@ def main():
       print( "ERROR - Unable to create file '{}'".format(args.file) )
       exit(1)
 
-  addresses = None
+  registers = None
   if args.type == "essential":       
-    addresses = [ '10105', '11000', '11016', '11018', '11020', '11028', '30258', '33000' ]
+    registers = [ '10105', '11000', '11016', '11018', '11020', '11028', '30258', '33000' ]
 
-  if args.addresses:
-    addresses = []
-    addr_str = args.addresses.split(",")
-    for addr in addr_str:
-      addresses.append(addr.strip())  
+  if args.registers:
+    registers = []
+    reg_str = args.registers.split(",")
+    for addr in reg_str:
+      registers.append(addr.strip())  
 
   # Do the export
   data = MTECmodbusAPI.read_modbus_data(ip_addr=cfg['MODBUS_IP'], port=cfg['MODBUS_PORT'], 
-                                        slave=cfg['MODBUS_SLAVE'], addresses=addresses)
+                                        slave=cfg['MODBUS_SLAVE'], registers=registers)
 
   if data: 
-    for address, item in data.items():
+    for register, item in data.items():
       if args.csv:
-        line = "{};{};{};{}".format( address, item["name"], item["value"], item["unit"] )
+        line = "{};{};{};{}".format( register, item["name"], item["value"], item["unit"] )
       else:
-        line = "- {}: {:50s} {} {}".format( address, item["name"], item["value"], item["unit"] )
+        line = "- {}: {:50s} {} {}".format( register, item["name"], item["value"], item["unit"] )
       print( line )
 
   # cleanup

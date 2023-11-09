@@ -12,10 +12,10 @@ from pymodbus.exceptions import ModbusException
 import logging
 
 #--------------------------------
-# These are the modbus addresses and how to interpret them
+# These are the modbus registers and how to interpret them
 # Data thankfully taken from https://smarthome.exposed/wattsonic-hybrid-inverter-gen3-modbus-rtu-protocol/
 register_map = {
-# Address    Name                                      Length, Type,  Unit,   Scale
+# Register   Name                                      Length, Type,  Unit,   Scale
 	'10000': [ 'Inverter serial number',                      8, 'STR',	'',     None  ],		
 	'10008': [ 'Equipment Info',                              1, 'BYTE', '',    None  ],	
   '10011': [ 'Firmware Version ',	                          4, 'BYTE', '',	  None  ],
@@ -103,25 +103,25 @@ register_map = {
  
 #--------------------------------
 # This is the main API function
-# It either fetches all addresses or a list of given addresses
-def read_modbus_data(ip_addr, port, slave, addresses=None):
+# It either fetches all registers or a list of given registers
+def read_modbus_data(ip_addr, port, slave, registers=None):
   data = {}
   # Connect to Modbus server
   logging.info("Connecting to server {}:{}".format(ip_addr, port))
-  client = ModbusTcpClient(ip_addr, port, framer=ModbusRtuFramer, timeout=2)
+  client = ModbusTcpClient(ip_addr, port, framer=ModbusRtuFramer, timeout=cfg["MODBUS_TIMEOUT"])
 
   if client.connect():
     logging.info("Retrieving data...")
-    if addresses == None: # fetch all addresses
-      for address, item in register_map.items():
-        data.update( read_address(client, address=address, slave=slave, item=item) )
-    else: # fetch list of given addresses
-      for address in addresses:
-        item = register_map.get(address)
+    if registers == None: # fetch all registers
+      for register, item in register_map.items():
+        data.update( read_register(client, register=register, slave=slave, item=item) )
+    else: # fetch list of given registers
+      for register in registers:
+        item = register_map.get(register)
         if item:
-          data.update( read_address(client, address=address, slave=slave, item=item) )
+          data.update( read_register(client, register=register, slave=slave, item=item) )
         else:
-          logging.warning("Unknowd address: {} - skipped.".format(address))
+          logging.warning("Unknowd register: {} - skipped.".format(register))
   
     logging.info("Data retrieval completed")
     client.close()
@@ -131,16 +131,16 @@ def read_modbus_data(ip_addr, port, slave, addresses=None):
   return data
   
 #--------------------------------
-def read_address(client, address, slave, item):
+def read_register(client, register, slave, item):
   data = {}
   try:
-    result = client.read_holding_registers(address=int(address), count=item[1], slave=slave)
+    result = client.read_holding_registers(address=int(register), count=item[1], slave=slave)
   except Exception as ex:
-    logging.error("Exception while reading address {} from pymodbus: {}".format(address, ex))
+    logging.error("Exception while reading register {} from pymodbus: {}".format(register, ex))
     return data
 
   if result.isError():
-    logging.error("Error while reading address {} from pymodbus".format(address))
+    logging.error("Error while reading register {} from pymodbus".format(register))
     return data
   
   val = None
@@ -175,12 +175,12 @@ def read_address(client, address, slave, item):
   elif item[2] == 'STR':
     val = decoder.decode_string(item[1]*2).decode()
   else:
-    logging.error("Unknown type {} to decode address {}".format(item[2], address))
+    logging.error("Unknown type {} to decode register {}".format(item[2], register))
     return data
   
   if val and item[4] and item[4]>0:
     val /= item[4]
-  data[address] = { "name":item[0], "value":val, "unit":item[3] } 
+  data[register] = { "name":item[0], "value":val, "unit":item[3] } 
 
   return data
   
@@ -193,14 +193,14 @@ def main():
 
   # fetch all available data
   logging.info("Fetching all data")
-  data = read_modbus_data(ip_addr=cfg['MODBUS_IP'], slave=cfg['MODBUS_SLAVE'], port=cfg['MODBUS_PORT'])
+  data = read_modbus_data(ip_addr=cfg['MODBUS_IP'], port=cfg['MODBUS_PORT'], slave=cfg['MODBUS_SLAVE'])
   for param, val in data.items():
     logging.info("- {} : {}".format(param, val))
 
-  # fetch selected addresses
+  # fetch selected  registers
   logging.info("Fetching selected data")
-  addresses = [ '11000', '11016', '11018', '11020', '11028', '30258', '33000', '10000', '10100' ]
-  data = read_modbus_data(ip_addr=cfg['MODBUS_IP'], port=cfg['MODBUS_PORT'], slave=cfg['MODBUS_SLAVE'], addresses=addresses)
+  registers = [ '11000', '11016', '11018', '11020', '11028', '30258', '33000', '10000', '10100' ]
+  data = read_modbus_data(ip_addr=cfg['MODBUS_IP'], port=cfg['MODBUS_PORT'], slave=cfg['MODBUS_SLAVE'],  registers= registers)
   for param, val in data.items():
     logging.info("- {} : {}".format(param, val))
 

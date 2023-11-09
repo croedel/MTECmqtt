@@ -71,10 +71,10 @@ def mqtt_publish( topic, payload ):
 # =============================================
 
 # read data from MTEC modbus
-def read_MTEC_data( addresses ):
+def read_MTEC_data( registers ):
   now = datetime.now()
   data = MTECmodbusAPI.read_modbus_data(ip_addr=cfg['MODBUS_IP'], port=cfg['MODBUS_PORT'], 
-                                        slave=cfg['MODBUS_SLAVE'], addresses=addresses)
+                                        slave=cfg['MODBUS_SLAVE'], registers=registers)
   pvdata = {}
   try:
     pvdata["api_date"] = now.strftime("%Y/%m/%d %H:%M:%S") 
@@ -124,11 +124,11 @@ def main():
     logging.getLogger().setLevel(logging.DEBUG)
   logging.info("Starting")
 
-  addresses = [ '10105', '11000', '11016', '11018', '11020', '11028', '30258', '33000' ]
+  registers = [ '10105', '11000', '11016', '11018', '11020', '11028', '30258', '33000' ]
   mqttclient = mqtt_start()
 
   while run_status: # and mqttclient
-    pvdata = read_MTEC_data(addresses=addresses)
+    pvdata = read_MTEC_data(registers=registers)
     if pvdata:
       write_to_MQTT( pvdata, cfg['MQTT_TOPIC'] + '/' )
     logging.debug("Sleep {}s".format( cfg['POLL_FREQUENCY'] ))

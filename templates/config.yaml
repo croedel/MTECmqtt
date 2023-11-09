@@ -3,6 +3,7 @@
 MODBUS_IP : "xx.xx.xx.xx"   # IP address of "espressif" modbus server
 MODBUS_PORT : 5743          # Port (usually no change required)
 MODBUS_SLAVE : 252          # Modbus slave id (usually no change required)
+MODBUS_TIMEOUT : 5          # Timeout for Modbus server (s)
 
 # MQTT
 MQTT_SERVER : "localhost"   # MQTT server 
