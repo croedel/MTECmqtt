@@ -133,6 +133,7 @@ The data will be written to a MQTT topic, using the naming: `MTEC/<parameter>`
 
 | Parameter             | Type  | Unit | Description 
 |---------------------- | ----- | ---- | ---------------------------------------------- 
+| api_date              | str   |      | Local date from API server YY/MM/DD HH:MM:SS 
 | day_production        | float | kWh  | Energy produced by the PV today 
 | total_production      | float | kWh  | Energy produced by the PV in total
 | current_PV            | float | W    | Current flow from PV 
@@ -161,8 +162,14 @@ The API currently supports following addresses:
 
 | Address |  Description 
 |------- | ---------------------------------------------- 
-| 10000  | Inverter serial number |                     	
-| 10105  | Inverter Running Status |                    
+| 10000  | Inverter serial number |  
+| 10008  | Equipment Info	    |
+| 10011  | Firmware Version       |
+| 10100  | Inverter date          |                   	
+| 10105  | Inverter Running Status |      
+| 10112  | Fault Flag1         | 
+| 10114  | Fault Flag2         | 
+| 10120  | Fault Flag3         | 
 | 10994  | Phase A Power on Meter |	                
 | 10996  | Phase B Power on Meter |	                
 | 10998  | Phase C Power on Meter |	                

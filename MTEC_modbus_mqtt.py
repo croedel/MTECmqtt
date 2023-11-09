@@ -4,6 +4,7 @@ MQTT server for M-TEC Energybutler reading modbus data
 (c) 2023 by Christian Rödel 
 """
 from config import cfg
+from datetime import datetime
 import logging
 import time
 import signal
@@ -55,25 +56,28 @@ def mqtt_stop(client):
   except Exception as e:
     logging.warning("Couldn't stop MQTT: {}".format(str(e)))
 
-def mqtt_publish( topic, payload ):  
-  auth = {
-    'username': cfg['MQTT_LOGIN'],
-    'password': cfg['MQTT_PASSWORD'] 
-  }  
-  logging.debug("Publish MQTT command {}: {}".format(topic, payload))
-  try:
-    publish.single(topic, payload=payload, hostname=cfg['MQTT_SERVER'], port=cfg['MQTT_PORT'], auth=auth)
-  except Exception as e:
-    logging.error("Could't send MQTT command: {}".format(str(e)))
+def mqtt_publish( topic, payload ):
+  if not cfg['MQTT_DISABLE']:  
+    auth = {
+      'username': cfg['MQTT_LOGIN'],
+      'password': cfg['MQTT_PASSWORD'] 
+    }  
+    logging.debug("Publish MQTT command {}: {}".format(topic, payload))
+    try:
+      publish.single(topic, payload=payload, hostname=cfg['MQTT_SERVER'], port=cfg['MQTT_PORT'], auth=auth)
+    except Exception as e:
+      logging.error("Could't send MQTT command: {}".format(str(e)))
 
 # =============================================
 
 # read data from MTEC modbus
 def read_MTEC_data( addresses ):
+  now = datetime.now()
   data = MTECmodbusAPI.read_modbus_data(ip_addr=cfg['MODBUS_IP'], port=cfg['MODBUS_PORT'], 
                                         slave=cfg['MODBUS_SLAVE'], addresses=addresses)
   pvdata = {}
   try:
+    pvdata["api_date"] = now.strftime("%Y/%m/%d %H:%M:%S") 
     pvdata["day_production"] = data["11018"]              # Energy produced by the PV today
     pvdata["total_production"] = data["11020"]            # Energy produced by the PV in total
     pvdata["current_PV"] = data["11028"]                  # Current flow from PV
