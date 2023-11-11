@@ -114,12 +114,16 @@ def read_modbus_data(ip_addr, port, slave, registers=None):
     logging.info("Retrieving data...")
     if registers == None: # fetch all registers
       for register, item in register_map.items():
-        data.update( read_register(client, register=register, slave=slave, item=item) )
+        reg_data = read_register(client, register=register, slave=slave, item=item) 
+        if reg_data:
+          data.update( reg_data )
     else: # fetch list of given registers
       for register in registers:
         item = register_map.get(register)
         if item:
-          data.update( read_register(client, register=register, slave=slave, item=item) )
+          reg_data = read_register(client, register=register, slave=slave, item=item) 
+          if reg_data:
+            data.update( reg_data )
         else:
           logging.warning("Unknowd register: {} - skipped.".format(register))
   
