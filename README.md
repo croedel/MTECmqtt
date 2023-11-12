@@ -216,10 +216,10 @@ MQTT_LOGIN  : " "           # MQTT Login
 MQTT_PASSWORD : ""          # MQTT Password  
 MQTT_TOPIC : "MTEC"         # MQTT topic name  
 
-REFRESH_CURRENT_S : 10         # Update "current" data every N seconds
-REFRESH_DAY_M     : 5          # Update "day" statistic every N minutes
-REFRESH_TOTAL_M   : 60         # Update "total" statistic every N minutes
-REFRESH_CONFIG_H  : 24         # Update "config" data every N hours
+REFRESH_CURRENT_S : 10          # Refresh "current" data every N seconds
+REFRESH_DAY_M     : 5           # Refresh "day" statistic every N minutes
+REFRESH_TOTAL_M   : 5           # Refresh "total" statistic every N minutes
+REFRESH_CONFIG_H  : 24          # Refresh "config" data every N hours
 
 MQTT_FLOAT_FORMAT : "{:.2f}"    # Defines how to format float values
 ```
@@ -228,12 +228,12 @@ MQTT_FLOAT_FORMAT : "{:.2f}"    # Defines how to format float values
 
 The data will be written to 4 MQTT topics, including the serial number of your Inverter.
  
-| Sub-topic                         | Refresh frequency    |  Description 
-|---------------------------------- | ------------------   | ---------------------------------------------- 
-| MTEC/<serial_number>/config       | `REFRESH_CONFIG_H`   | Relatively static config values     
-| MTEC/<serial_number>/current      | `REFRESH_CURRENT_S`  | Current data      
-| MTEC/<serial_number>/day          | `REFRESH_DAY_M`      | Daily statistics     
-| MTEC/<serial_number>/total        | `REFRESH_TOTAL_M`    | Lifetime statistics     
+| Sub-topic                         | Refresh frequency            |  Description 
+|---------------------------------- | --------------------------   | ---------------------------------------------- 
+| MTEC/<serial_number>/config       | `REFRESH_CONFIG_H` hours     | Relatively static config values     
+| MTEC/<serial_number>/current      | `REFRESH_CURRENT_S` seconds  | Current data      
+| MTEC/<serial_number>/day          | `REFRESH_DAY_M` minutes      | Daily statistics     
+| MTEC/<serial_number>/total        | `REFRESH_TOTAL_M` minutes    | Lifetime statistics     
 
 All `float` values will be written according to the configured `MQTT_FLOAT_FORMAT`. The default is a format with 3 decimal digits.
 

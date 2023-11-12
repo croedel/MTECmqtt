@@ -14,9 +14,9 @@ MQTT_TOPIC : "MTEC"           # MQTT topic name
 
 REFRESH_CURRENT_S : 10         # Refresh "current" data every N seconds
 REFRESH_DAY_M     : 5          # Refresh "day" statistic every N minutes
-REFRESH_TOTAL_M   : 60         # Refresh "total" statistic every N minutes
+REFRESH_TOTAL_M   : 5          # Refresh "total" statistic every N minutes
 REFRESH_CONFIG_H  : 24         # Refresh "config" data every N hours
-
+ 
 MQTT_FLOAT_FORMAT : "{:.3f}"  # Defines how to format float values
 
 DEBUG : False                 # Set to True to get verbose debug messages
