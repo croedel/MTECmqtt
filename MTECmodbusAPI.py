@@ -107,11 +107,11 @@ register_map = {
 def read_modbus_data(ip_addr, port, slave, registers=None):
   data = {}
   # Connect to Modbus server
-  logging.info("Connecting to server {}:{}".format(ip_addr, port))
+  logging.debug("Connecting to server {}:{}".format(ip_addr, port))
   client = ModbusTcpClient(ip_addr, port, framer=ModbusRtuFramer, timeout=cfg["MODBUS_TIMEOUT"])
 
   if client.connect():
-    logging.info("Retrieving data...")
+    logging.debug("Retrieving data...")
     if registers == None: # fetch all registers
       for register, item in register_map.items():
         reg_data = read_register(client, register=register, slave=slave, item=item) 
@@ -127,7 +127,7 @@ def read_modbus_data(ip_addr, port, slave, registers=None):
         else:
           logging.warning("Unknowd register: {} - skipped.".format(register))
   
-    logging.info("Data retrieval completed")
+    logging.debug("Data retrieval completed")
     client.close()
   else:
     logging.error("Couldn't connect to server {}:{}".format(ip_addr, port))
