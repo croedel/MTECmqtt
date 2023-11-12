@@ -173,27 +173,37 @@ def main():
   next_read_config = datetime.now()
   next_read_day = datetime.now()
   next_read_total = datetime.now()
+  topic_base = None
  
   # Main loop
   while run_status: 
     now = datetime.now()
+
+    # Config
     if next_read_config <= now:
       pv_config = read_MTEC_data( "config" )
       if pv_config:
         topic_base = cfg['MQTT_TOPIC'] + '/' + pv_config["serial_no"]["value"] + '/'
         write_to_MQTT( pv_config, topic_base + 'config/' )
         next_read_config = datetime.now() + timedelta(hours=cfg['REFRESH_CONFIG_H'])
+      if not topic_base:
+        logging.error("Cant retrieve initial config - retry in {}s".format( cfg['REFRESH_CURRENT_S'] ))
+        time.sleep(cfg['REFRESH_CURRENT_S'])
+        continue
 
+    # Current    
     pvdata = read_MTEC_data( "current" )
     if pvdata:
       write_to_MQTT( pvdata, topic_base + 'current/' )
 
+    # Day
     if next_read_day <= now:
       pvdata = read_MTEC_data( "day" )
       if pvdata:
         write_to_MQTT( pvdata, topic_base + 'day/' )
         next_read_day = datetime.now() + timedelta(minutes=cfg['REFRESH_DAY_M'])
 
+    # Total
     if next_read_total <= now:
       pvdata = read_MTEC_data( "total" )
       if pvdata:
