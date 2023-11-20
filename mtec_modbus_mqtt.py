@@ -217,7 +217,7 @@ def main():
   api.disconnect()
   mqtt_stop(mqttclient)
   logging.info("Exiting")
-
+ 
 #---------------------------------------------------
 if __name__ == '__main__':
   main()
