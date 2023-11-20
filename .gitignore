@@ -9,3 +9,4 @@ __pycache__/
 # others
 .vscode/launch.json
 .vscode
+*.code-workspace
