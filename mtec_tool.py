@@ -16,18 +16,27 @@ def parse_options():
   parser.add_argument( '-r', '--registers', help='Comma separated list of registers which shall be retrieved' )
   parser.add_argument( '-c', '--csv', action='store_true', help='Export as CSV')
   parser.add_argument( '-f', '--file', help='Write data to <FILE> instead of stdout')
+  parser.add_argument( '-a', '--append', action='store_true', help='Use as modifier in combination with --file argument to append data to file instead of replacing it')
   return parser.parse_args()
  
 #-------------------------------
 def main():
   args = parse_options()
+  print( "Reading data..." )
 
   # redirect stdout to file (if defined as command line parameter)
   if args.file:  
     try:
-      print( "Writing output to '{}' ...".format(args.file) )
+      if args.csv:  
+        print( "Writing output as CSV to '{}'".format(args.file) )
+      else:
+        print( "Writing output to '{}'".format(args.file) )
+      if args.append:
+        f_mode = 'a'
+      else:
+        f_mode = 'w'             
       original_stdout = sys.stdout
-      sys.stdout = open(args.file, 'w')
+      sys.stdout = open(args.file, f_mode)
     except:  
       print( "ERROR - Unable to create file '{}'".format(args.file) )
       exit(1)
@@ -61,7 +70,7 @@ def main():
   if args.file:
     sys.stdout.close()  
     sys.stdout = original_stdout
-    print( "done" )
+  print( "Data completed" )
 
 #-------------------------------
 if __name__ == '__main__':
