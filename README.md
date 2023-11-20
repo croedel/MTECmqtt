@@ -41,11 +41,11 @@ It seems that there are at least three more Inverter products on the market whic
 
 ## What the MTEC Modbus API offers
 ### API
-The actual API can be found in `MTECmodbusAPI.py`. It offers functionality to:
-* Connect to the Modbus RTU server of your inverter 
-* Retrieve current status and usage data
+The actual API can be found in `MTECmodbusAPI.py`. It implements a class which offers functionality to connect to the Modbus RTU server of your inverter and retrieve current status and usage data.
 
-The main function of the API is `read_modbus_data(ip_addr, port, slave, registers=None)`.
+To login, you can either call the class method `connect(ip_addr, port, slave)` or pass these parameters directly to the constructor. 
+
+The main method of the API is `read_modbus_data(registers=None)`.
 It either fetches all known registers (registers=None) or you can specify a list of registers (e.g. registers=['10105', '11000']) and returns a map, containing the nicely formatted data.
 
 The map should be self-explaining and looks like this:
@@ -58,25 +58,25 @@ The map should be self-explaining and looks like this:
 ```
 
 ### Commandline tool
-The command-line tool `MTEC_tool.py` offers functionality to export the data in various combinations and formats.
+The command-line tool `mtec_tool.py` offers functionality to export the data in various combinations and formats.
 It also shows how to use the API, if you e.g. want to integrate it into your own project.
 
 ### MQTT server
-The MQTT server `MTEC_modbus_mqtt.py` enables to export data to a MQTT broker. This can be useful, if you want to use the data e.g. as source for an EMS or home automation tool. Many of them enable to read data from MQTT, therefore this might be a good option for an easy integration.
+The MQTT server `mtec_modbus_mqtt.py` enables to export data to a MQTT broker. This can be useful, if you want to use the data e.g. as source for an EMS or home automation tool. Many of them enable to read data from MQTT, therefore this might be a good option for an easy integration.
 
 ## Setup & configuration
 As prerequisites, you need to have installed: 
-* Python 3 
-* PyYAML https://pypi.org/project/PyYAML/
-* PyModbus https://pymodbus.readthedocs.io/en/latest/
+* Python 3.8 or higher
+* PyYAML 
+* PyModbus
+* paho-mqtt (if you want to use the MQTT server) 
 
-(Depending on your Python installation, installation might require root rights or using `sudo`)
-
-PyYAML and PyModbus can be installed easily like this:
+The python modules can be installed easily by using `pip`:
 
 ```
-pip3 install pyyaml
-pip3 install PyModbus
+pip install pyyaml
+pip install PyModbus
+pip install paho-mqtt
 ```
 
 Now download the files of *this* repository to any location of your choise.
@@ -95,7 +95,7 @@ That's all you need to do!
 MODBUS_IP : "xx.xx.xx.xx"   # IP address of "espressif" modbus server
 MODBUS_PORT : 5743          # Port (usually no change required)
 MODBUS_SLAVE : 252          # Modbus slave id (usually no change required)
-MODBUS_TIMEOUT : 2          # Timeout for Modbus server (s)
+MODBUS_TIMEOUT : 5          # Timeout for Modbus server (s)
 ```
 The other values of the `config.yaml` you probably don't need to change as of now.
 

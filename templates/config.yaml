@@ -3,7 +3,8 @@
 MODBUS_IP : "xx.xx.xx.xx"     # IP address of "espressif" modbus server
 MODBUS_PORT : 5743            # Port (usually no change required)
 MODBUS_SLAVE : 252            # Modbus slave id (usually no change required)
-MODBUS_TIMEOUT : 2            # Timeout for Modbus server (s)
+MODBUS_TIMEOUT : 3            # Timeout for Modbus server (s)
+MODBUS_RETRIES : 3            # No. of retries
 
 # MQTT
 MQTT_SERVER : "localhost"     # MQTT server 
@@ -20,4 +21,5 @@ REFRESH_CONFIG_H  : 24         # Refresh "config" data every N hours
 MQTT_FLOAT_FORMAT : "{:.3f}"  # Defines how to format float values
 
 DEBUG : False                 # Set to True to get verbose debug messages
+MQTT_DISABLE : False          # Disable MQTT (e.g. for debug purposes)
  

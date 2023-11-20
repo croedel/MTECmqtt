@@ -44,8 +44,10 @@ def main():
       registers.append(addr.strip())  
 
   # Do the export
-  data = MTECmodbusAPI.read_modbus_data(ip_addr=cfg['MODBUS_IP'], port=cfg['MODBUS_PORT'], 
-                                        slave=cfg['MODBUS_SLAVE'], registers=registers)
+  api = MTECmodbusAPI.MTECmodbusAPI()
+  api.connect( ip_addr=cfg['MODBUS_IP'], port=cfg['MODBUS_PORT'], slave=cfg['MODBUS_SLAVE'] )
+  data = api.read_modbus_data( registers=registers )
+  api.disconnect()
 
   if data: 
     for register, item in data.items():
