@@ -5,7 +5,8 @@ MQTT server for M-TEC Energybutler reading modbus data
 """
 
 import logging
-FORMAT = '%(asctime)s [%(levelname)s] %(message)s'
+#FORMAT = '%(asctime)s [%(levelname)s] %(message)s'
+FORMAT = '[%(levelname)s] %(message)s'
 logging.basicConfig(format=FORMAT, level=logging.INFO)
 
 from config import cfg

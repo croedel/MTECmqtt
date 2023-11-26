@@ -71,6 +71,7 @@ As prerequisites, you need to have installed:
 * PyModbus
 * paho-mqtt (if you want to use the MQTT server) 
 
+I recommend to install it in a `venv`.
 The python modules can be installed easily by using `pip`:
 
 ```
@@ -205,6 +206,8 @@ I can't say what each of these registers exactly means. Some data seams quite re
 
 ## MQTT server
 The MQTT server `MTEC_modbus_mqtt.py` connects to your espressif Modbus server, retrieves relevant data, and writes them to a MQTT broker. This can be useful, if you want to use the data e.g. as source for an EMS or home automation tool. Many of them enable to read data from MQTT, therefore this might be a good option for an easy integration.
+
+If you want to run the mqtt server as a service, you can find a `.service` template in the `templates` directory. 
 
 ### Configuration
 Please see following options in `config.yaml` to configurate the service according your demand:

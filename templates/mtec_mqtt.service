@@ -1,0 +1,12 @@
+[Unit]
+Description=M-TEC inverter MQTT service
+After=multi-user.target
+
+[Service]
+Type=simple
+User=pi
+ExecStart=/home/pi/MTEC_MODBUS_API/venv/bin/python3 /home/pi/MTEC_MODBUS_API/mtec_modbus_mqtt.py
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
