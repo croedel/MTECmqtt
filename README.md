@@ -12,7 +12,9 @@ The highlights are:
 * Works within you LAN - no internet connection required
 * Enables fast polling of essential data (e.g. every 10s)
 * Uses the standard communication protocol 'Modbus RTU over TCP' 
-* Easy to use commandline-tool and MQTT broker integration, enabling an easy integration into almost any EMS or home automation tool
+* Easy to use commandline-tool
+* MQTT broker integration, enabling an easy integration into almost any EMS or home automation tool
+* Home Assistant auto discovery via MQTT
 
 I hope you like it and it will help you with for your EMS or home automation project :-) !
 
@@ -63,6 +65,9 @@ It also shows how to use the API, if you e.g. want to integrate it into your own
 
 ### MQTT server
 The MQTT server `mtec_modbus_mqtt.py` enables to export data to a MQTT broker. This can be useful, if you want to use the data e.g. as source for an EMS or home automation tool. Many of them enable to read data from MQTT, therefore this might be a good option for an easy integration.
+
+For Home Assistant (https://www.home-assistant.io), the MQTT server supports auto-discovery.
+You just need to enable and configure the MQTT integration within HASS and then start the MQTT server.  
 
 ## Setup & configuration
 As prerequisites, you need to have installed: 
