@@ -13,65 +13,18 @@ from config import cfg
 from datetime import datetime, timedelta
 import time
 import signal
+import mqtt
 import MTECmodbusAPI
+import hass_int
 
-try:
-  import paho.mqtt.client as mqttcl
-  import paho.mqtt.publish as publish
-except Exception as e:
-  logging.warning("MQTT not set up because of: {}".format(e))
- 
 #----------------------------------
 def signal_handler(signal_number, frame):
   global run_status
   logging.warning('Received Signal {}. Graceful shutdown initiated.'.format(signal_number))
   run_status = False
-    
-# ============ MQTT ================
-def on_mqtt_connect(mqttclient, userdata, flags, rc):
-  logging.info("Connected to MQTT broker")
-
-def on_mqtt_message(mqttclient, userdata, message):
-  try:
-    msg = message.payload.decode("utf-8")
-    topic = message.topic.split("/")
-  except Exception as e:
-    logging.warning("Error while handling MQTT message: {}".format(str(e)))
-
-def mqtt_start(): 
-  try: 
-    client = mqttcl.Client()
-    client.username_pw_set(cfg['MQTT_LOGIN'], cfg['MQTT_PASSWORD']) 
-    client.connect(cfg['MQTT_SERVER'], cfg['MQTT_PORT'], keepalive = 60) 
-    client.on_connect = on_mqtt_connect
-    client.on_message = on_mqtt_message
-    client.loop_start()
-    logging.info('MQTT server started')
-    return client
-  except Exception as e:
-    logging.warning("Couldn't start MQTT: {}".format(str(e)))
-    return None
-
-def mqtt_stop(client):
-  try: 
-    client.loop_stop()
-    logging.info('MQTT server stopped')
-  except Exception as e:
-    logging.warning("Couldn't stop MQTT: {}".format(str(e)))
-
-def mqtt_publish( topic, payload ):
-  if cfg['MQTT_DISABLE']: # Don't do anything - just logg
-    logging.info("- {}: {}".format(topic, str(payload)))
-  else:  
-    auth = { 'username': cfg['MQTT_LOGIN'], 'password': cfg['MQTT_PASSWORD'] }  
-    logging.debug("- {}: {}".format(topic, str(payload)))
-    try:
-      publish.single(topic, payload=payload, hostname=cfg['MQTT_SERVER'], port=cfg['MQTT_PORT'], auth=auth)
-    except Exception as e:
-      logging.error("Could't send MQTT command: {}".format(str(e)))
 
 # =============================================
-
+# MTEC Modbus read
 # Helper to get list of registers to read
 def get_register_list( category ):
   if category == "config":
@@ -95,7 +48,7 @@ def read_MTEC_data( api, category ):
   data = api.read_modbus_data(registers=registers)
   pvdata = {}
   try:
-    pvdata["api_date"] = now.strftime("%Y/%m/%d %H:%M:%S") # Local time of this server
+    pvdata["api_date"] = now.strftime("%Y-%m-%d %H:%M:%S") # Local time of this server
 
     if category == "config":
       pvdata["serial_no"] = data["10000"]                   # Inverter serial number
@@ -154,7 +107,7 @@ def write_to_MQTT( pvdata, base_topic ):
         payload = "{:d}".format( data )
       else:
         payload = data  
-    mqtt_publish( topic, payload )
+    mqtt.mqtt_publish( topic, payload )
 
 #==========================================
 def main():
@@ -173,11 +126,16 @@ def main():
   next_read_total = datetime.now()
   topic_base = None
   
-  mqttclient = mqtt_start()
+  if cfg["HASS_ENABLE"]:
+    hass = hass_int.HassIntegration()
+  else:
+    hass = None
+  
+  mqttclient = mqtt.mqtt_start( hass )
   api = MTECmodbusAPI.MTECmodbusAPI()
   api.connect(ip_addr=cfg['MODBUS_IP'], port=cfg['MODBUS_PORT'], slave=cfg['MODBUS_SLAVE'])
 
-  # Main loop
+  # Main loop - exit on signal only
   while run_status: 
     now = datetime.now()
 
@@ -188,6 +146,8 @@ def main():
         topic_base = cfg['MQTT_TOPIC'] + '/' + pv_config["serial_no"]["value"] + '/'
         write_to_MQTT( pv_config, topic_base + 'config/' )
         next_read_config = datetime.now() + timedelta(hours=cfg['REFRESH_CONFIG_H'])
+        if hass and not hass.is_initialized:
+          hass.initialize( pv_config["serial_no"]["value"] )
       if not topic_base:
         logging.error("Cant retrieve initial config - retry in {}s".format( cfg['REFRESH_CURRENT_S'] ))
         time.sleep(cfg['REFRESH_CURRENT_S'])
@@ -215,8 +175,11 @@ def main():
     logging.debug("Sleep {}s".format( cfg['REFRESH_CURRENT_S'] ))
     time.sleep(cfg['REFRESH_CURRENT_S'])
 
+  # clean up
+  if hass:
+    hass.send_unregister_info()
   api.disconnect()
-  mqtt_stop(mqttclient)
+  mqtt.mqtt_stop(mqttclient)
   logging.info("Exiting")
  
 #---------------------------------------------------

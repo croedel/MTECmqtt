@@ -1,0 +1,61 @@
+#!/usr/bin/env python3
+"""
+MQTT client base implemantation
+(c) 2023 by Christian Rödel 
+"""
+import logging
+from config import cfg
+
+try:
+  import paho.mqtt.client as mqttcl
+  import paho.mqtt.publish as publish
+except Exception as e:
+  logging.warning("MQTT not set up because of: {}".format(e))
+    
+# ============ MQTT ================
+def on_mqtt_connect(mqttclient, userdata, flags, rc):
+  logging.info("Connected to MQTT broker")
+
+def on_mqtt_message(mqttclient, userdata, message):
+  try:
+    msg = message.payload.decode("utf-8")
+    topic = message.topic.split("/")
+    if msg == "online" and userdata:
+      userdata.send_discovery_info()
+  except Exception as e:
+    logging.warning("Error while handling MQTT message: {}".format(str(e)))
+
+def mqtt_start( hass=None ): 
+  try: 
+    client = mqttcl.Client()
+    client.user_data_set(hass) # register home automation instance
+    client.username_pw_set(cfg['MQTT_LOGIN'], cfg['MQTT_PASSWORD']) 
+    client.connect(cfg['MQTT_SERVER'], cfg['MQTT_PORT'], keepalive = 60) 
+    if hass:
+      client.subscribe(cfg["HASS_BASE_TOPIC"]+"/status", qos=0)
+    client.on_connect = on_mqtt_connect
+    client.on_message = on_mqtt_message
+    client.loop_start()
+    logging.info('MQTT server started')
+    return client
+  except Exception as e:
+    logging.warning("Couldn't start MQTT: {}".format(str(e)))
+    return None
+
+def mqtt_stop(client):
+  try: 
+    client.loop_stop()
+    logging.info('MQTT server stopped')
+  except Exception as e:
+    logging.warning("Couldn't stop MQTT: {}".format(str(e)))
+
+def mqtt_publish( topic, payload ):
+  if cfg['MQTT_DISABLE']: # Don't do anything - just logg
+    logging.info("- {}: {}".format(topic, str(payload)))
+  else:  
+    auth = { 'username': cfg['MQTT_LOGIN'], 'password': cfg['MQTT_PASSWORD'] }  
+    logging.debug("- {}: {}".format(topic, str(payload)))
+    try:
+      publish.single(topic, payload=payload, hostname=cfg['MQTT_SERVER'], port=cfg['MQTT_PORT'], auth=auth)
+    except Exception as e:
+      logging.error("Could't send MQTT command: {}".format(str(e)))

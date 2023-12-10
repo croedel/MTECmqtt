@@ -196,7 +196,7 @@ class MTECmodbusAPI:
       if item[1] == 2:
         val = "{:08b} {:08b}".format( decoder.decode_8bit_uint(), decoder.decode_8bit_uint() )
     elif item[2] == 'DAT':
-      val = "{:02d}/{:02d}/{:02d} {:02d}:{:02d}:{:02d}".format( decoder.decode_8bit_uint(), decoder.decode_8bit_uint(), decoder.decode_8bit_uint(),
+      val = "{:02d}-{:02d}-{:02d} {:02d}:{:02d}:{:02d}".format( decoder.decode_8bit_uint(), decoder.decode_8bit_uint(), decoder.decode_8bit_uint(),
                       decoder.decode_8bit_uint(), decoder.decode_8bit_uint(), decoder.decode_8bit_uint() )
     elif item[2] == 'STR':
       val = decoder.decode_string(item[1]*2).decode()
