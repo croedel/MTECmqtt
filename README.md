@@ -42,7 +42,17 @@ It seems that there are at least three more Inverter products on the market whic
 | Daxtromn  | https://daxtromn-power.com/products/ |
 
 
-## What the MTEC Modbus API offers
+## Overview: What the MTEC Modbus API offers
+
+### Commandline tool
+The command-line tool `mtec_tool.py` offers functionality to export the data in various combinations and formats.
+It also shows how to use the API, if you e.g. want to integrate it into your own project.
+
+### MQTT server
+The MQTT server `mtec_modbus_mqtt.py` enables to export data to a MQTT broker. This can be useful, if you want to use the data e.g. as source for an EMS or home automation tool. Many of them enable to read data from MQTT, therefore this might be a good option for an easy integration.
+
+More details can be found below.
+
 ### API
 The actual API can be found in `MTECmodbusAPI.py`. It implements a class which offers functionality to connect to the Modbus RTU server of your inverter and retrieve current status and usage data.
 
@@ -59,15 +69,6 @@ The map should be self-explaining and looks like this:
   '11016': {'name': 'P_AC', 'value': 0.79, 'unit': 'kW'}, 
 }
 ```
-
-### Commandline tool
-The command-line tool `mtec_tool.py` offers functionality to export the data in various combinations and formats.
-It also shows how to use the API, if you e.g. want to integrate it into your own project.
-
-### MQTT server
-The MQTT server `mtec_modbus_mqtt.py` enables to export data to a MQTT broker. This can be useful, if you want to use the data e.g. as source for an EMS or home automation tool. Many of them enable to read data from MQTT, therefore this might be a good option for an easy integration.
-
-More details can be found below.
 
 ## Setup & configuration
 As prerequisites, you need to have installed: 
