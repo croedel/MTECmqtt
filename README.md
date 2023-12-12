@@ -10,11 +10,12 @@ The highlights are:
 * No additional hardware or modifications of your Inverter required 
 * Enables to read out more than 80 parameters from your Inverter
 * Works within you LAN - no internet connection required
-* Enables fast polling of essential data (e.g. every 10s)
+* Enables frequent polling of essential data (e.g. every 10s)
 * Uses the standard communication protocol 'Modbus RTU over TCP' 
-* Easy to use commandline-tool
 * MQTT broker integration, enabling an easy integration into almost any EMS or home automation tool
-* Home Assistant auto discovery via MQTT
+* Home Assistant (https://www.home-assistant.io) auto discovery via MQTT
+* Easy integration into evcc (https://evcc.io), which enables PV surplus charging 
+* Easy to use commandline-tool
 
 I hope you like it and it will help you with for your EMS or home automation project :-) !
 
@@ -66,8 +67,7 @@ It also shows how to use the API, if you e.g. want to integrate it into your own
 ### MQTT server
 The MQTT server `mtec_modbus_mqtt.py` enables to export data to a MQTT broker. This can be useful, if you want to use the data e.g. as source for an EMS or home automation tool. Many of them enable to read data from MQTT, therefore this might be a good option for an easy integration.
 
-For Home Assistant (https://www.home-assistant.io), the MQTT server supports auto-discovery.
-You just need to enable and configure the MQTT integration within HASS and then start the MQTT server.  
+More details can be found below.
 
 ## Setup & configuration
 As prerequisites, you need to have installed: 
@@ -212,10 +212,20 @@ I can't say what each of these registers exactly means. Some data seams quite re
 ## MQTT server
 The MQTT server `MTEC_modbus_mqtt.py` connects to your espressif Modbus server, retrieves relevant data, and writes them to a MQTT broker. This can be useful, if you want to use the data e.g. as source for an EMS or home automation tool. Many of them enable to read data from MQTT, therefore this might be a good option for an easy integration.
 
+This server enables e.g. an easy integration into well-known projects like Home Assistant (https://www.home-assistant.io) or evcc (https://evcc.io). 
+
+The MQTT server supports Home Assistant auto-discovery, which means that Home Assistant will automatically detect and configure your MTEC Inverter. You just need to enable and configure the MQTT integration within Home Assistant and then start `mtec_modbus_mqtt.py`.  
+
 If you want to run the mqtt server as a service, you can find a `.service` template in the `templates` directory. 
+
+If you want to integrate the data into evcc (https://evcc.io), you might want to have a look at the `èvcc.yaml` snippet in the `templates` directory. It shows how to define and use the MTEC `meters`, provided in MQTT.
+Please don't forget to replace `<MTEC_SERIAL_NO>` with the actual serial no of your Inverter.
 
 ### Configuration
 Please see following options in `config.yaml` to configurate the service according your demand:
+
+The `MQTT_` parameters define the connection to your MQTT server.
+The `REFRESH_` parameters define how frequently the data gets fetched from your Inverter
 
 ```
 MQTT_SERVER : "localhost"   # MQTT server 
@@ -230,6 +240,14 @@ REFRESH_TOTAL_M   : 5           # Refresh "total" statistic every N minutes
 REFRESH_CONFIG_H  : 24          # Refresh "config" data every N hours
 
 MQTT_FLOAT_FORMAT : "{:.2f}"    # Defines how to format float values
+```
+
+If require, you can disable Home Automation auto discovery and/or configure a different MQTT base topic within `config.yaml`
+
+```
+# Home Assistent
+HASS_ENABLE : True                  # Enable home assistant
+HASS_BASE_TOPIC : "homeassistant"   # Basis MQTT topic of home assistant
 ```
 
 ### Data format written to MQTT

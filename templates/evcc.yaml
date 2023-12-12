@@ -1,0 +1,52 @@
+# evcc.yaml snippet 
+# can be used as template how to integrate your MTEC inverter into evcc
+
+# Meters
+# replace <MTEC_SERIAL_NO> with the actual serial no of your inverter
+meters:
+  - name: MTEC-grid
+    type: custom
+    power: # Leistung (W)
+      source: mqtt
+      broker: localhost:1883
+      topic: MTEC/<MTEC_SERIAL_NO>/current/grid
+      scale: -1
+
+  - name: MTEC-pv
+    type: custom
+    power: # Leistung (W)
+      source: mqtt
+      broker: localhost:1883
+      topic: MTEC/<MTEC_SERIAL_NO>/current/PV
+      scale: 1
+
+  - name: MTEC-battery
+    type: custom
+    power: # Leistung (W)
+      source: mqtt
+      broker: localhost:1883
+      topic: MTEC/<MTEC_SERIAL_NO>/current/battery
+      scale: 1
+    soc: # Battery SOC (%) 
+      source: mqtt
+      broker: localhost:1883
+      topic: MTEC/<MTEC_SERIAL_NO>/current/battery_SOC
+      scale: 1
+
+# site describes the EVU connection, PV and home battery
+site:
+  title: Zuhause
+  meters:
+    grid: MTEC-grid # grid meter
+    pv:
+      - MTEC-pv # list of pv inverters/ meters
+    battery:
+      - MTEC-battery # list of battery meters
+
+# mqtt broker
+mqtt:
+  broker: localhost:1883
+  topic: evcc # root topic for publishing, set empty to disable publishing
+  # clientid: foo
+  # user:
+  # password:

@@ -5,6 +5,7 @@ __pycache__/
 
 # Private config file
 /config.yaml
+/evcc.yaml
 
 # others
 .vscode/launch.json
