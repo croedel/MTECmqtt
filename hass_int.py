@@ -15,8 +15,6 @@ class HassIntegration:
   sensors = [
     # name                      unique_id           device_class  unit  value_template  state_class     state_topic
     [ "Battery SOC",            "MTEC_cBatterySOC", "battery",    "%",  "{{ value }}",  "measurement",  "current/battery_SOC" ],
-#    [ "API date",               "MTEC_APIdate",     "timestamp",  None,   "{{ strptime(value, '%Y-%m-%d %H:%M:%S').timestamp() | timestamp_local }}", None, "current/api_date" ],
-#    [ "Inverter date",          "MTEC_Invdate",     "timestamp",  None,   "{{ strptime(value, '%y-%m-%d %H:%M:%S').timestamp() | timestamp_local }}", None, "current/inverter_date" ],
     [ "Inverter status",        "MTEC_cInvStat",    "enum",       None, "{{ value }}",  "measurement",  "current/inverter_status" ],
     [ "Current PV",             "MTEC_cPV",         "power",      "W",  "{{ value }}",  "measurement",  "current/PV" ],
     [ "Current Grid",           "MTEC_cGrid",       "power",      "W",  "{{ value }}",  "measurement",  "current/grid" ],
@@ -24,6 +22,8 @@ class HassIntegration:
     [ "Current Inverter",       "MTEC_cInv",        "power",      "W",  "{{ value }}",  "measurement",  "current/inverter" ],
     [ "Current Backup",         "MTEC_cBack",       "power",      "W",  "{{ value }}",  "measurement",  "current/backup" ],
     [ "Current Consumption",    "MTEC_cCons",       "power",      "W",  "{{ value }}",  "measurement",  "current/consumption" ],
+#    [ "API date",               "MTEC_APIdate",     "timestamp",  None,   "{{ strptime(value, '%Y-%m-%d %H:%M:%S').timestamp() | timestamp_local }}", None, "current/api_date" ],
+#    [ "Inverter date",          "MTEC_Invdate",     "timestamp",  None,   "{{ strptime(value, '%y-%m-%d %H:%M:%S').timestamp() | timestamp_local }}", None, "current/inverter_date" ],
 
     [ "PV (day)",               "MTEC_dPV",         "energy",     "kWh",  "{{ value }}",  "total_increasing",  "day/PV" ],
     [ "Grid feed (day)",        "MTEC_dGridFeed",   "energy",     "kWh",  "{{ value }}",  "total_increasing",  "day/grid_feed" ],

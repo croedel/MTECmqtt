@@ -10,7 +10,7 @@ The highlights are:
 * No additional hardware or modifications of your Inverter required 
 * MQTT enables an easy integration into almost any EMS or home automation tool 
 * Home Assistant (https://www.home-assistant.io) auto discovery via MQTT 
-* Easy integration into evcc (https://evcc.io), which enables PV surplus charging 
+* Easy and prepared integration into evcc (https://evcc.io), which enables PV surplus charging 
 * Works within you LAN - no internet connection required
 * Uses the standard communication protocol 'Modbus RTU over TCP' to read the data from the Inverter 
 * Enables frequent polling of essential data (e.g. every 10s)
