@@ -1,30 +1,36 @@
 ---
-# MODBUS Server
-MODBUS_IP : "xx.xx.xx.xx"     # IP address of "espressif" modbus server
-MODBUS_PORT : 5743            # Port (usually no change required)
-MODBUS_SLAVE : 252            # Modbus slave id (usually no change required)
-MODBUS_TIMEOUT : 3            # Timeout for Modbus server (s)
-MODBUS_RETRIES : 3            # No. of retries
+# M-TEC espressif MODBUS server
+MODBUS_IP : "xxx.xxx.xxx.xxx"  # IP address of "espressif" modbus server
+MODBUS_PORT : 5743          # Port (usually no change required)
+MODBUS_SLAVE : 252          # Modbus slave id (usually no change required)
+MODBUS_TIMEOUT : 3          # Timeout for Modbus server (s)
+MODBUS_RETRIES : 3          # Retries
 
 # MQTT
-MQTT_SERVER : "localhost"     # MQTT server 
-MQTT_PORT : 1883              # MQTT server port
-MQTT_LOGIN  : " "             # MQTT Login
-MQTT_PASSWORD : ""            # MQTT Password  
-MQTT_TOPIC : "MTEC"           # MQTT topic name  
+MQTT_DISABLE : False
+MQTT_SERVER : "localhost"   # MQTT server 
+MQTT_PORT : 1883            # MQTT server port
+MQTT_LOGIN  : " "           # MQTT Login
+MQTT_PASSWORD : ""          # MQTT Password  
+MQTT_TOPIC : "MTEC"         # MQTT topic name  
+MQTT_FLOAT_FORMAT : "{:.3f}"    # Defines how to format float values
 
-REFRESH_CURRENT_S : 10         # Refresh "current" data every N seconds
+# Refresh interval
+REFRESH_NOW_S     : 10         # Refresh "now" data every N seconds
 REFRESH_DAY_M     : 5          # Refresh "day" statistic every N minutes
 REFRESH_TOTAL_M   : 5          # Refresh "total" statistic every N minutes
 REFRESH_CONFIG_H  : 24         # Refresh "config" data every N hours
- 
-MQTT_FLOAT_FORMAT : "{:.3f}"  # Defines how to format float values
+
+# Define which extended data shall get included
+ENABLE_GRID_DATA : False         # Extended grid data
+ENABLE_INVERTER_DATA : False     # Extended inverter data
+ENABLE_BACKUP_DATA : False       # Extended backup data
+ENABLE_BATTERY_DATA : False      # Extended battery data
+ENABLE_PV_DATA : False           # Extended PV data
 
 # Home Assistent
 HASS_ENABLE : True                  # Enable home assistant
 HASS_BASE_TOPIC : "homeassistant"   # Basis MQTT topic of home assistant
 
 # General
-DEBUG : False                 # Set to True to get verbose debug messages
-MQTT_DISABLE : False          # Disable MQTT (e.g. for debug purposes)
- 
+DEBUG : False                # Set to True to get verbose debug messages

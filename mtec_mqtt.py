@@ -29,8 +29,18 @@ def signal_handler(signal_number, frame):
 def get_register_list( category ):
   if category == "config":
     registers = [ '10000', '10011' ]
-  elif category == "current":  
+  elif category == "now-base":  
     registers = [ '10100', '10105', '11028', '11000', '30258', '11016', '30230', '33000' ] 
+  elif category == "now-grid":  
+    registers = [ '11015', '10994', '10996', '10998' ]
+  elif category == "now-inverter":  
+    registers = [ '11009', '11010', '30236', '11011', '11012', '30242', '11013', '11014', '30248', '11032', '11033', '11034', '11035' ]
+  elif category == "now-backup":  
+    registers = [ '30200', '30201', '30202', '30204', '30210', '30211', '30212', '30214', '30220', '30221', '30222', '30224' ]
+  elif category == "now-battery":  
+    registers = [ '33001', '30254', '30255', '30256', '33009', '33011', '33013', '33015' ]
+  elif category == "now-pv":  
+    registers = [ '11038','11039', '11062', '11040', '11041', '11064' ]
   elif category == "day":  
     registers = [ '31000', '31001', '31003', '31004', '31005']
   elif category == "total":  
@@ -54,16 +64,69 @@ def read_MTEC_data( api, category ):
       pvdata["serial_no"] = data["10000"]                   # Inverter serial number
       pvdata["firmware_version"] = data["10011"]            # Inverter firmware version
 
-    elif category == "current":  
+    elif category == "now-base":  
       pvdata["inverter_date"] = data["10100"]               # Time from inverter
       pvdata["inverter_status"] = data["10105"]             # Inverter status 
-      pvdata["PV"] = data["11028"]                      # Current power flow from PV
-      pvdata["grid"] = data["11000"]                    # Current power flow from/to grid
-      pvdata["battery"] = data["30258"]                 # Current power flow from/to battery
-      pvdata["inverter"] = data["11016"]                # Current power flow from/to inverter
-      pvdata["backup"] = data["30230"]                  # Current backup power flow
-      pvdata["consumption"] = data["11016"]["value"] - data["11000"]["value"]  # Current power consumption 
-      pvdata["battery_SOC"] = data["33000"]           	# Current battery SOC
+      pvdata["pv"] = data["11028"]                      # power flow from PV
+      pvdata["grid"] = data["11000"]                    # power flow from/to grid
+      pvdata["battery"] = data["30258"]                 # power flow from/to battery
+      pvdata["inverter"] = data["11016"]                # power flow from/to inverter
+      pvdata["backup"] = data["30230"]                  # backup power flow
+      pvdata["consumption"] = data["11016"]["value"] - data["11000"]["value"]  # power consumption 
+      pvdata["battery_soc"] = data["33000"]           	# battery SOC
+
+    elif category == "now-grid":  
+      pvdata["grid_frequency"] = data["11015"]          # grid frequency
+      pvdata["grid_a"] = data["10994"]                  # power flow from/to grid, phase A
+      pvdata["grid_b"] = data["10996"]                  # power flow from/to grid, phase B
+      pvdata["grid_c"] = data["10998"]                  # power flow from/to grid, phase C
+
+    elif category == "now-inverter":  
+      pvdata["inverter_voltage_a"] = data["11009"]      # inverter voltage, phase A
+      pvdata["inverter_current_a"] = data["11010"]      # inverter current, phase A 
+      pvdata["inverter_a"] = data["30236"]              # inverter power, phase A 
+      pvdata["inverter_voltage_b"] = data["11011"]      # inverter voltage, phase B
+      pvdata["inverter_current_b"] = data["11012"]      # inverter current, phase B
+      pvdata["inverter_b"] = data["30242"]              # inverter power, phase B 
+      pvdata["inverter_voltage_c"] = data["11013"]      # inverter voltage, phase C 
+      pvdata["inverter_current_c"] = data["11014"]      # inverter current, phase C 
+      pvdata["inverter_c"] = data["30248"]              # inverter power, phase C 
+      pvdata["inverter_temp1"] = data["11032"]          # inverter temperature sensor 1 
+      pvdata["inverter_temp2"] = data["11033"]          # inverter temperature sensor 2 
+      pvdata["inverter_temp3"] = data["11034"]          # inverter temperature sensor 3 
+      pvdata["inverter_temp4"] = data["11035"]          # inverter temperature sensor 4
+
+    elif category == "now-backup":  
+      pvdata["backup_voltage_a"] = data["30200"]        # Backup voltage, phase A 
+      pvdata["backup_current_a"] = data["30201"]        # Backup current, phase A 
+      pvdata["backup_frequency_a"] = data["30202"]      # Backup frequency, phase A 
+      pvdata["backup_a"] = data["30204"]                # Backup power, phase A 
+      pvdata["backup_voltage_b"] = data["30210"]        # Backup voltage, phase B 
+      pvdata["backup_current_b"] = data["30211"]        # Backup current, phase B 
+      pvdata["backup_frequency_b"] = data["30212"]      # Backup frequency, phase B 
+      pvdata["backup_b"] = data["30214"]                # Backup power, phase B
+      pvdata["backup_voltage_c"] = data["30220"]        # Backup voltage, phase C 
+      pvdata["backup_current_c"] = data["30221"]        # Backup current, phase C 
+      pvdata["backup_frequency_c"] = data["30222"]      # Backup frequency, phase C 
+      pvdata["backup_c"] = data["30224"]                # Backup power, phase C
+
+    elif category == "now-battery":  
+      pvdata["battery_soh"] = data["33001"]           	# Battery SOH
+      pvdata["battery_voltage"] = data["30254"]         # Battery voltage
+      pvdata["battery_current"] = data["30255"]         # Battery current
+      pvdata["battery_mode"] = data["30256"]            # Battery mode
+      pvdata["battery_cell_t_max"] = data["33009"]      # Battery min. cell temperature
+      pvdata["battery_cell_t_min"] = data["33011"]      # Battery min. cell temperature
+      pvdata["battery_cell_v_max"] = data["33013"]      # Battery max. cell voltage
+      pvdata["battery_cell_v_min"] = data["33015"]      # Battery min. cell voltage
+
+    elif category == "now-pv":  
+      pvdata["pv_voltage_1"] = data["11038"]             # PV1 voltage 
+      pvdata["pv_current_1"] = data["11039"]             # PV1 voltage 
+      pvdata["pv_1"] = data["11062"]                     # PV1 power 
+      pvdata["pv_voltage_2"] = data["11040"]             # PV2 voltage 
+      pvdata["pv_current_2"] = data["11041"]             # PV2 voltage 
+      pvdata["pv_2"] = data["11064"]                     # PV2 power 
 
     elif category == "day":  
       pvdata["PV"] = data["31005"]                      # Energy generated by PV today
@@ -71,7 +134,7 @@ def read_MTEC_data( api, category ):
       pvdata["grid_purchase"] = data["31001"]           # Energy purchased from grid today
       pvdata["battery_charge"] = data["31003"]          # Energy charged to battery total
       pvdata["battery_discharge"] = data["31004"]       # Energy discharged from battery total
-      pvdata["consumption"] = data["31005"]["value"] + data["31001"]["value"] + data["31004"]["value"] - data["31000"]["value"] - data["31003"]["value"]  # Current power consumption 
+      pvdata["consumption"] = data["31005"]["value"] + data["31001"]["value"] + data["31004"]["value"] - data["31000"]["value"] - data["31003"]["value"]  # power consumption 
       pvdata["autarky_rate"] = 100*(1 - (data["31001"]["value"] / pvdata["consumption"])) if pvdata["consumption"]>0 else 0 
       pvdata["own_consumption_rate"] = 100*(1-data["31000"]["value"] / data["31005"]["value"]) if data["31005"]["value"]>0 else 0
 
@@ -81,7 +144,7 @@ def read_MTEC_data( api, category ):
       pvdata["grid_purchase"] = data["31104"]           # Energy purchased from grid total
       pvdata["battery_charge"] = data["31108"]          # Energy charged to battery total
       pvdata["battery_discharge"] = data["31110"]       # Energy discharged from battery total
-      pvdata["consumption"] = data["31112"]["value"] + data["31104"]["value"] + data["31110"]["value"] - data["31102"]["value"] - data["31108"]["value"]  # Current power consumption 
+      pvdata["consumption"] = data["31112"]["value"] + data["31104"]["value"] + data["31110"]["value"] - data["31102"]["value"] - data["31108"]["value"]  # power consumption 
       pvdata["autarky_rate"] = 100*(1 - (data["31104"]["value"] / pvdata["consumption"])) if pvdata["consumption"]>0 else 0
       pvdata["own_consumption_rate"] = 100*(1-data["31102"]["value"] / data["31112"]["value"]) if data["31112"]["value"]>0 else 0
   except Exception as e:
@@ -149,14 +212,34 @@ def main():
         if hass and not hass.is_initialized:
           hass.initialize( pv_config["serial_no"]["value"] )
       if not topic_base:
-        logging.error("Cant retrieve initial config - retry in {}s".format( cfg['REFRESH_CURRENT_S'] ))
-        time.sleep(cfg['REFRESH_CURRENT_S'])
+        logging.error("Cant retrieve initial config - retry in {}s".format( cfg['REFRESH_NOW_S'] ))
+        time.sleep(cfg['REFRESH_NOW_S'])
         continue
 
-    # Current    
-    pvdata = read_MTEC_data( api, "current" )
+    # Now 
+    pvdata = read_MTEC_data( api, "now-base" )
     if pvdata:
-      write_to_MQTT( pvdata, topic_base + 'current/' )
+      write_to_MQTT( pvdata, topic_base + 'now/' )
+    if cfg['ENABLE_GRID_DATA']:
+      pvdata = read_MTEC_data( api, "now-grid" )
+      if pvdata:
+        write_to_MQTT( pvdata, topic_base + 'now/' )
+    if cfg['ENABLE_INVERTER_DATA']:
+      pvdata = read_MTEC_data( api, "now-inverter" )
+      if pvdata:
+        write_to_MQTT( pvdata, topic_base + 'now/' )
+    if cfg['ENABLE_BACKUP_DATA']:
+      pvdata = read_MTEC_data( api, "now-backup" )
+      if pvdata:
+        write_to_MQTT( pvdata, topic_base + 'now/' )
+    if cfg['ENABLE_BATTERY_DATA']:
+      pvdata = read_MTEC_data( api, "now-battery" )
+      if pvdata:
+        write_to_MQTT( pvdata, topic_base + 'now/' )
+    if cfg['ENABLE_PV_DATA']:
+      pvdata = read_MTEC_data( api, "now-pv" )
+      if pvdata:
+        write_to_MQTT( pvdata, topic_base + 'now/' )
 
     # Day
     if next_read_day <= now:
@@ -172,8 +255,8 @@ def main():
         write_to_MQTT( pvdata, topic_base + 'total/' )
         next_read_total = datetime.now() + timedelta(minutes=cfg['REFRESH_TOTAL_M'])
 
-    logging.debug("Sleep {}s".format( cfg['REFRESH_CURRENT_S'] ))
-    time.sleep(cfg['REFRESH_CURRENT_S'])
+    logging.debug("Sleep {}s".format( cfg['REFRESH_NOW_S'] ))
+    time.sleep(cfg['REFRESH_NOW_S'])
 
   # clean up
   if hass:

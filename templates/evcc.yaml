@@ -1,8 +1,8 @@
 # evcc.yaml snippet 
-# can be used as template how to integrate your MTEC inverter into evcc
+# can be used as template for an integration of your MTEC inverter into evcc
 
 # Meters
-# replace <MTEC_SERIAL_NO> with the actual serial no of your inverter
+# TODO: replace <MTEC_SERIAL_NO> with the actual serial no of your inverter
 meters:
   - name: MTEC-grid
     type: custom
