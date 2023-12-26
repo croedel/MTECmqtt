@@ -23,135 +23,138 @@ def signal_handler(signal_number, frame):
   logging.warning('Received Signal {}. Graceful shutdown initiated.'.format(signal_number))
   run_status = False
 
+#----------------------------------
+# map MQTT parameters and modbus registers
+param_map = [
+  # parameter             # register  # group
+  [ "serial_no",          "10000",    "config" ],    
+  [ "firmware_version",   "10011",    "config" ],    
+
+  [ "inverter_date",      "10100",    "now-base" ],    
+  [ "inverter_status",    "10105",    "now-base" ],    
+  [ "pv",                 "11028",    "now-base" ],    
+  [ "grid",               "11000",    "now-base" ],    
+  [ "battery",            "30258",    "now-base" ],    
+  [ "inverter",           "11016",    "now-base" ],    
+  [ "backup",             "30230",    "now-base" ],    
+  [ "battery_soc",        "33000",    "now-base" ],    
+  [ "mode",               "50000",    "now-base" ],    
+
+  [ "grid_frequency",     "11015",    "now-grid" ],    
+  [ "grid_a",             "10994",    "now-grid" ],    
+  [ "grid_b",             "10996",    "now-grid" ],    
+  [ "grid_c",             "10998",    "now-grid" ],    
+
+  [ "grid_inject_switch", "25100",    "now-inverter" ],
+  [ "grid_inject_limit",  "25103",    "now-inverter" ],
+  [ "on_grid_soc_switch", "52502",    "now-inverter" ],
+  [ "on_grid_soc_limit",  "52503",    "now-inverter" ],
+  [ "off_grid_soc_switch", "52504",   "now-inverter" ],
+  [ "off_grid_soc_limit", "52505",    "now-inverter" ],
+  [ "inverter_voltage_a", "11009",    "now-inverter" ],
+  [ "inverter_current_a", "11010",    "now-inverter" ],
+  [ "inverter_a",         "30236",    "now-inverter" ],
+  [ "inverter_voltage_b", "11011",    "now-inverter" ],
+  [ "inverter_current_b", "11012",    "now-inverter" ],
+  [ "inverter_b",         "30242",    "now-inverter" ],
+  [ "inverter_voltage_c", "11013",    "now-inverter" ],
+  [ "inverter_current_c", "11014",    "now-inverter" ],
+  [ "inverter_c",         "30248",    "now-inverter" ],
+  [ "inverter_temp1",     "11032",    "now-inverter" ],
+  [ "inverter_temp2",     "11033",    "now-inverter" ],
+  [ "inverter_temp3",     "11034",    "now-inverter" ],
+  [ "inverter_temp4",     "11035",    "now-inverter" ],
+
+  [ "backup_voltage_a",   "30200",    "now-backup" ],  
+  [ "backup_current_a",   "30201",    "now-backup" ],  
+  [ "backup_frequency_a", "30202",    "now-backup" ],  
+  [ "backup_a",           "30204",    "now-backup" ],  
+  [ "backup_voltage_b",   "30210",    "now-backup" ],  
+  [ "backup_current_b",   "30211",    "now-backup" ],  
+  [ "backup_frequency_b", "30212",    "now-backup" ],  
+  [ "backup_b",           "30214",    "now-backup" ],  
+  [ "backup_voltage_c",   "30220",    "now-backup" ],  
+  [ "backup_current_c",   "30221",    "now-backup" ],  
+  [ "backup_frequency_c", "30222",    "now-backup" ],  
+  [ "backup_c",           "30224",    "now-backup" ],  
+
+  [ "battery_soh",        "33001",    "now-battery" ], 
+  [ "battery_voltage",    "30254",    "now-battery" ], 
+  [ "battery_current",    "30255",    "now-battery" ], 
+  [ "battery_mode",       "30256",    "now-battery" ], 
+  [ "battery_cell_t_max", "33009",    "now-battery" ], 
+  [ "battery_cell_t_min", "33011",    "now-battery" ], 
+  [ "battery_cell_v_max", "33013",    "now-battery" ], 
+  [ "battery_cell_v_min", "33015",    "now-battery" ], 
+
+  [ "pv_voltage_1",       "11038",    "now-pv" ],         
+  [ "pv_current_1",       "11039",    "now-pv" ],         
+  [ "pv_1",               "11062",    "now-pv" ],         
+  [ "pv_voltage_2",       "11040",    "now-pv" ],         
+  [ "pv_current_2",       "11041",    "now-pv" ],         
+  [ "pv_2",               "11064",    "now-pv" ],         
+
+  [ "PV",                 "31005",    "day" ],            
+  [ "grid_feed",          "31000",    "day" ],            
+  [ "grid_purchase",      "31001",    "day" ],         
+  [ "battery_charge",     "31003",    "day" ],        
+  [ "battery_discharge",  "31004",    "day" ],       
+
+  [ "PV",                 "31112",    "total" ],          
+  [ "grid_feed",          "31102",    "total" ],          
+  [ "grid_purchase",      "31104",    "total" ],          
+  [ "battery_charge",     "31108",    "total" ],          
+  [ "battery_discharge",  "31110",    "total" ],   
+]
+
 # =============================================
 # MTEC Modbus read
 # Helper to get list of registers to read
 def get_register_list( category ):
-  if category == "config":
-    registers = [ '10000', '10011' ]
-  elif category == "now-base":  
-    registers = [ '10100', '10105', '11028', '11000', '30258', '11016', '30230', '33000' ] 
-  elif category == "now-grid":  
-    registers = [ '11015', '10994', '10996', '10998' ]
-  elif category == "now-inverter":  
-    registers = [ '11009', '11010', '30236', '11011', '11012', '30242', '11013', '11014', '30248', '11032', '11033', '11034', '11035' ]
-  elif category == "now-backup":  
-    registers = [ '30200', '30201', '30202', '30204', '30210', '30211', '30212', '30214', '30220', '30221', '30222', '30224' ]
-  elif category == "now-battery":  
-    registers = [ '33001', '30254', '30255', '30256', '33009', '33011', '33013', '33015' ]
-  elif category == "now-pv":  
-    registers = [ '11038','11039', '11062', '11040', '11041', '11064' ]
-  elif category == "day":  
-    registers = [ '31000', '31001', '31003', '31004', '31005']
-  elif category == "total":  
-    registers = [ '31102', '31104', '31108', '31110', '31112']
-  else:
+  items = []
+  registers = []
+  for item in param_map:
+    if item[2] == category:
+      items.append(item)
+      registers.append(item[1])
+
+  if len(registers)==0:
     logging.error("Unknown read category: {}".format(category))
     return None              
-  return registers
+  return items, registers
 
+#----------------------------------
 # read data from MTEC modbus
 def read_MTEC_data( api, category ):
   logging.info("Reading registers for category: {}".format(category))
-  registers = get_register_list( category )
+  items, registers = get_register_list( category )
   now = datetime.now()
   data = api.read_modbus_data(registers=registers)
   pvdata = {}
   try:
     pvdata["api_date"] = now.strftime("%Y-%m-%d %H:%M:%S") # Local time of this server
+    # assign all data
+    for item in items:
+      pvdata[item[0]] = data[item[1]]
 
-    if category == "config":
-      pvdata["serial_no"] = data["10000"]                   # Inverter serial number
-      pvdata["firmware_version"] = data["10011"]            # Inverter firmware version
-
-    elif category == "now-base":  
-      pvdata["inverter_date"] = data["10100"]               # Time from inverter
-      pvdata["inverter_status"] = data["10105"]             # Inverter status 
-      pvdata["pv"] = data["11028"]                      # power flow from PV
-      pvdata["grid"] = data["11000"]                    # power flow from/to grid
-      pvdata["battery"] = data["30258"]                 # power flow from/to battery
-      pvdata["inverter"] = data["11016"]                # power flow from/to inverter
-      pvdata["backup"] = data["30230"]                  # backup power flow
+    # calculate some additional data
+    if category == "now-base":  
       pvdata["consumption"] = data["11016"]["value"] - data["11000"]["value"]  # power consumption 
-      pvdata["battery_soc"] = data["33000"]           	# battery SOC
-
-    elif category == "now-grid":  
-      pvdata["grid_frequency"] = data["11015"]          # grid frequency
-      pvdata["grid_a"] = data["10994"]                  # power flow from/to grid, phase A
-      pvdata["grid_b"] = data["10996"]                  # power flow from/to grid, phase B
-      pvdata["grid_c"] = data["10998"]                  # power flow from/to grid, phase C
-
-    elif category == "now-inverter":  
-      pvdata["inverter_voltage_a"] = data["11009"]      # inverter voltage, phase A
-      pvdata["inverter_current_a"] = data["11010"]      # inverter current, phase A 
-      pvdata["inverter_a"] = data["30236"]              # inverter power, phase A 
-      pvdata["inverter_voltage_b"] = data["11011"]      # inverter voltage, phase B
-      pvdata["inverter_current_b"] = data["11012"]      # inverter current, phase B
-      pvdata["inverter_b"] = data["30242"]              # inverter power, phase B 
-      pvdata["inverter_voltage_c"] = data["11013"]      # inverter voltage, phase C 
-      pvdata["inverter_current_c"] = data["11014"]      # inverter current, phase C 
-      pvdata["inverter_c"] = data["30248"]              # inverter power, phase C 
-      pvdata["inverter_temp1"] = data["11032"]          # inverter temperature sensor 1 
-      pvdata["inverter_temp2"] = data["11033"]          # inverter temperature sensor 2 
-      pvdata["inverter_temp3"] = data["11034"]          # inverter temperature sensor 3 
-      pvdata["inverter_temp4"] = data["11035"]          # inverter temperature sensor 4
-
-    elif category == "now-backup":  
-      pvdata["backup_voltage_a"] = data["30200"]        # Backup voltage, phase A 
-      pvdata["backup_current_a"] = data["30201"]        # Backup current, phase A 
-      pvdata["backup_frequency_a"] = data["30202"]      # Backup frequency, phase A 
-      pvdata["backup_a"] = data["30204"]                # Backup power, phase A 
-      pvdata["backup_voltage_b"] = data["30210"]        # Backup voltage, phase B 
-      pvdata["backup_current_b"] = data["30211"]        # Backup current, phase B 
-      pvdata["backup_frequency_b"] = data["30212"]      # Backup frequency, phase B 
-      pvdata["backup_b"] = data["30214"]                # Backup power, phase B
-      pvdata["backup_voltage_c"] = data["30220"]        # Backup voltage, phase C 
-      pvdata["backup_current_c"] = data["30221"]        # Backup current, phase C 
-      pvdata["backup_frequency_c"] = data["30222"]      # Backup frequency, phase C 
-      pvdata["backup_c"] = data["30224"]                # Backup power, phase C
-
-    elif category == "now-battery":  
-      pvdata["battery_soh"] = data["33001"]           	# Battery SOH
-      pvdata["battery_voltage"] = data["30254"]         # Battery voltage
-      pvdata["battery_current"] = data["30255"]         # Battery current
-      pvdata["battery_mode"] = data["30256"]            # Battery mode
-      pvdata["battery_cell_t_max"] = data["33009"]      # Battery min. cell temperature
-      pvdata["battery_cell_t_min"] = data["33011"]      # Battery min. cell temperature
-      pvdata["battery_cell_v_max"] = data["33013"]      # Battery max. cell voltage
-      pvdata["battery_cell_v_min"] = data["33015"]      # Battery min. cell voltage
-
-    elif category == "now-pv":  
-      pvdata["pv_voltage_1"] = data["11038"]             # PV1 voltage 
-      pvdata["pv_current_1"] = data["11039"]             # PV1 voltage 
-      pvdata["pv_1"] = data["11062"]                     # PV1 power 
-      pvdata["pv_voltage_2"] = data["11040"]             # PV2 voltage 
-      pvdata["pv_current_2"] = data["11041"]             # PV2 voltage 
-      pvdata["pv_2"] = data["11064"]                     # PV2 power 
-
     elif category == "day":  
-      pvdata["PV"] = data["31005"]                      # Energy generated by PV today
-      pvdata["grid_feed"] = data["31000"]               # Energy feed to grid today
-      pvdata["grid_purchase"] = data["31001"]           # Energy purchased from grid today
-      pvdata["battery_charge"] = data["31003"]          # Energy charged to battery total
-      pvdata["battery_discharge"] = data["31004"]       # Energy discharged from battery total
       pvdata["consumption"] = data["31005"]["value"] + data["31001"]["value"] + data["31004"]["value"] - data["31000"]["value"] - data["31003"]["value"]  # power consumption 
       pvdata["autarky_rate"] = 100*(1 - (data["31001"]["value"] / pvdata["consumption"])) if pvdata["consumption"]>0 else 0 
       pvdata["own_consumption_rate"] = 100*(1-data["31000"]["value"] / data["31005"]["value"]) if data["31005"]["value"]>0 else 0
-
     elif category == "total":  
-      pvdata["PV"] = data["31112"]                      # Energy generated by PV total
-      pvdata["grid_feed"] = data["31102"]               # Energy feed to grid total
-      pvdata["grid_purchase"] = data["31104"]           # Energy purchased from grid total
-      pvdata["battery_charge"] = data["31108"]          # Energy charged to battery total
-      pvdata["battery_discharge"] = data["31110"]       # Energy discharged from battery total
       pvdata["consumption"] = data["31112"]["value"] + data["31104"]["value"] + data["31110"]["value"] - data["31102"]["value"] - data["31108"]["value"]  # power consumption 
       pvdata["autarky_rate"] = 100*(1 - (data["31104"]["value"] / pvdata["consumption"])) if pvdata["consumption"]>0 else 0
       pvdata["own_consumption_rate"] = 100*(1-data["31102"]["value"] / data["31112"]["value"]) if data["31112"]["value"]>0 else 0
+ 
   except Exception as e:
     logging.warning("Retrieved Modbus data is incomplete: {}".format(str(e)))
     return None
   return pvdata
 
+#----------------------------------
 # write data to MQTT
 def write_to_MQTT( pvdata, base_topic ):
   for param, data in pvdata.items():

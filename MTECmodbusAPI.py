@@ -15,90 +15,97 @@ import logging
 class MTECmodbusAPI:
   # list of modbus registers and how to interpret them
   register_map = {
-  # Register   Name                                      Length, Type,  Unit,   Scale
-    '10000': [ 'Inverter serial number',                      8, 'STR',	'',     None  ],		
-    '10008': [ 'Equipment Info',                              1, 'BYTE', '',    None  ],	
-    '10011': [ 'Firmware Version ',	                          4, 'BYTE', '',	  None  ],
-    '10100': [ 'Inverter date',                               3, 'DAT',	'',     None  ],		
-    '10105': [ 'Inverter Running Status',                     1, 'U16', '',   	None  ],
-    '10112': [ 'Fault Flag1',                                 2, 'BIT', '',	    None	], 
-    '10114': [ 'Fault Flag2',                                 2, 'BIT', '',	    None	], 
-    '10120': [ 'Fault Flag3',                                 2, 'BIT', '',	    None	], 
-    '10994': [ 'Phase A Power on Meter',	                    2, 'I32', 'W',	  None	],
-    '10996': [ 'Phase B Power on Meter',	                    2, 'I32', 'W',	  None	],
-    '10998': [ 'Phase C Power on Meter',	                    2, 'I32', 'W',	  None	],
-    '11000': [ 'Total Power on Meter',	                      2, 'I32', 'W',	  None	],
-    '11002': [ 'Total Grid-Injection Energy on Meter',	      2, 'U32', 'kWh',  100   ],
-    '11004': [ 'Total Purchasing Energy from Grid on Meter',	2, 'U32', 'kWh',  100   ],
-    '11006': [ 'Grid Lines A/B Voltage',	                    1, 'U16', 'V',	  10	  ],
-    '11007': [ 'Grid Lines B/C Voltage',	                    1, 'U16', 'V',	  10	  ],
-    '11008': [ 'Grid Lines C/A Voltage',	                    1, 'U16', 'V',	  10	  ],
-    '11009': [ 'Grid Phase A Voltage',	                      1, 'U16', 'V',	  10	  ],
-    '11010': [ 'Grid Phase A Current',	                      1, 'U16', 'A',	  10	  ],
-    '11011': [ 'Grid Phase B Voltage',	                      1, 'U16', 'V',	  10	  ],
-    '11012': [ 'Grid Phase B Current',	                      1, 'U16', 'A',	  10	  ],
-    '11013': [ 'Grid Phase C Voltage',	                      1, 'U16', 'V',	  10	  ],
-    '11014': [ 'Grid Phase C Current',	                      1, 'U16', 'A',	  10	  ],
-    '11015': [ 'Grid Frequency',	                            1, 'U16', 'Hz',	  100	  ],
-    '11016': [ 'P_AC',	                                      2, 'I32', 'W',	  None	],
-    '11018': [ 'Total PV Generation on that day',	            2, 'U32', 'kWh',  10	  ],
-    '11020': [ 'Total PV Generation from Installation',       2, 'U32', 'kWh',  10	  ],
-    '11022': [ 'Total PV Generation Time from Installation',	2, 'U32', 'h',	  None  ],
-    '11028': [ 'PV Input Total Power',	                      2, 'U32', 'kW',	  1000	],
-    '11032': [ 'Temperature Sensor 1',	                      1, 'I16', '℃',	 10	   ],
-    '11033': [ 'Temperature Sensor 2',	                      1, 'I16', '℃',	 10	   ],
-    '11034': [ 'Temperature Sensor 3',	                      1, 'I16', '℃',	 10	   ],
-    '11035': [ 'Temperature Sensor 4',	                      1, 'I16', '℃',	 10	   ],
-    '11038': [ 'PV1 Voltage',	                                1, 'U16', 'V',	  10	  ],
-    '11039': [ 'PV1 Current',	                                1, 'U16', 'A',	  10	  ],
-    '11040': [ 'PV2 Voltage',	                                1, 'U16', 'V',	  10	  ],
-    '11041': [ 'PV2 Current',	                                1, 'U16', 'A',	  10	  ],
-    '11062': [ 'PV1 Input Power',                             2, 'U32', 'W',	  None	],
-    '11064': [ 'PV2 Input Power',                             2, 'U32', 'W',	  None	],
-    '30200': [ 'Backup_A_V',	                                1, 'U16', 'V',	  10	  ],
-    '30201': [ 'Backup_A_I',	                                1, 'U16', 'A',	  10	  ],
-    '30202': [ 'Backup_A_F',	                                1, 'U16', 'Hz',	  100	  ],
-    '30204': [ 'Backup_A_P',	                                2, 'I32', 'W',	  None  ],
-    '30210': [ 'Backup_B_V',	                                1, 'U16', 'V',	  10	  ],
-    '30211': [ 'Backup_B_I',	                                1, 'U16', 'A',	  10	  ],
-    '30212': [ 'Backup_B_F',	                                1, 'U16', 'Hz',	  100	  ],
-    '30214': [ 'Backup_B_P',	                                2, 'I32', 'W',	  None  ],
-    '30220': [ 'Backup_C_V',	                                1, 'U16', 'V',	  10	  ],
-    '30221': [ 'Backup_C_I',	                                1, 'U16', 'A',	  10	  ],
-    '30222': [ 'Backup_C_F',	                                1, 'U16', 'Hz',	  100	  ],
-    '30224': [ 'Backup_C_P',	                                2, 'I32', 'W',	  None  ],
-    '30230': [ 'Total_Backup_P',	                            2, 'I32', 'W',	  None  ],
-    '30236': [ 'Invt_A_P',	                                  2, 'I32', 'W',	  None  ],
-    '30242': [ 'Invt_B_P',	                                  2, 'I32', 'W',	  None  ],
-    '30248': [ 'Invt_C_P',	                                  2, 'I32', 'W',	  None  ],
-    '30254': [ 'Battery_V',	                                  1, 'U16', 'V',	  10	  ],
-    '30255': [ 'Battery_I',	                                  1, 'I16', 'A',	  10	  ],
-    '30256': [ 'Battery_Mode',	                              1, 'U16', '',	    None  ],
-    '30258': [ 'Battery_P',                                   2, 'I32', 'W',	  None  ],
-    '31000': [ 'Grid Injection Energy on that day[Meter]',	  1, 'U16', 'kWh',  10	  ],
-    '31001': [ 'Grid Purchasing Energy on that day[Meter]',   1, 'U16', 'kWh',  10	  ],
-    '31002': [ 'Backup Output Energy on that day',	          1, 'U16', 'kWh',  10	  ],
-    '31003': [ 'Battery Charge Energy on that day',           1, 'U16', 'kWh',  10	  ],
-    '31004': [ 'Battery Discharge Energy on that day',	      1, 'U16', 'kWh',  10	  ],
-    '31005': [ 'PV Generation Energy on that day',	          1, 'U16', 'kWh',  10	  ],
-    '31006': [ 'Loading Energy on that day',	                1, 'U16', 'kWh',  10	  ],
-    '31008': [ 'Energy Purchased from Grid on that day',	    1, 'U16', 'kWh',  10	  ],
-    '31102': [ 'Total Energy injected to grid',               2, 'U32', 'kWh',  10	  ],
-    '31104': [ 'Total Energy Purchased from Grid from Meter', 2, 'U32', 'kWh',  10	  ],
-    '31106': [ 'Total Output Energy on backup port',	        2, 'U32', 'kWh',  10	  ],
-    '31108': [ 'Total Energy Charged to Battery',             2, 'U32', 'kWh',  10	  ],
-    '31110': [ 'Total Energy Discharged from Battery',	      2, 'U32', 'kWh',  10	  ],
-    '31112': [ 'Total PV Generation',                         2, 'U32', 'kWh',  10	  ],
-    '31114': [ 'Total Loading Energy consumed at grid side',	2, 'U32', 'kWh',  10	  ],
-    '31118': [ 'Total Energy Purchased from Grid',            2, 'U32', 'kWh',  10	  ],
-    '33000': [ 'SOC',	                                        1, 'U16', '%',	  100	  ],
-    '33001': [ 'SOH',	                                        1, 'U16', '%',	  100	  ],
-    '33002': [ 'BMS Status',	                                1, 'U16', '',	    None  ],
-    '33003': [ 'BMS Pack Temperature',	                      1, 'U16', '℃',	 10	   ],
-    '33009': [ 'Max Cell Temperature',	                      1, 'U16', '℃',	 10	   ],
-    '33011': [ 'Min Cell Temperature',	                      1, 'U16', '℃',	 10	   ],
-    '33013': [ 'Max Cell Voltage',	                          1, 'U16', 'V',	  1000	],
-    '33015': [ 'Min Cell Voltage',	                          1, 'U16', 'V',	  1000	],
+  # Register   Name                                      Length, Type,  Unit,   Scale,  RW-mode
+    '10000': [ 'Inverter serial number',                      8, 'STR',	'',     None,   False  ],		
+    '10008': [ 'Equipment Info',                              1, 'BYTE', '',    None,   False  ],	
+    '10011': [ 'Firmware Version ',	                          4, 'BYTE', '',	  None,   False  ],
+    '10100': [ 'Inverter date',                               3, 'DAT',	'',     None,   False  ],		
+    '10105': [ 'Inverter Running Status',                     1, 'U16', '',   	None,   False  ],
+    '10112': [ 'Fault Flag1',                                 2, 'BIT', '',	    None,   False  ], 
+    '10114': [ 'Fault Flag2',                                 2, 'BIT', '',	    None,   False	 ], 
+    '10120': [ 'Fault Flag3',                                 2, 'BIT', '',	    None,   False	 ], 
+    '10994': [ 'Phase A Power on Meter',	                    2, 'I32', 'W',	  None,   False	 ],
+    '10996': [ 'Phase B Power on Meter',	                    2, 'I32', 'W',	  None,   False	 ],
+    '10998': [ 'Phase C Power on Meter',	                    2, 'I32', 'W',	  None,   False	 ],
+    '11000': [ 'Total Power on Meter',	                      2, 'I32', 'W',	  None,   False	 ],
+    '11002': [ 'Total Grid-Injection Energy on Meter',	      2, 'U32', 'kWh',  100,    False  ],
+    '11004': [ 'Total Purchasing Energy from Grid on Meter',	2, 'U32', 'kWh',  100,    False  ],
+    '11006': [ 'Grid Lines A/B Voltage',	                    1, 'U16', 'V',	  10,     False  ],
+    '11007': [ 'Grid Lines B/C Voltage',	                    1, 'U16', 'V',	  10,     False  ],
+    '11008': [ 'Grid Lines C/A Voltage',	                    1, 'U16', 'V',	  10,     False  ],
+    '11009': [ 'Grid Phase A Voltage',	                      1, 'U16', 'V',	  10,     False  ],
+    '11010': [ 'Grid Phase A Current',	                      1, 'U16', 'A',	  10,     False  ],
+    '11011': [ 'Grid Phase B Voltage',	                      1, 'U16', 'V',	  10,     False  ],
+    '11012': [ 'Grid Phase B Current',	                      1, 'U16', 'A',	  10,     False  ],
+    '11013': [ 'Grid Phase C Voltage',	                      1, 'U16', 'V',	  10,     False  ],
+    '11014': [ 'Grid Phase C Current',	                      1, 'U16', 'A',	  10,     False  ],
+    '11015': [ 'Grid Frequency',	                            1, 'U16', 'Hz',	  100,    False  ],
+    '11016': [ 'P_AC',	                                      2, 'I32', 'W',	  None,   False	 ],
+    '11018': [ 'Total PV Generation on that day',	            2, 'U32', 'kWh',  10,     False  ],
+    '11020': [ 'Total PV Generation from Installation',       2, 'U32', 'kWh',  10,     False  ],
+    '11022': [ 'Total PV Generation Time from Installation',	2, 'U32', 'h',	  None,   False  ],
+    '11028': [ 'PV Input Total Power',	                      2, 'U32', 'kW',	  1000,   False	 ],
+    '11032': [ 'Temperature Sensor 1',	                      1, 'I16', '℃',	 10,     False  ],
+    '11033': [ 'Temperature Sensor 2',	                      1, 'I16', '℃',	 10,     False  ],
+    '11034': [ 'Temperature Sensor 3',	                      1, 'I16', '℃',	 10,     False  ],
+    '11035': [ 'Temperature Sensor 4',	                      1, 'I16', '℃',	 10,     False  ],
+    '11038': [ 'PV1 Voltage',	                                1, 'U16', 'V',	  10,     False  ],
+    '11039': [ 'PV1 Current',	                                1, 'U16', 'A',	  10,     False  ],
+    '11040': [ 'PV2 Voltage',	                                1, 'U16', 'V',	  10,     False  ],
+    '11041': [ 'PV2 Current',	                                1, 'U16', 'A',	  10,     False  ],
+    '11062': [ 'PV1 Input Power',                             2, 'U32', 'W',	  None,   False  ],
+    '11064': [ 'PV2 Input Power',                             2, 'U32', 'W',	  None,   False  ],
+    '30200': [ 'Backup_A_V',	                                1, 'U16', 'V',	  10,     False  ],
+    '30201': [ 'Backup_A_I',	                                1, 'U16', 'A',	  10,     False  ],
+    '30202': [ 'Backup_A_F',	                                1, 'U16', 'Hz',	  100,    False  ],
+    '30204': [ 'Backup_A_P',	                                2, 'I32', 'W',	  None,   False  ],
+    '30210': [ 'Backup_B_V',	                                1, 'U16', 'V',	  10,     False  ],
+    '30211': [ 'Backup_B_I',	                                1, 'U16', 'A',	  10,     False  ],
+    '30212': [ 'Backup_B_F',	                                1, 'U16', 'Hz',	  100,    False  ],
+    '30214': [ 'Backup_B_P',	                                2, 'I32', 'W',	  None,   False  ],
+    '30220': [ 'Backup_C_V',	                                1, 'U16', 'V',	  10,     False  ],
+    '30221': [ 'Backup_C_I',	                                1, 'U16', 'A',	  10,     False  ],
+    '30222': [ 'Backup_C_F',	                                1, 'U16', 'Hz',	  100,    False  ],
+    '30224': [ 'Backup_C_P',	                                2, 'I32', 'W',	  None,   False  ],
+    '30230': [ 'Total_Backup_P',	                            2, 'I32', 'W',	  None,   False  ],
+    '30236': [ 'Invt_A_P',	                                  2, 'I32', 'W',	  None,   False  ],
+    '30242': [ 'Invt_B_P',	                                  2, 'I32', 'W',	  None,   False  ],
+    '30248': [ 'Invt_C_P',	                                  2, 'I32', 'W',	  None,   False  ],
+    '30254': [ 'Battery_V',	                                  1, 'U16', 'V',	  10,     False  ],
+    '30255': [ 'Battery_I',	                                  1, 'I16', 'A',	  10,     False  ],
+    '30256': [ 'Battery_Mode',	                              1, 'U16', '',	    None,   False  ],
+    '30258': [ 'Battery_P',                                   2, 'I32', 'W',	  None,   False  ],
+    '31000': [ 'Grid Injection Energy on that day[Meter]',	  1, 'U16', 'kWh',  10,     False  ],
+    '31001': [ 'Grid Purchasing Energy on that day[Meter]',   1, 'U16', 'kWh',  10,     False  ],
+    '31002': [ 'Backup Output Energy on that day',	          1, 'U16', 'kWh',  10,     False  ],
+    '31003': [ 'Battery Charge Energy on that day',           1, 'U16', 'kWh',  10,     False  ],
+    '31004': [ 'Battery Discharge Energy on that day',	      1, 'U16', 'kWh',  10,     False  ],
+    '31005': [ 'PV Generation Energy on that day',	          1, 'U16', 'kWh',  10,     False  ],
+    '31006': [ 'Loading Energy on that day',	                1, 'U16', 'kWh',  10,     False  ],
+    '31008': [ 'Energy Purchased from Grid on that day',	    1, 'U16', 'kWh',  10,     False  ],
+    '31102': [ 'Total Energy injected to grid',               2, 'U32', 'kWh',  10,     False  ],
+    '31104': [ 'Total Energy Purchased from Grid from Meter', 2, 'U32', 'kWh',  10,     False  ],
+    '31106': [ 'Total Output Energy on backup port',	        2, 'U32', 'kWh',  10,     False  ],
+    '31108': [ 'Total Energy Charged to Battery',             2, 'U32', 'kWh',  10,     False  ],
+    '31110': [ 'Total Energy Discharged from Battery',	      2, 'U32', 'kWh',  10,     False  ],
+    '31112': [ 'Total PV Generation',                         2, 'U32', 'kWh',  10,     False  ],
+    '31114': [ 'Total Loading Energy consumed at grid side',	2, 'U32', 'kWh',  10,     False  ],
+    '31118': [ 'Total Energy Purchased from Grid',            2, 'U32', 'kWh',  10,     False  ],
+    '33000': [ 'SOC',	                                        1, 'U16', '%',	  100,    False  ],
+    '33001': [ 'SOH',	                                        1, 'U16', '%',	  100,    False  ],
+    '33002': [ 'BMS Status',	                                1, 'U16', '',	    None,   False  ],
+    '33003': [ 'BMS Pack Temperature',	                      1, 'U16', '℃',	 10,     False  ],
+    '33009': [ 'Max Cell Temperature',	                      1, 'U16', '℃',	 10,     False  ],
+    '33011': [ 'Min Cell Temperature',	                      1, 'U16', '℃',	 10,     False  ],
+    '33013': [ 'Max Cell Voltage',	                          1, 'U16', 'V',	  1000,   False  ],
+    '33015': [ 'Min Cell Voltage',	                          1, 'U16', 'V',	  1000,   False  ],
+    '50000': [ 'Operation Mode',	                            1, 'U16', '',	    None,   True  ],
+    '25100': [ 'Grid injection limit switch',	                1, 'U16', '',	    None,   True  ],
+    '25103': [ 'Grid injection power limit',	                1, 'U16', '%',	  10,     True  ],
+    '52502': [ 'On-grid SOC limit switch',	                  1, 'U16', '',	    None,   True  ],
+    '52503': [ 'On-grid SOC limit',	                          1, 'U16', '%',	  10,     True  ],
+    '52504': [ 'Off-grid SOC limit switch',	                  1, 'U16', '',	    None,   True  ],
+    '52505': [ 'Off-grid SOC limit',	                        1, 'U16', '%',	  10,     True  ],
   }
 
   #-------------------------------------------------
@@ -209,7 +216,32 @@ class MTECmodbusAPI:
     data[register] = { "name":item[0], "value":val, "unit":item[3] } 
 
     return data
-  
+
+  #--------------------------------
+  def write_register(self, register, value):
+    # Lookup register
+    item = self.register_map.get(str(register), None)
+    if not item:
+      logging.error("Can't write unknown register: {}".format(register))
+      return False
+    elif item[5]==False:
+      logging.error("Can't write register which is marked read-only: {}".format(register))
+      return False
+    # adjust scale 
+    if item[4] and item[4]>0:
+      value *= item[4]
+
+    try:
+      result = self.modbus_client.write_register(address=int(register), value=int(value), slave=self.slave )
+    except Exception as ex:
+      logging.error("Exception while writing register {} to pymodbus: {}".format(register, ex))
+      return False
+
+    if result.isError():
+      logging.error("Error while writing register {} to pymodbus".format(register))
+      return False
+    return True
+
 #--------------------------------
 # The main() function is just a demo code how to use the API
 def main():
@@ -219,6 +251,11 @@ def main():
 
   api = MTECmodbusAPI()
   api.connect(ip_addr=cfg['MODBUS_IP'], port=cfg['MODBUS_PORT'], slave=cfg['MODBUS_SLAVE'])
+
+# Write a register
+  api.write_register(register=123, value=123)
+  api.write_register(register=31000, value=21.1)
+#  api.write_register(register=52503, value=21.1)
 
   # fetch all available data
   logging.info("Fetching all data")
