@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-This tool enables to query MTECmodbusapi and can act as demo on how to use the API
+This tool enables to query MTECmodbusapi and export the data in various ways.
 (c) 2023 by Christian Rödel 
 """
 from config import cfg
@@ -10,7 +10,7 @@ import MTECmodbusAPI
 
 #-----------------------------
 def parse_options():
-  parser = argparse.ArgumentParser(description='MTEC Modbus data command line tool. Allows to read and export Modbus registers from an MTEC inverter.', 
+  parser = argparse.ArgumentParser(description='MTEC Modbus data export tool. Allows to read and export Modbus registers from an MTEC inverter.', 
                                    formatter_class=argparse.RawDescriptionHelpFormatter)
   parser.add_argument( '-t', '--type', choices=["all", "essential"], default="all", help='Defines set of registers to export.' )
   parser.add_argument( '-r', '--registers', help='Comma separated list of registers which shall be retrieved' )

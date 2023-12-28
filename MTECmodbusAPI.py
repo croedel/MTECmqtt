@@ -3,7 +3,7 @@
 Modbus API for M-TEC Energybutler
 (c) 2023 by Christian Rödel 
 """
-from config import cfg
+from config import cfg, register_map
 from pymodbus.client import ModbusTcpClient
 from pymodbus.transaction import ModbusRtuFramer
 from pymodbus.payload import BinaryPayloadDecoder
@@ -13,101 +13,6 @@ import logging
 
 #=====================================================
 class MTECmodbusAPI:
-  # list of modbus registers and how to interpret them
-  register_map = {
-  # Register   Name                                      Length, Type,  Unit,   Scale,  RW-mode
-    '10000': [ 'Inverter serial number',                      8, 'STR',	'',     None,   False  ],		
-    '10008': [ 'Equipment Info',                              1, 'BYTE', '',    None,   False  ],	
-    '10011': [ 'Firmware Version ',	                          4, 'BYTE', '',	  None,   False  ],
-    '10100': [ 'Inverter date',                               3, 'DAT',	'',     None,   False  ],		
-    '10105': [ 'Inverter Running Status',                     1, 'U16', '',   	None,   False  ],
-    '10112': [ 'Fault Flag1',                                 2, 'BIT', '',	    None,   False  ], 
-    '10114': [ 'Fault Flag2',                                 2, 'BIT', '',	    None,   False	 ], 
-    '10120': [ 'Fault Flag3',                                 2, 'BIT', '',	    None,   False	 ], 
-    '10994': [ 'Phase A Power on Meter',	                    2, 'I32', 'W',	  None,   False	 ],
-    '10996': [ 'Phase B Power on Meter',	                    2, 'I32', 'W',	  None,   False	 ],
-    '10998': [ 'Phase C Power on Meter',	                    2, 'I32', 'W',	  None,   False	 ],
-    '11000': [ 'Total Power on Meter',	                      2, 'I32', 'W',	  None,   False	 ],
-    '11002': [ 'Total Grid-Injection Energy on Meter',	      2, 'U32', 'kWh',  100,    False  ],
-    '11004': [ 'Total Purchasing Energy from Grid on Meter',	2, 'U32', 'kWh',  100,    False  ],
-    '11006': [ 'Grid Lines A/B Voltage',	                    1, 'U16', 'V',	  10,     False  ],
-    '11007': [ 'Grid Lines B/C Voltage',	                    1, 'U16', 'V',	  10,     False  ],
-    '11008': [ 'Grid Lines C/A Voltage',	                    1, 'U16', 'V',	  10,     False  ],
-    '11009': [ 'Grid Phase A Voltage',	                      1, 'U16', 'V',	  10,     False  ],
-    '11010': [ 'Grid Phase A Current',	                      1, 'U16', 'A',	  10,     False  ],
-    '11011': [ 'Grid Phase B Voltage',	                      1, 'U16', 'V',	  10,     False  ],
-    '11012': [ 'Grid Phase B Current',	                      1, 'U16', 'A',	  10,     False  ],
-    '11013': [ 'Grid Phase C Voltage',	                      1, 'U16', 'V',	  10,     False  ],
-    '11014': [ 'Grid Phase C Current',	                      1, 'U16', 'A',	  10,     False  ],
-    '11015': [ 'Grid Frequency',	                            1, 'U16', 'Hz',	  100,    False  ],
-    '11016': [ 'P_AC',	                                      2, 'I32', 'W',	  None,   False	 ],
-    '11018': [ 'Total PV Generation on that day',	            2, 'U32', 'kWh',  10,     False  ],
-    '11020': [ 'Total PV Generation from Installation',       2, 'U32', 'kWh',  10,     False  ],
-    '11022': [ 'Total PV Generation Time from Installation',	2, 'U32', 'h',	  None,   False  ],
-    '11028': [ 'PV Input Total Power',	                      2, 'U32', 'kW',	  1000,   False	 ],
-    '11032': [ 'Temperature Sensor 1',	                      1, 'I16', '℃',	 10,     False  ],
-    '11033': [ 'Temperature Sensor 2',	                      1, 'I16', '℃',	 10,     False  ],
-    '11034': [ 'Temperature Sensor 3',	                      1, 'I16', '℃',	 10,     False  ],
-    '11035': [ 'Temperature Sensor 4',	                      1, 'I16', '℃',	 10,     False  ],
-    '11038': [ 'PV1 Voltage',	                                1, 'U16', 'V',	  10,     False  ],
-    '11039': [ 'PV1 Current',	                                1, 'U16', 'A',	  10,     False  ],
-    '11040': [ 'PV2 Voltage',	                                1, 'U16', 'V',	  10,     False  ],
-    '11041': [ 'PV2 Current',	                                1, 'U16', 'A',	  10,     False  ],
-    '11062': [ 'PV1 Input Power',                             2, 'U32', 'W',	  None,   False  ],
-    '11064': [ 'PV2 Input Power',                             2, 'U32', 'W',	  None,   False  ],
-    '30200': [ 'Backup_A_V',	                                1, 'U16', 'V',	  10,     False  ],
-    '30201': [ 'Backup_A_I',	                                1, 'U16', 'A',	  10,     False  ],
-    '30202': [ 'Backup_A_F',	                                1, 'U16', 'Hz',	  100,    False  ],
-    '30204': [ 'Backup_A_P',	                                2, 'I32', 'W',	  None,   False  ],
-    '30210': [ 'Backup_B_V',	                                1, 'U16', 'V',	  10,     False  ],
-    '30211': [ 'Backup_B_I',	                                1, 'U16', 'A',	  10,     False  ],
-    '30212': [ 'Backup_B_F',	                                1, 'U16', 'Hz',	  100,    False  ],
-    '30214': [ 'Backup_B_P',	                                2, 'I32', 'W',	  None,   False  ],
-    '30220': [ 'Backup_C_V',	                                1, 'U16', 'V',	  10,     False  ],
-    '30221': [ 'Backup_C_I',	                                1, 'U16', 'A',	  10,     False  ],
-    '30222': [ 'Backup_C_F',	                                1, 'U16', 'Hz',	  100,    False  ],
-    '30224': [ 'Backup_C_P',	                                2, 'I32', 'W',	  None,   False  ],
-    '30230': [ 'Total_Backup_P',	                            2, 'I32', 'W',	  None,   False  ],
-    '30236': [ 'Invt_A_P',	                                  2, 'I32', 'W',	  None,   False  ],
-    '30242': [ 'Invt_B_P',	                                  2, 'I32', 'W',	  None,   False  ],
-    '30248': [ 'Invt_C_P',	                                  2, 'I32', 'W',	  None,   False  ],
-    '30254': [ 'Battery_V',	                                  1, 'U16', 'V',	  10,     False  ],
-    '30255': [ 'Battery_I',	                                  1, 'I16', 'A',	  10,     False  ],
-    '30256': [ 'Battery_Mode',	                              1, 'U16', '',	    None,   False  ],
-    '30258': [ 'Battery_P',                                   2, 'I32', 'W',	  None,   False  ],
-    '31000': [ 'Grid Injection Energy on that day[Meter]',	  1, 'U16', 'kWh',  10,     False  ],
-    '31001': [ 'Grid Purchasing Energy on that day[Meter]',   1, 'U16', 'kWh',  10,     False  ],
-    '31002': [ 'Backup Output Energy on that day',	          1, 'U16', 'kWh',  10,     False  ],
-    '31003': [ 'Battery Charge Energy on that day',           1, 'U16', 'kWh',  10,     False  ],
-    '31004': [ 'Battery Discharge Energy on that day',	      1, 'U16', 'kWh',  10,     False  ],
-    '31005': [ 'PV Generation Energy on that day',	          1, 'U16', 'kWh',  10,     False  ],
-    '31006': [ 'Loading Energy on that day',	                1, 'U16', 'kWh',  10,     False  ],
-    '31008': [ 'Energy Purchased from Grid on that day',	    1, 'U16', 'kWh',  10,     False  ],
-    '31102': [ 'Total Energy injected to grid',               2, 'U32', 'kWh',  10,     False  ],
-    '31104': [ 'Total Energy Purchased from Grid from Meter', 2, 'U32', 'kWh',  10,     False  ],
-    '31106': [ 'Total Output Energy on backup port',	        2, 'U32', 'kWh',  10,     False  ],
-    '31108': [ 'Total Energy Charged to Battery',             2, 'U32', 'kWh',  10,     False  ],
-    '31110': [ 'Total Energy Discharged from Battery',	      2, 'U32', 'kWh',  10,     False  ],
-    '31112': [ 'Total PV Generation',                         2, 'U32', 'kWh',  10,     False  ],
-    '31114': [ 'Total Loading Energy consumed at grid side',	2, 'U32', 'kWh',  10,     False  ],
-    '31118': [ 'Total Energy Purchased from Grid',            2, 'U32', 'kWh',  10,     False  ],
-    '33000': [ 'SOC',	                                        1, 'U16', '%',	  100,    False  ],
-    '33001': [ 'SOH',	                                        1, 'U16', '%',	  100,    False  ],
-    '33002': [ 'BMS Status',	                                1, 'U16', '',	    None,   False  ],
-    '33003': [ 'BMS Pack Temperature',	                      1, 'U16', '℃',	 10,     False  ],
-    '33009': [ 'Max Cell Temperature',	                      1, 'U16', '℃',	 10,     False  ],
-    '33011': [ 'Min Cell Temperature',	                      1, 'U16', '℃',	 10,     False  ],
-    '33013': [ 'Max Cell Voltage',	                          1, 'U16', 'V',	  1000,   False  ],
-    '33015': [ 'Min Cell Voltage',	                          1, 'U16', 'V',	  1000,   False  ],
-    '50000': [ 'Operation Mode',	                            1, 'U16', '',	    None,   True  ],
-    '25100': [ 'Grid injection limit switch',	                1, 'U16', '',	    None,   True  ],
-    '25103': [ 'Grid injection power limit',	                1, 'U16', '%',	  10,     True  ],
-    '52502': [ 'On-grid SOC limit switch',	                  1, 'U16', '',	    None,   True  ],
-    '52503': [ 'On-grid SOC limit',	                          1, 'U16', '%',	  10,     True  ],
-    '52504': [ 'Off-grid SOC limit switch',	                  1, 'U16', '',	    None,   True  ],
-    '52505': [ 'Off-grid SOC limit',	                        1, 'U16', '%',	  10,     True  ],
-  }
-
   #-------------------------------------------------
   def __init__( self ):
     self.modbus_client = None
@@ -146,13 +51,13 @@ class MTECmodbusAPI:
     data = {}
     logging.debug("Retrieving data...")
     if registers == None: # fetch all registers
-      for register, item in self.register_map.items():
+      for register, item in register_map.items():
         reg_data = self._read_register(register=register, item=item) 
         if reg_data:
           data.update( reg_data )
     else: # fetch list of given registers
       for register in registers:
-        item = self.register_map.get(register)
+        item = register_map.get(register)
         if item:
           reg_data = self._read_register(register=register, item=item) 
           if reg_data:
@@ -167,7 +72,7 @@ class MTECmodbusAPI:
   def _read_register(self, register, item):
     data = {}
     try:
-      result = self.modbus_client.read_holding_registers(address=int(register), count=item[1], slave=self.slave )
+      result = self.modbus_client.read_holding_registers(address=int(register), count=item["length"], slave=self.slave )
     except Exception as ex:
       logging.error("Exception while reading register {} from pymodbus: {}".format(register, ex))
       return data
@@ -178,58 +83,59 @@ class MTECmodbusAPI:
     
     val = None
     decoder = BinaryPayloadDecoder.fromRegisters(result.registers,byteorder=Endian.BIG, wordorder=Endian.BIG)
-    if item[2] == 'U16':
+    item["type"] = item["type"]
+    if item["type"] == 'U16':
       val = decoder.decode_16bit_uint()
-    elif item[2] == 'I16':
+    elif item["type"] == 'I16':
       val = decoder.decode_16bit_int()
-    elif item[2] == 'U32':
+    elif item["type"] == 'U32':
       val = decoder.decode_32bit_uint()
-    elif item[2] == 'I32':
+    elif item["type"] == 'I32':
       val = decoder.decode_32bit_int()
-    elif item[2] == 'BYTE':
-      if item[1] == 1:
+    elif item["type"] == 'BYTE':
+      if item["length"] == 1:
         val = "{:02d} {:02d}".format( decoder.decode_8bit_uint(), decoder.decode_8bit_uint() )
-      elif item[1] == 2:
+      elif item["length"] == 2:
         val = "{:02d} {:02d}  {:02d} {:02d}".format( decoder.decode_8bit_uint(), decoder.decode_8bit_uint(), 
                                                   decoder.decode_8bit_uint(), decoder.decode_8bit_uint() )
-      elif item[1] == 4:
+      elif item["length"] == 4:
         val = "{:02d} {:02d} {:02d} {:02d}  {:02d} {:02d} {:02d} {:02d}".format( decoder.decode_8bit_uint(), decoder.decode_8bit_uint(), 
                                                   decoder.decode_8bit_uint(), decoder.decode_8bit_uint(),
                                                   decoder.decode_8bit_uint(), decoder.decode_8bit_uint(), 
                                                   decoder.decode_8bit_uint(), decoder.decode_8bit_uint() )
-    elif item[2] == 'BIT':
-      if item[1] == 1:
+    elif item["type"] == 'BIT':
+      if item["length"] == 1:
         val = "{:08b}".format( decoder.decode_8bit_uint() )
-      if item[1] == 2:
+      if item["length"] == 2:
         val = "{:08b} {:08b}".format( decoder.decode_8bit_uint(), decoder.decode_8bit_uint() )
-    elif item[2] == 'DAT':
+    elif item["type"] == 'DAT':
       val = "{:02d}-{:02d}-{:02d} {:02d}:{:02d}:{:02d}".format( decoder.decode_8bit_uint(), decoder.decode_8bit_uint(), decoder.decode_8bit_uint(),
                       decoder.decode_8bit_uint(), decoder.decode_8bit_uint(), decoder.decode_8bit_uint() )
-    elif item[2] == 'STR':
-      val = decoder.decode_string(item[1]*2).decode()
+    elif item["type"] == 'STR':
+      val = decoder.decode_string(item["length"]*2).decode()
     else:
-      logging.error("Unknown type {} to decode register {}".format(item[2], register))
+      logging.error("Unknown type {} to decode register {}".format(item["type"], register))
       return data
     
-    if val and item[4] and item[4]>0:
-      val /= item[4]
-    data[register] = { "name":item[0], "value":val, "unit":item[3] } 
+    if val and item["scale"] > 1:
+      val /= item["scale"]
+    data[register] = { "name":item["name"], "value":val, "unit":item["unit"] } 
 
     return data
 
   #--------------------------------
   def write_register(self, register, value):
     # Lookup register
-    item = self.register_map.get(str(register), None)
+    item = register_map.get(str(register), None)
     if not item:
       logging.error("Can't write unknown register: {}".format(register))
       return False
-    elif item[5]==False:
+    elif item.get("writable", False) == False:
       logging.error("Can't write register which is marked read-only: {}".format(register))
       return False
     # adjust scale 
-    if item[4] and item[4]>0:
-      value *= item[4]
+    if item["scale"] > 1:
+      value *= item["scale"]
 
     try:
       result = self.modbus_client.write_register(address=int(register), value=int(value), slave=self.slave )
