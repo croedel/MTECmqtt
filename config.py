@@ -28,11 +28,21 @@ def init_register_map():
 
   # Syntax checks 
   register_map = {}
-  p_mandatory = ["name", "length", "type"]
+  p_mandatory = [
+    "name", 
+  ]
   p_optional = [ 
+    # param, default
+    [ "length", None ], 
+    [ "type", None ],
     [ "unit", "" ],
     [ "scale", 1 ],
-    [ "writeable", False ]
+    [ "writeable", False ],
+    [ "mqtt", None ],
+    [ "group", None ],
+    [ "hass_device_class", None ],
+    [ "hass_value_template", "{{ value }}" ],
+    [ "hass_state_class", "measurement" ],
   ] 
 
   for key, val in r_map.items():

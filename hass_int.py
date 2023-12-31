@@ -4,9 +4,9 @@ Auto discovery for home assistant
 (c) 2023 by Christian Rödel 
 """
 
+from config import cfg, register_map
 import logging
 import json
-from config import cfg
 import mqtt
 
 #---------------------------------------------------
@@ -196,31 +196,27 @@ class HassIntegration:
     }  
 
     # build sensor registration
-    sensors = self.sensors_base
-    if cfg['ENABLE_GRID_DATA']:
-      sensors.extend(self.sensors_grid)
-    if cfg['ENABLE_INVERTER_DATA']:
-      sensors.extend(self.sensors_inverter)
-    if cfg['ENABLE_BACKUP_DATA']:
-      sensors.extend(self.sensors_backup)
-    if cfg['ENABLE_BATTERY_DATA']:
-      sensors.extend(self.sensors_battery)
-    if cfg['ENABLE_PV_DATA']:
-      sensors.extend(self.sensors_pv)
-
-    for item in sensors:
-      data_item = { 
-        "name": item[0], 
-        "unique_id": item[1], 
-        "device_class": item[2], 
-        "unit_of_measurement": item[3],
-        "value_template": item[4], 
-        "state_class": item[5], 
-        "state_topic": "MTEC/" + self.serial_no + "/" + item[6],
-        "device": device
-      }
-      topic = cfg["HASS_BASE_TOPIC"] + "/sensor/" + item[1] + "/config"
-      self.devices_array.append( [topic, json.dumps(data_item)] )  
+    for register, item in register_map.items():
+      if item["group"]:
+        if ( (item["group"] in ["now-base", "day", "total"]) or 
+          (item["group"]=="now-grid" and cfg['ENABLE_GRID_DATA']) or
+          (item["group"]=="now-inverter" and cfg['ENABLE_INVERTER_DATA']) or
+          (item["group"]=="now-backup" and cfg['ENABLE_BACKUP_DATA']) or
+          (item["group"]=="now-battery" and cfg['ENABLE_BATTERY_DATA']) or
+          (item["group"]=="now-pv" and cfg['ENABLE_PV_DATA']) 
+        ):        
+          data_item = { 
+            "name": item["name"], 
+            "unique_id": "MTEC_" + item["mqtt"], 
+            "device_class": item["hass_device_class"], 
+            "unit_of_measurement": item["unit"],
+            "value_template": item["hass_value_template"], 
+            "state_class": item["hass_state_class"], 
+            "state_topic": "MTEC/" + self.serial_no + "/" + item["group"] + "/" + item["mqtt"],
+            "device": device
+          }
+          topic = cfg["HASS_BASE_TOPIC"] + "/sensor/" + "MTEC_" + item["mqtt"] + "/config"
+          self.devices_array.append( [topic, json.dumps(data_item)] )  
 
 #---------------------------------------------------
 # Testcode only

@@ -1,193 +1,353 @@
 ---
-# Inverter registers and their mappings 
+# Template with all supported parameters 
 #"10000": 
 #  name: Inverter serial number
 #  length: 8 
 #  type: STR
-#
-#
-#
+#  unit: "%"
+#  scale: 10
+#  writeable: True 
+#  mqtt: serial_no
+#  group: config
+#  hass_device_class: battery
+#  hass_value_template: "{{ value | round(1) }}"
+#  hass_state_class: measurement 
+
+
+#------------------------------------------------------------------
+# Calculated pseudo-registers
+
+"household":
+  name: Household current
+  unit: W
+  mqtt: household
+  group: now-base
+  hass_device_class: power
+  hass_value_template: "{{ value | round(0) }}"
+  hass_state_class: measurement
+
+"consumption-day":
+  name: Household energy consumption (day)
+  unit: kWh
+  mqtt: consumption_day
+  group: day
+  hass_device_class: energy
+  hass_value_template: "{{ value | round(1) }}"
+  hass_state_class: measurement
+
+"autarky-day":
+  name: Household autarky (day)
+  unit: "%"
+  mqtt: autarky_rate_day
+  group: day
+  hass_device_class: power_factor
+  hass_value_template: "{{ value | round(1) }}"
+  hass_state_class: measurement
+
+"ownconsumption-day":
+  name: Own consumption rate (day)
+  unit: "%"
+  mqtt: own_consumption_day
+  group: day
+  hass_device_class: power_factor
+  hass_value_template: "{{ value | round(1) }}"
+  hass_state_class: measurement
+
+"consumption-total":
+  name: Household energy consumption (total)
+  unit: kWh
+  mqtt: consumption_total
+  group: total
+  hass_device_class: energy
+  hass_value_template: "{{ value | round(1) }}"
+  hass_state_class: measurement
+
+"autarky-total":
+  name: Household autarky (total)
+  unit: "%"
+  mqtt: autarky_rate_total
+  group: total
+  hass_device_class: power_factor
+  hass_value_template: "{{ value | round(1) }}"
+  hass_state_class: measurement
+
+"ownconsumption-total":
+  name: Own consumption rate (total)
+  unit: "%"
+  mqtt: own_consumption_total
+  group: total
+  hass_device_class: power_factor
+  hass_value_template: "{{ value | round(1) }}"
+  hass_state_class: measurement
+
+#------------------------------------------------------------------
+# Modbus registers
 
 "10000": 
   name: Inverter serial number
   length: 8 
   type: STR
+  mqtt: serial_no
+  group: config
+  hass_device_class: 
+  hass_value_template: "{{ value | round(1) }}"
+  hass_state_class: measurement 
 
 "10008":
-  name: Equipment Info
+  name: Equipment info
   length: 1
   type: BYTE
 
 "10011":
-  name: Firmware Version
+  name: Firmware version
   length: 4
   type: BYTE
+  mqtt: firmware_version
+  group: config
+  hass_device_class: 
+  hass_value_template: "{{ value }}"
+  hass_state_class: measurement 
 
 "10100":
   name: Inverter date
   length: 3
   type: DAT
+  mqtt: inverter_date
+  group: now-base
+  hass_device_class: timestamp
+  hass_value_template: "{{ strptime(value, '%y-%m-%d %H:%M:%S').timestamp() | timestamp_local }}"
+  hass_state_class: measurement 
 
 "10105":
-  name: Inverter Running Status             
+  name: Inverter status             
   length: 1
   type: U16
+  mqtt: inverter_status
+  group: now-base
+  hass_device_class: enum
+  hass_value_template: "{% if value=='0' %}wait for on-grid{% elif value=='1' %}self-check{% elif value=='2' %}on-grid{% elif value=='3' %}fault{% elif value=='4' %}firmware update{% elif value=='5' %}off grid{% else %}Unknown{% endif %}"
+  hass_state_class: measurement 
 
 "10112":
-  name: Fault Flag1
+  name: Fault flag1
   length: 2
   type: BIT
 
 "10114":
-  name: Fault Flag2                
+  name: Fault flag2                
   length: 2
   type: BIT
 
 "10120":
-  name: Fault Flag3                
+  name: Fault flag3                
   length: 2
   type: BIT
 
 "10994":
-  name: Phase A Power on Meter
+  name: Meter power phase A
   length: 2
   type: I32
   unit: W
+  mqtt: grid_a
+  group: now-grid  
+  hass_device_class: power
+  hass_value_template: "{{ value | round(0) }}"
+  hass_state_class: measurement 
 
 "10996":
-  name: Phase B Power on Meter
+  name: Meter power phase B
   length: 2
   type: I32
   unit: W
+  mqtt: grid_b
+  group: now-grid 
+  hass_device_class: power
+  hass_value_template: "{{ value | round(0) }}"
+  hass_state_class: measurement 
 
 "10998":
-  name: Phase C Power on Meter
+  name: Meter power phase C
   length: 2
   type: I32
   unit: W
+  mqtt: grid_c
+  group: now-grid
+  hass_device_class: power
+  hass_value_template: "{{ value | round(0) }}"
+  hass_state_class: measurement 
 
 "11000":
-  name: Total Power on Meter
+  name: Meter power total
   length: 2
   type: I32
   unit: W
+  mqtt: grid
+  group: now-base
+  hass_device_class: power
+  hass_value_template: "{{ value | round(0) }}"
+  hass_state_class: measurement 
 
 "11002":
-  name: Total Grid-Injection Energy on Meter
+  name: Grid-injection on meter (total)
   length: 2
   type: U32
   unit: kWh
   scale: 100
 
 "11004":
-  name: Total Purchasing Energy from Grid on Meter
+  name: Purchased energy from grid on meter (total) 
   length: 2
   type: U32
   unit: kWh
   scale: 100
 
 "11006":
-  name: Grid Lines A/B Voltage
+  name: Grid lines A/B voltage
   length: 1
   type: U16
   unit: V
   scale: 10
 
 "11007":
-  name: Grid Lines B/C Voltage
+  name: Grid lines B/C voltage
   length: 1
   type: U16
   unit: V
   scale: 10
 
 "11008":
-  name: Grid Lines C/A Voltage
+  name: Grid lines C/A voltage
   length: 1
   type: U16
   unit: V
   scale: 10
 
 "11009":
-  name: Grid Phase A Voltage
+  name: Grid voltage phase A 
   length: 1
   type: U16
   unit: V
   scale: 10
+  mqtt: grid_voltage_a
+  group: now-grid
+  hass_device_class: voltage
+  hass_value_template: "{{ value | round(1) }}"
+  hass_state_class: measurement 
 
 "11010":
-  name: Grid Phase A Current
+  name: Grid current phase A
   length: 1
   type: U16
   unit: A
   scale: 10
+  mqtt: grid_current_a
+  group: now-grid
+  hass_device_class: current
+  hass_value_template: "{{ value | round(1) }}"
+  hass_state_class: measurement 
 
 "11011":
-  name: Grid Phase B Voltage
+  name: Grid voltage phase B
   length: 1
   type: U16
   unit: V
   scale: 10
+  mqtt: grid_voltage_b
+  group: now-grid
+  hass_device_class: voltage
+  hass_value_template: "{{ value | round(1) }}"
+  hass_state_class: measurement 
 
 "11012":
-  name: Grid Phase B Current
+  name: Grid current phase B
   length: 1
   type: U16
   unit: A
   scale: 10
+  mqtt: grid_current_b
+  group: now-grid
+  hass_device_class: current
+  hass_value_template: "{{ value | round(1) }}"
+  hass_state_class: measurement 
 
 "11013":
-  name: Grid Phase C Voltage
+  name: Grid voltage phase C
   length: 1
   type: U16
   unit: V
   scale: 10
+  mqtt: grid_voltage_c
+  group: now-grid
+  hass_device_class: voltage
+  hass_value_template: "{{ value | round(1) }}"
+  hass_state_class: measurement 
 
 "11014":
-  name: Grid Phase C Current
+  name: Grid current phase C
   length: 1
   type: U16
   unit: A
   scale: 10
+  mqtt: grid_current_c
+  group: now-grid
+  hass_device_class: current
+  hass_value_template: "{{ value | round(1) }}"
+  hass_state_class: measurement 
 
 "11015":
-  name: Grid Frequency
+  name: Grid frequency
   length: 1
   type: U16
   unit: Hz
   scale: 100
+  mqtt: grid_fequency 
+  group: now-grid
+  hass_device_class: frequency
+  hass_value_template: "{{ value | round(2) }}"
+  hass_state_class: measurement 
 
 "11016":
-  name: P_AC
+  name: Power AC
   length: 2
   type: I32
   unit: W
+  mqtt: inverter
+  group: now-base
+  hass_device_class: power
+  hass_value_template: "{{ value | round(0) }}"
+  hass_state_class: measurement 
 
 "11018":
-  name: Total PV Generation on that day
+  name: PV generation on that day
   length: 2
   type: U32
   unit: kWh
   scale: 10
 
 "11020":
-  name: Total PV Generation from Installation
+  name: PV generation total
   length: 2
   type: U32
   unit: kWh
   scale: 10
 
 "11022":
-  name: Total PV Generation Time from Installation
+  name: PV generation time total
   length: 2
   type: U32
   unit: h
 
 "11028":
-  name: PV Input Total Power
+  name: PV (now)
   length: 2
   type: U32
-  unit: kW
-  scale: 1000
+  unit: W
+  scale: 1
+  mqtt: pv
+  group: now-base
+  hass_device_class: power
+  hass_value_template: "{{ value | round(0) }}"
+  hass_state_class: measurement 
 
 "11032":
   name: Temperature Sensor 1
@@ -195,6 +355,11 @@
   type: I16
   unit: ℃
   scale: 10
+  mqtt: inverter_temp1
+  group: now-inverter
+  hass_device_class: temperature
+  hass_value_template: "{{ value | round(1) }}"
+  hass_state_class: measurement 
 
 "11033":
   name: Temperature Sensor 2
@@ -202,6 +367,11 @@
   type: I16
   unit: ℃
   scale: 10
+  mqtt: inverter_temp2
+  group: now-inverter
+  hass_device_class: temperature
+  hass_value_template: "{{ value | round(1) }}"
+  hass_state_class: measurement 
 
 "11034":
   name: Temperature Sensor 3
@@ -209,6 +379,11 @@
   type: I16
   unit: ℃
   scale: 10
+  mqtt: inverter_temp3
+  group: now-inverter
+  hass_device_class: temperature
+  hass_value_template: "{{ value | round(1) }}"
+  hass_state_class: measurement 
 
 "11035":
   name: Temperature Sensor 4
@@ -216,274 +391,454 @@
   type: I16
   unit: ℃
   scale: 10
+  mqtt: inverter_temp4
+  group: now-inverter
+  hass_device_class: temperature
+  hass_value_template: "{{ value | round(1) }}"
+  hass_state_class: measurement 
 
 "11038":
-  name: PV1 Voltage
+  name: PV1 voltage
   length: 1
   type: U16
   unit: V
   scale: 10
+  mqtt: pv_voltage_1
+  group: now-pv
+  hass_device_class: voltage
+  hass_value_template: "{{ value | round(1) }}"
+  hass_state_class: measurement 
 
 "11039":
-  name: PV1 Current
+  name: PV1 current
   length: 1
   type: U16
   unit: A
   scale: 10
+  mqtt: pv_current_1
+  group: now-pv
+  hass_device_class: current
+  hass_value_template: "{{ value | round(1) }}"
+  hass_state_class: measurement 
 
 "11040":
-  name: PV2 Voltage
+  name: PV2 voltage
   length: 1
   type: U16
   unit: V
   scale: 10
+  mqtt: pv_voltage_2
+  group: now-pv
+  hass_device_class: voltage
+  hass_value_template: "{{ value | round(1) }}"
+  hass_state_class: measurement 
 
 "11041":
-  name: PV2 Current
+  name: PV2 current
   length: 1
   type: U16
   unit: A
   scale: 10
+  mqtt: pv_current_2
+  group: now-pv
+  hass_device_class: current
+  hass_value_template: "{{ value | round(1) }}"
+  hass_state_class: measurement 
 
 "11062":
-  name: PV1 Input Power
+  name: PV1 power
   length: 2
   type: U32
   unit: W
+  mqtt: pv_1
+  group: now-pv
+  hass_device_class: power
+  hass_value_template: "{{ value | round(0) }}"
+  hass_state_class: measurement 
 
 "11064":
-  name: PV2 Input Power
+  name: PV2 power
   length: 2
   type: U32
   unit: W
+  mqtt: pv_2
+  group: now-pv
+  hass_device_class: power
+  hass_value_template: "{{ value | round(0) }}"
+  hass_state_class: measurement 
 
 "30200":
-  name: Backup_A_V
+  name: Backup voltage phase A
   length: 1
   type: U16
   unit: V
   scale: 10
+  mqtt: backup_voltage_a 
+  group: now-backup
+  hass_device_class: voltage
+  hass_value_template: "{{ value | round(1) }}"
+  hass_state_class: measurement 
 
 "30201":
-  name: Backup_A_I
+  name: Backup current phase A
   length: 1
   type: U16
   unit: A
   scale: 10
+  mqtt: backup_current_a 
+  group: now-backup
+  hass_device_class: current
+  hass_value_template: "{{ value | round(1) }}"
+  hass_state_class: measurement 
 
 "30202":
-  name: Backup_A_F
+  name: Backup frequency phase A
   length: 1
   type: U16
   unit: Hz
   scale: 100
+  mqtt: backup_frequency_a 
+  group: now-backup
+  hass_device_class: frequency
+  hass_value_template: "{{ value | round(2) }}"
+  hass_state_class: measurement 
 
 "30204":
-  name: Backup_A_P
+  name: Backup power phase A
   length: 2
   type: I32
   unit: W
+  mqtt: backup_a 
+  group: now-backup
+  hass_device_class: power
+  hass_value_template: "{{ value | round(0) }}"
+  hass_state_class: measurement 
 
 "30210":
-  name: Backup_B_V
+  name: Backup voltage phase B
   length: 1
   type: U16
   unit: V
   scale: 10
+  mqtt: backup_voltage_b 
+  group: now-backup
+  hass_device_class: voltage
+  hass_value_template: "{{ value | round(1) }}"
+  hass_state_class: measurement 
 
 "30211":
-  name: Backup_B_I
+  name: Backup current phase B
   length: 1
   type: U16
   unit: A
   scale: 10
+  mqtt: backup_current_b 
+  group: now-backup
+  hass_device_class: current
+  hass_value_template: "{{ value | round(1) }}"
+  hass_state_class: measurement 
 
 "30212":
-  name: Backup_B_F
+  name: Backup frequency phase B
   length: 1
   type: U16
   unit: Hz
   scale: 100
+  mqtt: backup_frequency_b 
+  group: now-backup
+  hass_device_class: frequency
+  hass_value_template: "{{ value | round(2) }}"
+  hass_state_class: measurement 
 
 "30214":
-  name: Backup_B_P
+  name: Backup power phase B
   length: 2
   type: I32
   unit: W
+  mqtt: backup_b 
+  group: now-backup
+  hass_device_class: power
+  hass_value_template: "{{ value | round(0) }}"
+  hass_state_class: measurement 
 
 "30220":
-  name: Backup_C_V
+  name: Backup voltage phase C
   length: 1
   type: U16
   unit: V
   scale: 10
+  mqtt: backup_voltage_c 
+  group: now-backup
+  hass_device_class: voltage
+  hass_value_template: "{{ value | round(1) }}"
+  hass_state_class: measurement 
 
 "30221":
-  name: Backup_C_I
+  name: Backup current phase C
   length: 1
   type: U16
   unit: A
   scale: 10
+  mqtt: backup_current_c 
+  group: now-backup
+  hass_device_class: current
+  hass_value_template: "{{ value | round(1) }}"
+  hass_state_class: measurement 
 
 "30222":
-  name: Backup_C_F
+  name: Backup frequency phase C
   length: 1
   type: U16
   unit: Hz
   scale: 100
+  mqtt: backup_frequency_c 
+  group: now-backup
+  hass_device_class: frequency
+  hass_value_template: "{{ value | round(2) }}"
+  hass_state_class: measurement 
 
 "30224":
-  name: Backup_C_P
+  name: Backup power phase C
   length: 2
   type: I32
   unit: W
+  mqtt: backup_c 
+  group: now-backup
+  hass_device_class: power
+  hass_value_template: "{{ value | round(0) }}"
+  hass_state_class: measurement 
 
 "30230":
-  name: Total_Backup_P
+  name: Backup power total
   length: 2
   type: I32
   unit: W
+  mqtt: backup 
+  group: now-base
+  hass_device_class: power
+  hass_value_template: "{{ value | round(0) }}"
+  hass_state_class: measurement 
 
 "30236":
-  name: Invt_A_P
+  name: Inverter power phase A
   length: 2
   type: I32
   unit: W
+  mqtt: inverter_a 
+  group: now-inverter 
+  hass_device_class: power
+  hass_value_template: "{{ value | round(0) }}"
+  hass_state_class: measurement 
 
 "30242":
-  name: Invt_B_P
+  name: Inverter power phase B
   length: 2
   type: I32
   unit: W
+  mqtt: inverter_b 
+  group: now-inverter 
+  hass_device_class: power
+  hass_value_template: "{{ value | round(0) }}"
+  hass_state_class: measurement 
 
 "30248":
-  name: Invt_C_P
+  name: Inverter power phase C
   length: 2
   type: I32
   unit: W
+  mqtt: inverter_c 
+  group: now-inverter 
+  hass_device_class: power
+  hass_value_template: "{{ value | round(0) }}"
+  hass_state_class: measurement 
 
 "30254":
-  name: Battery_V
+  name: Battery voltage
   length: 1
   type: U16
   unit: V 
   scale: 10
 
 "30255":
-  name: Battery_I
+  name: Battery current
   length: 1
   type: I16
   unit: A
   scale: 10
 
 "30256":
-  name: Battery_Mode
+  name: Battery mode
   length: 1
   type: U16
 
 "30258":
-  name: Battery_P
+  name: Battery power
   length: 2
   type: I32
   unit: W
+  mqtt: battery
+  group: now-base
+  hass_device_class: power
+  hass_value_template: "{{ value | round(0) }}"
+  hass_state_class: measurement 
 
 "31000":
-  name: Grid Injection Energy on that day[Meter]
+  name: Grid injection energy (day)
   length: 1
   type: U16
   unit: kWh
   scale: 10
+  mqtt: grid_feed_day
+  group: day
+  hass_device_class: energy
+  hass_value_template: "{{ value | round(1) }}"
+  hass_state_class: measurement 
 
 "31001":
-  name: Grid Purchasing Energy on that day[Meter]
+  name: Grid purchasing energy (day)
   length: 1
   type: U16
   unit: kWh
   scale: 10
+  mqtt: grid_purchase_day
+  group: day
+  hass_device_class: energy
+  hass_value_template: "{{ value | round(1) }}"
+  hass_state_class: measurement 
 
 "31002":
-  name: Backup Output Energy on that day
+  name: Backup energy (day)
   length: 1
   type: U16
   unit: kWh
   scale: 10
+  mqtt: backup_day
+  group: day
+  hass_device_class: energy
+  hass_value_template: "{{ value | round(1) }}"
+  hass_state_class: measurement 
 
 "31003":
-  name: Battery Charge Energy on that day
+  name: Battery charge energy (day)
   length: 1
   type: U16
   unit: kWh
   scale: 10
+  mqtt: battery_charge_day
+  group: day
+  hass_device_class: energy
+  hass_value_template: "{{ value | round(1) }}"
+  hass_state_class: measurement 
 
 "31004":
-  name: Battery Discharge Energy on that day
+  name: Battery discharge energy (day)
   length: 1
   type: U16
   unit: kWh
   scale: 10
+  mqtt: battery_discharge_day
+  group: day
+  hass_device_class: energy
+  hass_value_template: "{{ value | round(1) }}"
+  hass_state_class: measurement 
 
 "31005":
-  name: PV Generation Energy on that day
+  name: PV generation energy (day)
   length: 1
   type: U16
   unit: kWh
   scale: 10
+  mqtt: pv_day
+  group: day
+  hass_device_class: energy
+  hass_value_template: "{{ value | round(1) }}"
+  hass_state_class: measurement 
 
 "31006":
-  name: Loading Energy on that day
+  name: Loading energy (day)
   length: 1
   type: U16
   unit: kWh
   scale: 10
 
 "31008":
-  name: Energy Purchased from Grid on that day
+  name: Energy purchased from grid (day)
   length: 1
   type: U16
   unit: kWh
   scale: 10
 
 "31102":
-  name: Total Energy injected to grid
+  name: Energy injected to grid (total)
   length: 2
   type: U32
   unit: kWh
   scale: 10
+  mqtt: grid_feed_total
+  group: total
+  hass_device_class: energy
+  hass_value_template: "{{ value | round(0) }}"
+  hass_state_class: measurement 
 
 "31104":
-  name: Total Energy Purchased from Grid from Meter
+  name: Energy purchased from grid (total)
   length: 2
   type: U32
   unit: kWh
   scale: 10
+  mqtt: grid_purchase_total
+  group: total
+  hass_device_class: energy
+  hass_value_template: "{{ value | round(0) }}"
+  hass_state_class: measurement 
 
 "31106":
-  name: Total Output Energy on backup port
+  name: Backup energy (total)
   length: 2
   type: U32
   unit: kWh
   scale: 10
+  mqtt: backup_total
+  group: total
+  hass_device_class: energy
+  hass_value_template: "{{ value | round(0) }}"
+  hass_state_class: measurement 
 
 "31108":
-  name: Total Energy Charged to Battery
+  name: Energy charged to battery (total)
   length: 2
   type: U32
   unit: kWh
   scale: 10
+  mqtt: battery_charge_total
+  group: total
+  hass_device_class: energy
+  hass_value_template: "{{ value | round(0) }}"
+  hass_state_class: measurement 
 
 "31110":
-  name: Total Energy Discharged from Battery
+  name: Energy discharged from battery (total)
   length: 2
   type: U32
   unit: kWh
   scale: 10
+  mqtt: battery_discharge_total
+  group: total
+  hass_device_class: energy
+  hass_value_template: "{{ value | round(0) }}"
+  hass_state_class: measurement 
 
 "31112":
-  name: Total PV Generation
+  name: PV generation (total)
   length: 2
   type: U32
   unit: kWh
   scale: 10
+  mqtt: pv_total
+  group: total
+  hass_device_class: energy
+  hass_value_template: "{{ value | round(0) }}"
+  hass_state_class: measurement 
 
 "31114":
   name: Total Loading Energy consumed at grid side
@@ -500,18 +855,28 @@
   scale: 10
 
 "33000":
-  name: SOC
+  name: Battery SOC
   length: 1
   type: U16
   unit:  "%"
   scale: 100
+  mqtt: battery_soc 
+  group: now-base
+  hass_device_class: battery
+  hass_value_template: "{{ value | round(1) }}"
+  hass_state_class: measurement 
 
 "33001":
-  name: SOH
+  name: Battery SOH
   length: 1
   type: U16
   unit:  "%"
   scale: 100
+  mqtt: battery_soh
+  group: now-battery
+  hass_device_class: power_factor
+  hass_value_template: "{{ value | round(1) }}"
+  hass_state_class: measurement 
 
 "33002":
   name: BMS Status
@@ -526,44 +891,74 @@
   scale: 10
 
 "33009":
-  name: Max Cell Temperature
+  name: Battery max. cell temperature
   length: 1
   type: U16
   unit: "℃" 
   scale: 10
+  mqtt: battery_cell_t_max
+  group: now-battery
+  hass_device_class: temperature
+  hass_value_template: "{{ value | round(1) }}"
+  hass_state_class: measurement 
 
 "33011":
-  name: Min Cell Temperature
+  name: Battery min. cell temperature
   length: 1
   type: U16
   unit: "℃"
   scale: 10
+  mqtt: battery_cell_t_min
+  group: now-battery
+  hass_device_class: temperature
+  hass_value_template: "{{ value | round(1) }}"
+  hass_state_class: measurement 
 
 "33013":
-  name: Max Cell Voltage
+  name: Battery max. cell voltage
   length: 1
   type: U16
   unit: V
   scale: 1000
+  mqtt: battery_cell_v_max
+  group: now-battery
+  hass_device_class: voltage
+  hass_value_template: "{{ value | round(2) }}"
+  hass_state_class: measurement 
 
 "33015":
-  name: Min Cell Voltage
+  name: Battery min. cell voltage
   length: 1
   type: U16
   unit: V
   scale: 1000
+  mqtt: battery_cell_v_min
+  group: now-battery
+  hass_device_class: voltage
+  hass_value_template: "{{ value | round(2) }}"
+  hass_state_class: measurement 
 
 "50000":
-  name: Operation Mode
+  name: Inverter operation mode
   length: 1
   type: U16
   writeable: True 
+  mqtt: mode 
+  group: now-base
+  hass_device_class: enum
+  hass_value_template: "{% if value=='257' %}General mode{% elif value=='258' %}Economic mode{% elif value=='259' %}UPS mode{% elif value=='512' %}Off grid{% elif value=='771' %}Manual mode{% else %}Unknown{% endif %}"
+  hass_state_class: measurement 
 
 "25100":
   name: Grid injection limit switch
   length: 1
   type: U16
   writeable: True 
+  mqtt: grid_inject_switch 
+  group: now-inverter
+  hass_device_class: enum
+  hass_value_template: "{% if value=='0' %}OFF{% elif value=='1' %}ON{% else %}Unknown{% endif %}"
+  hass_state_class: measurement 
 
 "25103":
   name: Grid injection power limit
@@ -572,12 +967,22 @@
   unit: "%"
   scale: 10
   writeable: True 
+  mqtt: grid_inject_limit 
+  group: now-inverter
+  hass_device_class: power_factor
+  hass_value_template: "{{ value | round(1) }}"
+  hass_state_class: measurement 
 
 "52502":
   name: On-grid SOC limit switch
   length: 1
   type: U16
   writeable: True 
+  mqtt: on_grid_soc_switch 
+  group: now-inverter
+  hass_device_class: enum
+  hass_value_template: "{% if value=='0' %}OFF{% elif value=='1' %}ON{% else %}Unknown{% endif %}"
+  hass_state_class: measurement 
 
 "52503":
   name: On-grid SOC limit
@@ -586,12 +991,22 @@
   unit: "%"
   scale: 10
   writeable: True 
+  mqtt: on_grid_soc_limit 
+  group: now-inverter
+  hass_device_class: power_factor
+  hass_value_template: "{{ value | round(1) }}"
+  hass_state_class: measurement 
 
 "52504":
   name: Off-grid SOC limit switch
   length: 1
   type: U16
   writeable: True 
+  mqtt: off_grid_soc_switch 
+  group: now-inverter
+  hass_device_class: enum
+  hass_value_template: "{% if value=='0' %}OFF{% elif value=='1' %}ON{% else %}Unknown{% endif %}"
+  hass_state_class: measurement 
 
 "52505":
   name: Off-grid SOC limit  
@@ -600,4 +1015,9 @@
   unit: "%"
   scale: 10
   writeable: True 
+  mqtt: off_grid_soc_limit 
+  group: now-inverter
+  hass_device_class: power_factor
+  hass_value_template: "{{ value | round(1) }}"
+  hass_state_class: measurement 
 

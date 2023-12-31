@@ -8,7 +8,6 @@ from pymodbus.client import ModbusTcpClient
 from pymodbus.transaction import ModbusRtuFramer
 from pymodbus.payload import BinaryPayloadDecoder
 from pymodbus.constants import Endian
-from pymodbus.exceptions import ModbusException
 import logging
 
 #=====================================================
@@ -52,16 +51,18 @@ class MTECmodbusAPI:
     logging.debug("Retrieving data...")
     if registers == None: # fetch all registers
       for register, item in register_map.items():
-        reg_data = self._read_register(register=register, item=item) 
-        if reg_data:
-          data.update( reg_data )
+        if register.isnumeric(): # non-numeric registers are deemed to be calculated pseudo-registers 
+          reg_data = self._read_register(register=register, item=item) 
+          if reg_data:
+            data.update( reg_data )
     else: # fetch list of given registers
       for register in registers:
         item = register_map.get(register)
         if item:
-          reg_data = self._read_register(register=register, item=item) 
-          if reg_data:
-            data.update( reg_data )
+          if register.isnumeric(): # non-numeric registers are deemed to be calculated pseudo-registers 
+            reg_data = self._read_register(register=register, item=item) 
+            if reg_data:
+              data.update( reg_data )
         else:
           logging.warning("Unknowd register: {} - skipped.".format(register))
   
