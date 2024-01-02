@@ -227,6 +227,9 @@ Battery -------    |                --------- house
 | 10994    | grid_a                  | W    | Meter power phase A
 | 10996    | grid_b                  | W    | Meter power phase B
 | 10998    | grid_c                  | W    | Meter power phase C
+| 11006    | grid_voltage_a_b        | V    | Grid voltage lines A/B
+| 11007    | grid_voltage_b_c        | V    | Grid voltage lines B/C
+| 11008    | grid_voltage_c_a        | V    | Grid voltage lines C/A
 | 11009    | grid_voltage_a          | V    | Grid voltage phase A
 | 11010    | grid_current_a          | A    | Grid current phase A
 | 11011    | grid_voltage_b          | V    | Grid voltage phase B
@@ -314,7 +317,7 @@ The command-line tool `mtec_export.py` offers functionality to read data from yo
 As default, it will connect to your device and retrieve a list of all known Modbus registers in a human readable format.
 
 By specifying commandline parameters, you can:
-* Toggle between a full export of all registers `-t all` or a subset of the essential ones `-t essential`
-* Provide a customize list of Modbus registers which you would like to retrieve, e.g. `-r 33000,10105,11000`
+* Specify a register group (e.g. `-g config`) or "all" (`-g all`) to export of all registers
+* Provide a customize list of Modbus registers which you would like to retrieve, e.g. `-r "33000,10105,11000"`
 * Request to export CSV instead of human readable (`-c`) 
 * Write output to a file (`-f FILENAME`)

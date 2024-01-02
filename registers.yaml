@@ -217,6 +217,11 @@
   type: U16
   unit: V
   scale: 10
+  mqtt: grid_voltage_a_b
+  group: now-grid
+  hass_device_class: voltage
+  hass_value_template: "{{ value | round(1) }}"
+  hass_state_class: measurement 
 
 "11007":
   name: Grid voltage lines B/C
@@ -224,6 +229,11 @@
   type: U16
   unit: V
   scale: 10
+  mqtt: grid_voltage_b_c
+  group: now-grid
+  hass_device_class: voltage
+  hass_value_template: "{{ value | round(1) }}"
+  hass_state_class: measurement 
 
 "11008":
   name: Grid voltage lines C/A
@@ -231,6 +241,11 @@
   type: U16
   unit: V
   scale: 10
+  mqtt: grid_voltage_c_a
+  group: now-grid
+  hass_device_class: voltage
+  hass_value_template: "{{ value | round(1) }}"
+  hass_state_class: measurement 
 
 "11009":
   name: Grid voltage phase A 

@@ -104,7 +104,7 @@ def main():
   api.connect( ip_addr=cfg['MODBUS_IP'], port=cfg['MODBUS_PORT'], slave=cfg['MODBUS_SLAVE'] )
 
   while True:
-    print( "-------------------------------------" )
+    print( "=====================================" )
     print( "Menu:")
     print( "  1: List all known registers" )
     print( "  2: List register configuration by groups" )
