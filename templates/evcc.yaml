@@ -9,7 +9,7 @@ meters:
     power: # Leistung (W)
       source: mqtt
       broker: localhost:1883
-      topic: MTEC/<MTEC_SERIAL_NO>/current/grid
+      topic: MTEC/<MTEC_SERIAL_NO>/now-base/meter_power
       scale: -1
 
   - name: MTEC-pv
@@ -17,7 +17,7 @@ meters:
     power: # Leistung (W)
       source: mqtt
       broker: localhost:1883
-      topic: MTEC/<MTEC_SERIAL_NO>/current/PV
+      topic: MTEC/<MTEC_SERIAL_NO>/now-base/pv
       scale: 1
 
   - name: MTEC-battery
@@ -25,12 +25,12 @@ meters:
     power: # Leistung (W)
       source: mqtt
       broker: localhost:1883
-      topic: MTEC/<MTEC_SERIAL_NO>/current/battery
+      topic: MTEC/<MTEC_SERIAL_NO>/now-base/battery
       scale: 1
     soc: # Battery SOC (%) 
       source: mqtt
       broker: localhost:1883
-      topic: MTEC/<MTEC_SERIAL_NO>/current/battery_SOC
+      topic: MTEC/<MTEC_SERIAL_NO>/now-base/battery_soc
       scale: 1
 
 # site describes the EVU connection, PV and home battery

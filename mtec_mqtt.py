@@ -24,24 +24,10 @@ def signal_handler(signal_number, frame):
   run_status = False
 
 # =============================================
-# MTEC Modbus read
-# Helper to get list of registers to read
-def get_register_list( group ):
-  registers = []
-  for register, item in register_map.items():
-    if item["group"] == group:
-      registers.append(register)
-
-  if len(registers)==0:
-    logging.error("Unknown read group: {}".format(group))
-    return None              
-  return registers
-
-#----------------------------------
 # read data from MTEC modbus
 def read_MTEC_data( api, group ):
   logging.info("Reading registers for group: {}".format(group))
-  registers = get_register_list( group )
+  registers = api.get_register_list( group )
   now = datetime.now()
   data = api.read_modbus_data(registers=registers)
   pvdata = {}

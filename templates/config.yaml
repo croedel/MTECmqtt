@@ -8,11 +8,11 @@ MODBUS_RETRIES : 3          # Retries
 
 # MQTT
 MQTT_DISABLE : False
-MQTT_SERVER : "localhost"   # MQTT server 
+MQTT_SERVER : localhost     # MQTT server 
 MQTT_PORT : 1883            # MQTT server port
 MQTT_LOGIN  : " "           # MQTT Login
 MQTT_PASSWORD : ""          # MQTT Password  
-MQTT_TOPIC : "MTEC"         # MQTT topic name  
+MQTT_TOPIC : MTEC           # MQTT topic name  
 MQTT_FLOAT_FORMAT : "{:.3f}"    # Defines how to format float values
 
 # Refresh interval
@@ -29,8 +29,8 @@ ENABLE_BATTERY_DATA : False      # Extended battery data
 ENABLE_PV_DATA : False           # Extended PV data
 
 # Home Assistent
-HASS_ENABLE : True                  # Enable home assistant
-HASS_BASE_TOPIC : "homeassistant"   # Basis MQTT topic of home assistant
+HASS_ENABLE : True                # Enable home assistant
+HASS_BASE_TOPIC : homeassistant   # Basis MQTT topic of home assistant
 
 # General
 DEBUG : False                # Set to True to get verbose debug messages

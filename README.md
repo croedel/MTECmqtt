@@ -18,9 +18,7 @@ The highlights are:
 I hope you like it and it will help you with for your EMS or home automation project :-) !
 
 ### Disclaimer 
-In order not to do uninteneded changes or settings and avoid any side-effects, I intentionally implemented read functionality only. 
-
-_Disclaimer:_ This project is a pure hobby project which I created by reverse-engineering different internet sources and my M-TEC Energybutler. It is *not* related to or supported by M-TEC GmbH by any means. Usage is on you own risk. I don't take any responsibility on functionality or potential damage.
+This project is a pure hobby project which I created by reverse-engineering different internet sources and my M-TEC Energybutler. It is *not* related to or supported by M-TEC GmbH by any means. Usage is on you own risk. I don't take any responsibility on functionality or potential damage.
 
 ### Credits
 This project would not have been possible without the really valuable pre-work of other people, especially: 
@@ -122,30 +120,35 @@ ENABLE_PV_DATA : False           # Extended PV data
 The `REFRESH_` parameters define how frequently the data gets fetched from your Inverter
 
 ```
-REFRESH_CURRENT_S : 10          # Refresh "current" data every N seconds
-REFRESH_DAY_M     : 5           # Refresh "day" statistic every N minutes
-REFRESH_TOTAL_M   : 5           # Refresh "total" statistic every N minutes
-REFRESH_CONFIG_H  : 24          # Refresh "config" data every N hours
-
-MQTT_FLOAT_FORMAT : "{:.2f}"    # Defines how to format float values
+REFRESH_NOW_S     : 10          # Refresh current data every N seconds
+REFRESH_DAY_M     : 5           # Refresh dayly statistic every N minutes
+REFRESH_TOTAL_M   : 5           # Refresh total statistic every N minutes
+REFRESH_CONFIG_H  : 24          # Refresh config data every N hours
 ```
+
+Please be aware that a frequent export of a lot of parameters increases the load on the `espressif` device of your Inverter. This might imply unwanted side effects. 
 
 If require, you can disable Home Automation auto discovery and/or configure a different MQTT base topic: 
 
 ```
 # Home Assistent
-HASS_ENABLE : True                  # Enable home assistant
-HASS_BASE_TOPIC : "homeassistant"   # Basis MQTT topic of home assistant
+HASS_ENABLE : True                # Enable home assistant
+HASS_BASE_TOPIC : homeassistant   # Basis MQTT topic of home assistant
 ```
 
 ## Data format written to MQTT
 
-The data will be written to 4 MQTT topics. The topic path includes the serial number of your Inverter.
+The data will be written to several MQTT topics. The topic path includes the serial number of your Inverter.
  
 | Sub-topic                         | Refresh frequency            |  Description 
 |---------------------------------- | --------------------------   | ---------------------------------------------- 
 | MTEC/<serial_number>/config       | `REFRESH_CONFIG_H` hours     | Relatively static config values     
-| MTEC/<serial_number>/now          | `REFRESH_NOW_S` seconds      | Current data      
+| MTEC/<serial_number>/now-base     | `REFRESH_NOW_S` seconds      | Current base data      
+| MTEC/<serial_number>/now-grid     | `REFRESH_NOW_S` seconds      | Current extended grid data      
+| MTEC/<serial_number>/now-inverter | `REFRESH_NOW_S` seconds      | Current extended inverter data      
+| MTEC/<serial_number>/now-backup   | `REFRESH_NOW_S` seconds      | Current extended backup data      
+| MTEC/<serial_number>/now-battery  | `REFRESH_NOW_S` seconds      | Current extended battery data      
+| MTEC/<serial_number>/now-pv       | `REFRESH_NOW_S` seconds      | Current extended PV data      
 | MTEC/<serial_number>/day          | `REFRESH_DAY_M` minutes      | Daily statistics     
 | MTEC/<serial_number>/total        | `REFRESH_TOTAL_M` minutes    | Lifetime statistics     
 
@@ -162,130 +165,151 @@ Battery -------    |                --------- house
                    -------------------------- backup power
 </pre>
 
-*Remark:* The parameters marked by `(*)` are calculated values. 
+*Remark:* Some parameters - marked by `(*)` - are calculated values. 
 
 ### config
-| Parameter               | Type  | Unit | Description 
-|----------------------   | ----- | ---- | ---------------------------------------------- 
-| api_date                | str   |      | Local date from API server YYYY-MM-DD HH:MM:SS 
-| serial_no               | str   |      | Inverter serial number 
-| firmware_version        | str   |      | Inverter firmware version 
+| Register | MQTT Parameter          | Unit | Description 
+| -------- | ----------------------  | ---- | ---------------------------------------------- 
+| 10000    | serial_no               |      | Inverter serial number
+| 10011    | firmware_version        |      | Firmware version
+| 25100    | grid_inject_switch      |      | Grid injection limit switch
+| 25103    | grid_inject_limit       | %    | Grid injection power limit
+| 52502    | on_grid_soc_switch      |      | On-grid SOC limit switch
+| 52503    | on_grid_soc_limit       | %    | On-grid SOC limit
+| 52504    | off_grid_soc_switch     |      | Off-grid SOC limit switch
+| 52505    | off_grid_soc_limit      | %    | Off-grid SOC limit
 
-### now
-| Parameter               | Type  | Unit | Description 
-|----------------------   | ----- | ---- | ---------------------------------------------- 
-| api_date                | str   |      | Local date from API server YYYY-MM-DD HH:MM:SS 
-| inverter_date           | str   |      | Date from inverter YY-MM-DD HH:MM:SS 
-| inverter_status         | int   |      | 0:wait for on-grid, 1:self-check, 2:on grid, 3:fault, 4:firmware update, 5:off grid 
-| mode                    | int   |      | Inverter mode 257=General mode; 258=Economic mode; 259=UPS mode; 512=Off grid mode; 771=Manual mode
-| pv                      | float | W    | Current power generated by PV 
-| grid                    | float | W    | Current power flow to/from grid (flow to grid is represented by pos. values)
-| battery                 | float | W    | Current power flow to/from battery (flow from battery is represented by pos. values)
-| inverter                | float | W    | Current power flow to/from inverter (flow from inverter is represented by pos. values)
-| backup                  | float | W    | Current backup power flow
-| consumption             | float | W    | Current consumption 
-| battery_soc             | int   | %    | Current battery SOC
+### now-backup
+| Register | MQTT Parameter          | Unit | Description 
+| -------- | ----------------------  | ---- | ---------------------------------------------- 
+| 30200    | backup_voltage_a        | V    | Backup voltage phase A
+| 30201    | backup_current_a        | A    | Backup current phase A
+| 30202    | backup_frequency_a      | Hz   | Backup frequency phase A
+| 30204    | backup_a                | W    | Backup power phase A
+| 30210    | backup_voltage_b        | V    | Backup voltage phase B
+| 30211    | backup_current_b        | A    | Backup current phase B
+| 30212    | backup_frequency_b      | Hz   | Backup frequency phase B
+| 30214    | backup_b                | W    | Backup power phase B
+| 30220    | backup_voltage_c        | V    | Backup voltage phase C
+| 30221    | backup_current_c        | A    | Backup current phase C
+| 30222    | backup_frequency_c      | Hz   | Backup frequency phase C
+| 30224    | backup_c                | W    | Backup power phase C
 
-#### now - Extended grid data
-| Parameter               | Type  | Unit | Description 
-|----------------------   | ----- | ---- | ---------------------------------------------- 
-| grid_frequency          | float | Hz   | Grid frequency
-| grid_a                  | float | W    | Grid power phase A
-| grid_b                  | float | W    | Grid power phase B
-| grid_c                  | float | W    | Grid power phase C
+### now-base
+| Register | MQTT Parameter          | Unit | Description 
+| -------- | ----------------------  | ---- | ---------------------------------------------- 
+| 10100    | inverter_date           |      | Inverter date
+| 10105    | inverter_status         |      | Inverter status
+| 11000    | meter_power             | W    | Meter power
+| 11016    | inverter                | W    | AC power
+| 11028    | pv                      | W    | PV energy (now)
+| 30230    | backup                  | W    | Backup power total
+| 30256    | battery_mode            |      | Battery mode
+| 30258    | battery                 | W    | Battery power
+| 33000    | battery_soc             | %    | Battery SOC
+| 50000    | mode                    |      | Inverter operation mode
+|          | household               | W    | Household current (*)
 
-#### now - Extended inverter data
-| Parameter               | Type  | Unit | Description 
-|----------------------   | ----- | ---- | ---------------------------------------------- 
-| grid_inject_switch      | int   |      | Grid injection limit switch (0=off, 1=on)
-| grid_inject_limit       | int   | %    | Grid injection limit
-| on_grid_soc_switch      | int   |      | On-grid SOC limit switch (0=off, 1=on)
-| on_grid_soc_limit       | int   | %    | On-grid SOC limit
-| off_grid_soc_switch     | int   |      | Off-grid SOC limit switch (0=off, 1=on)
-| off_grid_soc_limit      | int   | %    | Off-grid SOC limit
-| inverter_voltage_a      | float | V    | Inverter voltage phase A
-| inverter_current_a      | float | A    | Inverter current phase A
-| inverter_power_a        | float | W    | Inverter power phase A
-| inverter_voltage_b      | float | V    | Inverter voltage phase B
-| inverter_current_b      | float | A    | Inverter current phase B
-| inverter_power_b        | float | W    | Inverter power phase B
-| inverter_voltage_c      | float | V    | Inverter voltage phase C
-| inverter_current_c      | float | A    | Inverter current phase C
-| inverter_power_c        | float | W    | Inverter power phase C
-| inverter_temp1          | float | °C   | Inverter temperature sensor 1
-| inverter_temp2          | float | °C   | Inverter temperature sensor 2
-| inverter_temp3          | float | °C   | Inverter temperature sensor 3
-| inverter_temp4          | float | °C   | Inverter temperature sensor 4
+### now-battery
+| Register | MQTT Parameter          | Unit | Description 
+| -------- | ----------------------  | ---- | ---------------------------------------------- 
+| 30254    | battery_voltage         | V    | Battery voltage
+| 30255    | battery_current         | A    | Battery current
+| 33001    | battery_soh             | %    | Battery SOH
+| 33009    | battery_cell_t_max      | ℃   | Battery cell temperature max.
+| 33011    | battery_cell_t_min      | ℃   | Battery cell temperature min.
+| 33013    | battery_cell_v_max      | V    | Battery cell voltage max.
+| 33015    | battery_cell_v_min      | V    | Battery cell voltage min.
 
-#### now - Extended backup data
-| Parameter               | Type  | Unit | Description 
-|----------------------   | ----- | ---- | ---------------------------------------------- 
-| backup_voltage_a        | float | V    | Backup voltage phase A
-| backup_current_a        | float | A    | Backup current phase A
-| backup_power_a          | float | W    | Backup power phase A
-| backup_frequency_a      | float | Hz   | Backup frequency phase A
-| backup_voltage_b        | float | V    | Backup voltage phase B
-| backup_current_b        | float | A    | Backup current phase B
-| backup_power_b          | float | W    | Backup power phase B
-| backup_frequency_b      | float | Hz   | Backup frequency phase B
-| backup_voltage_c        | float | V    | Backup voltage phase C
-| backup_current_c        | float | A    | Backup current phase C
-| backup_power_c          | float | W    | Backup power phase C
-| backup_frequency_c      | float | Hz   | Backup frequency phase C
+# now-grid
+| Register | MQTT Parameter          | Unit | Description 
+| -------- | ----------------------  | ---- | ---------------------------------------------- 
+| 10994    | grid_a                  | W    | Meter power phase A
+| 10996    | grid_b                  | W    | Meter power phase B
+| 10998    | grid_c                  | W    | Meter power phase C
+| 11009    | grid_voltage_a          | V    | Grid voltage phase A
+| 11010    | grid_current_a          | A    | Grid current phase A
+| 11011    | grid_voltage_b          | V    | Grid voltage phase B
+| 11012    | grid_current_b          | A    | Grid current phase B
+| 11013    | grid_voltage_c          | V    | Grid voltage phase C
+| 11014    | grid_current_c          | A    | Grid current phase C
+| 11015    | grid_fequency           | Hz   | Grid frequency
 
-#### now - Extended battery data
-| Parameter               | Type  | Unit | Description 
-|----------------------   | ----- | ---- | ---------------------------------------------- 
-| battery_soh             | float | %    | Battery SOH
-| battery_voltage         | float | V    | Battery voltage
-| battery_current         | float | A    | Battery current
-| battery_mode            | int   |      | Battery mode 0=discharge, 1=charge
-| battery_cell_t_max      | float | °C   | Battery cell temperature max.
-| battery_cell_t_min      | float | °C   | Battery cell temperature min.
-| battery_cell_v_max      | float | V    | Battery cell voltage max.
-| battery_cell_v_min      | float | V    | Battery cell voltage min.
+### now-inverter
+| Register | MQTT Parameter          | Unit | Description 
+| -------- | ----------------------  | ---- | ---------------------------------------------- 
+| 11032    | inverter_temp1          | ℃  | Temperature Sensor 1
+| 11033    | inverter_temp2          | ℃  | Temperature Sensor 2
+| 11034    | inverter_temp3          | ℃  | Temperature Sensor 3
+| 11035    | inverter_temp4          | ℃  | Temperature Sensor 4
+| 30236    | inverter_a              | W   | Inverter power phase A
+| 30242    | inverter_b              | W   | Inverter power phase B
+| 30248    | inverter_c              | W   | Inverter power phase C
 
-#### now - Extended PV data
-| Parameter               | Type  | Unit | Description 
-|----------------------   | ----- | ---- | ---------------------------------------------- 
-| pv_voltage_1            | float | V    | PV voltage string 1
-| pv_current_1            | float | A    | PV current string 1
-| pv_1                    | float | A    | PV power string 1
-| pv_voltage_2            | float | V    | PV voltage string 2
-| pv_current_2            | float | A    | PV current string 2
-| pv_2                    | float | A    | PV power string 2
+### now-pv
+| Register | MQTT Parameter          | Unit | Description 
+| -------- | ----------------------  | ---- | ---------------------------------------------- 
+| 11038    | pv_voltage_1            | V    | PV1 voltage
+| 11039    | pv_current_1            | A    | PV1 current
+| 11040    | pv_voltage_2            | V    | PV2 voltage
+| 11041    | pv_current_2            | A    | PV2 current
+| 11062    | pv_1                    | W    | PV1 power
+| 11064    | pv_2                    | W    | PV2 power
 
 ### day
-| Parameter               | Type  | Unit | Description 
-|----------------------   | ----- | ---- | ---------------------------------------------- 
-| api_date                | str   |      | Local date from API server YYYY/MM/DD HH:MM:SS 
-| PV                      | float | kWh  | Energy generated PV today 
-| grid_feed               | float | kWh  | Energy feed into grid today
-| grid_purchase           | float | kWh  | Energy purchased from grid today
-| battery_charge          | float | kWh  | Energy charged to battery today
-| battery_discharge       | float | kWh  | Energy discharged from battery today
-| consumption             | float | kWh  | Own energy consumption today (*)
-| autarky_rate            | float | %    | Autarky rate today (*)
-| own_consumption_rate    | float | %    | Own consumption rate today (*)
+| Register | MQTT Parameter          | Unit | Description 
+| -------- | ----------------------  | ---- | ---------------------------------------------- 
+| 31000    | grid_feed_day           | kWh  | Grid injection energy (day)
+| 31001    | grid_purchase_day       | kWh  | Grid purchased energy (day)
+| 31002    | backup_day              | kWh  | Backup energy (day)
+| 31003    | battery_charge_day      | kWh  | Battery charge energy (day)
+| 31004    | battery_discharge_day   | kWh  | Battery discharge energy (day)
+| 31005    | pv_day                  | kWh  | PV energy generated (day)
+|          | autarky_rate_day        | %    | Household autarky (day) (*)
+|          | consumption_day         | kWh  | Household energy consumed (day) (*)
+|          | own_consumption_day     | %    | Own consumption rate (day) (*)
 
 ### total
-| Parameter               | Type  | Unit | Description 
-|----------------------   | ----- | ---- | ---------------------------------------------- 
-| api_date                | str   |      | Local date from API server YYYY/MM/DD HH:MM:SS 
-| PV                      | float | kWh  | Energy generated PV 
-| grid_feed               | float | kWh  | Energy feed into grid 
-| grid_purchase           | float | kWh  | Energy purchased from grid 
-| battery_charge          | float | kWh  | Energy charged to battery 
-| battery_discharge       | float | kWh  | Energy discharged from battery 
-| consumption             | float | kWh  | Own energy consumption (*)
-| autarky_rate            | float | %    | Autarky rate (*)
-| own_consumption_rate    | float | %    | Own consumption rate (*)
+| Register | MQTT Parameter             | Unit | Description 
+| -------- | ----------------------     | ---- | ---------------------------------------------- 
+| 11002    | meter_grid_injected_total  | kWh  | Meter grid energy injected (total)
+| 11004    | meter_grid_purchased_total | kWh  | Meter grid energy purchased (total)
+| 31102    | grid_feed_total            | kWh  | Grid energy injected (total)
+| 31104    | grid_purchase_total        | kWh  | Grid energy purchased (total)
+| 31106    | backup_total               | kWh  | Backup energy (total)
+| 31108    | battery_charge_total       | kWh  | Battery energy charged (total)
+| 31110    | battery_discharge_total    | kWh  | Battery energy discharged (total)
+| 31112    | pv_total                   | kWh  | PV energy generated (total)
+|          | autarky_rate_total         | %    | Household autarky (total) (*)
+|          | consumption_total          | kWh  | Household energy consumed (total) (*)
+|          | own_consumption_total      | %    | Own consumption rate (total) (*)
 
 
 ## What else you can find in the project?
 
-### Commandline tool
-The command-line tool `mtec_tool.py` offers functionality to export the data in various combinations and formats.
+### Modbus Utility
+`mtec_util.py` is an small inteative tool which enable to list the supported parameters and read and write registers of your Inverter.
+You can choose between:
+
+ * 1: List all known registers
+ * 2: List register configuration by groups
+ * 3: Read register group from Inverter
+ * 4: Read single register from Inverter
+ * 5: Write register to Inverter
+
+(1) lists all know registers. This includes the ones which are written to MQTT as listed above. You will find a few more registers, which are not mapped to MQTT (=no value in "mqtt") - mostly because I'm not sure if they are reliable or what they really mean.   
+
+(2) will give you a list of all mapped registers, similar to the one listed above.
+
+(3) allows you to read the current values of all registers or of a certain group from your Inverter.
+
+(4) allows you to read a sinfle register from your Inverter
+
+(5) enables you to write a value to a register of your Inverter
+
+
+### Commandline export tool
+The command-line tool `mtec_export.py` offers functionality to read data from your Inverter using Modbus and export it in various combinations and formats.
 
 As default, it will connect to your device and retrieve a list of all known Modbus registers in a human readable format.
 
@@ -294,96 +318,3 @@ By specifying commandline parameters, you can:
 * Provide a customize list of Modbus registers which you would like to retrieve, e.g. `-r 33000,10105,11000`
 * Request to export CSV instead of human readable (`-c`) 
 * Write output to a file (`-f FILENAME`)
-
-### Supported registers
-The API currently supports the Modbus registers listed below. 
-
-Many thanks to https://smarthome.exposed/wattsonic-hybrid-inverter-gen3-modbus-rtu-protocol/ for the fabulous collection of the registers!
-
-I can't say what each of these registers exactly means. Some data seams quite reliable and comprehensible - others is probably questionable.
-
-| Register |  Description 
-|------- | ---------------------------------------------- 
-| 10000  | Inverter serial number |  
-| 10008  | Equipment Info	    |
-| 10011  | Firmware Version       |
-| 10100  | Inverter date          |                   	
-| 10105  | Inverter Running Status |      
-| 10112  | Fault Flag1         | 
-| 10114  | Fault Flag2         | 
-| 10120  | Fault Flag3         | 
-| 10994  | Phase A Power on Meter |	                
-| 10996  | Phase B Power on Meter |	                
-| 10998  | Phase C Power on Meter |	                
-| 11000  | Total Power on Meter |	                     
-| 11002  | Total Grid-Injection Energy on Meter |	      
-| 11004  | Total Purchasing Energy from Grid on Meter |
-| 11006  | Grid Lines A/B Voltage |	                
-| 11007  | Grid Lines B/C Voltage |	                
-| 11008  | Grid Lines C/A Voltage |	                
-| 11009  | Grid Phase A Voltage |	                     
-| 11010  | Grid Phase A Current |	                     
-| 11011  | Grid Phase B Voltage |	                     
-| 11012  | Grid Phase B Current |	                     
-| 11013  | Grid Phase C Voltage |	                     
-| 11014  | Grid Phase C Current |	                     
-| 11015  | Grid Frequency |	                          
-| 11016  | P_AC |	                                    
-| 11018  | Total PV Generation on that day |	          
-| 11020  | Total PV Generation from Installation |      
-| 11022  | Total PV Generation Time from Installation |
-| 11028  | PV Input Total Power |	                     
-| 11032  | Temperature Sensor 1 |	                     
-| 11033  | Temperature Sensor 2 |	                     
-| 11034  | Temperature Sensor 3 |	                     
-| 11035  | Temperature Sensor 4 |	                     
-| 11038  | PV1 Voltage |	                              
-| 11039  | PV1 Current |	                              
-| 11040  | PV2 Voltage |	                              
-| 11041  | PV2 Current |	                              
-| 11062  | PV1 Input Power |                            
-| 11064  | PV2 Input Power |                            
-| 30200  | Backup_A_V |	                               
-| 30201  | Backup_A_I |	                               
-| 30202  | Backup_A_F |	                               
-| 30204  | Backup_A_P |	                               
-| 30210  | Backup_B_V |	                               
-| 30211  | Backup_B_I |	                               
-| 30212  | Backup_B_F |	                               
-| 30214  | Backup_B_P |	                               
-| 30220  | Backup_C_V |	                               
-| 30221  | Backup_C_I |	                               
-| 30222  | Backup_C_F |	                               
-| 30224  | Backup_C_P |	                               
-| 30230  | Total_Backup_P |	                          
-| 30236  | Invt_A_P |	                               
-| 30242  | Invt_B_P |	                               
-| 30248  | Invt_C_P |	                               
-| 30254  | Battery_V |	                               
-| 30255  | Battery_I |	                               
-| 30256  | Battery_Mode |	                          
-| 30258  | Battery_P |                                  
-| 31000  | Grid Injection Energy on that day[Meter] |	 
-| 31001  | Grid Purchasing Energy on that day[Meter] |  
-| 31002  | Backup Output Energy on that day |	      
-| 31003  | Battery Charge Energy on that day |          
-| 31004  | Battery Discharge Energy on that day |	      
-| 31005  | PV Generation Energy on that day |	      
-| 31006  | Loading Energy on that day |	                
-| 31008  | Energy Purchased from Grid on that day |	 
-| 31102  | Total Energy injected to grid |              
-| 31104  | Total Energy Purchased from Grid from Meter |
-| 31106  | Total Output Energy on backup port |	      
-| 31108  | Total Energy Charged to Battery |            
-| 31110  | Total Energy Discharged from Battery |	      
-| 31112  | Total PV Generation |                        
-| 31114  | Total Loading Energy consumed at grid side |
-| 31118  | Total Energy Purchased from Grid |           
-| 33000  | SOC |	                                    
-| 33001  | SOH |	                                    
-| 33002  | BMS Status |	                               
-| 33003  | BMS Pack Temperature |	                     
-| 33009  | Max Cell Temperature |	                     
-| 33011  | Min Cell Temperature |	                     
-| 33013  | Max Cell Voltage |	                          
-| 33015  | Min Cell Voltage |	                          

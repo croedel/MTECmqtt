@@ -149,6 +149,18 @@ class MTECmodbusAPI:
       return False
     return True
 
+  #--------------------------------
+  def get_register_list( self, group ):
+    registers = []
+    for register, item in register_map.items():
+      if item["group"] == group:
+        registers.append(register)
+
+    if len(registers)==0:
+      logging.error("Unknown or empty register group: {}".format(group))
+      return None              
+    return registers
+
 #--------------------------------
 # The main() function is just a demo code how to use the API
 def main():
@@ -159,21 +171,9 @@ def main():
   api = MTECmodbusAPI()
   api.connect(ip_addr=cfg['MODBUS_IP'], port=cfg['MODBUS_PORT'], slave=cfg['MODBUS_SLAVE'])
 
-# Write a register
-  api.write_register(register=123, value=123)
-  api.write_register(register=31000, value=21.1)
-#  api.write_register(register=52503, value=21.1)
-
   # fetch all available data
   logging.info("Fetching all data")
   data = api.read_modbus_data()
-  for param, val in data.items():
-    logging.info("- {} : {}".format(param, val))
-
-  # fetch selected  registers
-  logging.info("Fetching selected data")
-  registers = [ '11000', '11016', '11018', '11020', '11028', '30258', '33000', '10000', '10100' ]
-  data = api.read_modbus_data(registers=registers)
   for param, val in data.items():
     logging.info("- {} : {}".format(param, val))
 

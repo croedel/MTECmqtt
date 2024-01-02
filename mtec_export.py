@@ -3,16 +3,19 @@
 This tool enables to query MTECmodbusapi and export the data in various ways.
 (c) 2023 by Christian Rödel 
 """
-from config import cfg
+from config import cfg, register_groups
 import argparse
 import sys
 import MTECmodbusAPI
 
 #-----------------------------
 def parse_options():
+  groups = register_groups
+  groups.append("all")
+
   parser = argparse.ArgumentParser(description='MTEC Modbus data export tool. Allows to read and export Modbus registers from an MTEC inverter.', 
                                    formatter_class=argparse.RawDescriptionHelpFormatter)
-  parser.add_argument( '-t', '--type', choices=["all", "essential"], default="all", help='Defines set of registers to export.' )
+  parser.add_argument( '-g', '--group', choices=groups, default="all", help='Group of registers you want to export' )
   parser.add_argument( '-r', '--registers', help='Comma separated list of registers which shall be retrieved' )
   parser.add_argument( '-c', '--csv', action='store_true', help='Export as CSV')
   parser.add_argument( '-f', '--file', help='Write data to <FILE> instead of stdout')
@@ -22,6 +25,7 @@ def parse_options():
 #-------------------------------
 def main():
   args = parse_options()
+  api = MTECmodbusAPI.MTECmodbusAPI()
   print( "Reading data..." )
 
   # redirect stdout to file (if defined as command line parameter)
@@ -42,9 +46,8 @@ def main():
       exit(1)
 
   registers = None
-  if args.type == "essential":       
-    registers = [ '10100', '10105', '11028', '11000', '30258', '11016', '30230', '33000', 
-               '31000', '31001', '31003', '31004', '31005', '31102', '31104', '31108', '31110', '31112' ]
+  if args.group and args.group != "all":
+    registers = api.get_register_list( args.group )
 
   if args.registers:
     registers = []
@@ -53,7 +56,6 @@ def main():
       registers.append(addr.strip())  
 
   # Do the export
-  api = MTECmodbusAPI.MTECmodbusAPI()
   api.connect( ip_addr=cfg['MODBUS_IP'], port=cfg['MODBUS_PORT'], slave=cfg['MODBUS_SLAVE'] )
   data = api.read_modbus_data( registers=registers )
   api.disconnect()

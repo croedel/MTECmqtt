@@ -37,13 +37,14 @@ def init_register_map():
     [ "type", None ],
     [ "unit", "" ],
     [ "scale", 1 ],
-    [ "writeable", False ],
+    [ "writable", False ],
     [ "mqtt", None ],
     [ "group", None ],
     [ "hass_device_class", None ],
     [ "hass_value_template", "{{ value }}" ],
     [ "hass_state_class", "measurement" ],
   ] 
+  register_groups = []
 
   for key, val in r_map.items():
     # Check for mandatory paramaters
@@ -60,15 +61,16 @@ def init_register_map():
       for p in p_optional:  
         if not item.get(p[0]):
           item[p[0]] = p[1]
-       
       register_map[key] = item # Append to register_map
-  return register_map
+      if item["group"] and item["group"] not in register_groups:
+        register_groups.append(item["group"]) # Append to group list
+  return dict(sorted(register_map.items())), sorted(register_groups)
 
 #----------------------------------------
 logging.basicConfig( level=logging.INFO, format="[%(levelname)s] %(filename)s: %(message)s" )
 BASE_DIR = os.path.dirname(__file__) # Base installation directory
 cfg = init_config()
-register_map = init_register_map()
+register_map, register_groups = init_register_map()
 
 #--------------------------------------
 # Test code only
