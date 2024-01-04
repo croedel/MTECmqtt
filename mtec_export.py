@@ -10,7 +10,7 @@ import MTECmodbusAPI
 
 #-----------------------------
 def parse_options():
-  groups = register_groups
+  groups = sorted(register_groups)
   groups.append("all")
 
   parser = argparse.ArgumentParser(description='MTEC Modbus data export tool. Allows to read and export Modbus registers from an MTEC inverter.', 
@@ -47,7 +47,7 @@ def main():
 
   registers = None
   if args.group and args.group != "all":
-    registers = api.get_register_list( args.group )
+    registers = sorted(api.get_register_list(args.group))
 
   if args.registers:
     registers = []

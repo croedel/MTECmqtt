@@ -23,7 +23,7 @@ def read_register(api):
 def read_register_group(api):
   print( "-------------------------------------" )
   line = "Groups: "
-  for g in register_groups:
+  for g in sorted(register_groups):
     line += g + ", "  
   print( line + "all" )
 
@@ -31,7 +31,7 @@ def read_register_group(api):
   if group=="" or group=="all":
     registers = None
   else:  
-    registers = api.get_register_list( group )
+    registers = sorted(api.get_register_list(group))
     if not registers:
       return
   print( "Reading..." )
@@ -71,7 +71,8 @@ def list_register_config(api):
   print( "-------------------------------------" )
   print( "Reg   MQTT Parameter                 Unit Mode Group           Name                   " )
   print( "----- ------------------------------ ---- ---- --------------- -----------------------" )
-  for register, item in register_map.items():
+  register_map_sorted = dict(sorted(register_map.items()))
+  for register, item in register_map_sorted.items():
     if not register.isnumeric(): # non-numeric registers are deemed to be calculated pseudo-registers
       register = "" 
     mqtt = item["mqtt"] if item["mqtt"] else ""
@@ -88,9 +89,10 @@ def list_register_config_by_groups(api):
     print( "" )
     print( "Reg   MQTT Parameter                 Unit Mode Name                   " )
     print( "----- ------------------------------ ---- ---- -----------------------" )
-    for register, item in register_map.items():
+    register_map_sorted = dict(sorted(register_map.items()))
+    for register, item in register_map_sorted.items():
       if item["group"]==group: 
-        if not register.isnumeric(): # non-numeric registers are deemed to be calculated pseudo-registers
+        if not register.isnumeric(): # non-nu1meric registers are deemed to be calculated pseudo-registers
           register = "" 
         mqtt = item["mqtt"] if item["mqtt"] else ""
         unit = item["unit"] if item["unit"] else ""

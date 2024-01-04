@@ -40,9 +40,6 @@ def init_register_map():
     [ "writable", False ],
     [ "mqtt", None ],
     [ "group", None ],
-    [ "hass_device_class", None ],
-    [ "hass_value_template", "{{ value }}" ],
-    [ "hass_state_class", "measurement" ],
   ] 
   register_groups = []
 
@@ -64,7 +61,7 @@ def init_register_map():
       register_map[key] = item # Append to register_map
       if item["group"] and item["group"] not in register_groups:
         register_groups.append(item["group"]) # Append to group list
-  return dict(sorted(register_map.items())), sorted(register_groups)
+  return register_map, register_groups
 
 #----------------------------------------
 logging.basicConfig( level=logging.INFO, format="[%(levelname)s] %(filename)s: %(message)s" )

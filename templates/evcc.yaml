@@ -9,7 +9,7 @@ meters:
     power: # Leistung (W)
       source: mqtt
       broker: localhost:1883
-      topic: MTEC/<MTEC_SERIAL_NO>/now-base/meter_power
+      topic: MTEC/<MTEC_SERIAL_NO>/now-base/grid_power
       scale: -1
 
   - name: MTEC-pv

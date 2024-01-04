@@ -200,15 +200,15 @@ Battery -------    |                --------- house
 | -------- | ----------------------  | ---- | ---------------------------------------------- 
 | 10100    | inverter_date           |      | Inverter date
 | 10105    | inverter_status         |      | Inverter status
-| 11000    | meter_power             | W    | Meter power
-| 11016    | inverter                | W    | AC power
-| 11028    | pv                      | W    | PV energy (now)
+| 11000    | grid_power              | W    | Grid power
+| 11016    | inverter                | W    | Inverter AC power
+| 11028    | pv                      | W    | PV power
 | 30230    | backup                  | W    | Backup power total
 | 30256    | battery_mode            |      | Battery mode
 | 30258    | battery                 | W    | Battery power
 | 33000    | battery_soc             | %    | Battery SOC
 | 50000    | mode                    |      | Inverter operation mode
-|          | household               | W    | Household current (*)
+|          | household               | W    | Household power (*)
 
 ### now-battery
 | Register | MQTT Parameter          | Unit | Description 
@@ -224,19 +224,19 @@ Battery -------    |                --------- house
 # now-grid
 | Register | MQTT Parameter          | Unit | Description 
 | -------- | ----------------------  | ---- | ---------------------------------------------- 
-| 10994    | grid_a                  | W    | Meter power phase A
-| 10996    | grid_b                  | W    | Meter power phase B
-| 10998    | grid_c                  | W    | Meter power phase C
-| 11006    | grid_voltage_a_b        | V    | Grid voltage lines A/B
-| 11007    | grid_voltage_b_c        | V    | Grid voltage lines B/C
-| 11008    | grid_voltage_c_a        | V    | Grid voltage lines C/A
-| 11009    | grid_voltage_a          | V    | Grid voltage phase A
-| 11010    | grid_current_a          | A    | Grid current phase A
-| 11011    | grid_voltage_b          | V    | Grid voltage phase B
-| 11012    | grid_current_b          | A    | Grid current phase B
-| 11013    | grid_voltage_c          | V    | Grid voltage phase C
-| 11014    | grid_current_c          | A    | Grid current phase C
-| 11015    | grid_fequency           | Hz   | Grid frequency
+| 10994    | grid_a                  | W    | Grid power phase A
+| 10996    | grid_b                  | W    | Grid power phase B
+| 10998    | grid_c                  | W    | Grid power phase C
+| 11006    | ac_voltage_a_b          | V    | Inverter AC voltage lines A/B
+| 11007    | ac_voltage_b_c          | V    | Inverter AC voltage lines B/C
+| 11008    | ac_voltage_c_a          | V    | Inverter AC voltage lines C/A
+| 11009    | ac_voltage_a            | V    | Inverter AC voltage phase A
+| 11010    | ac_current_a            | A    | Inverter AC current phase A
+| 11011    | ac_voltage_b            | V    | Inverter AC voltage phase B
+| 11012    | ac_current_b            | A    | Inverter AC current phase B
+| 11013    | ac_voltage_c            | V    | Inverter AC voltage phase C
+| 11014    | ac_current_c            | A    | Inverter AC current phase C
+| 11015    | ac_fequency             | Hz   | Inverter AC frequency
 
 ### now-inverter
 | Register | MQTT Parameter          | Unit | Description 
@@ -275,8 +275,6 @@ Battery -------    |                --------- house
 ### total
 | Register | MQTT Parameter             | Unit | Description 
 | -------- | ----------------------     | ---- | ---------------------------------------------- 
-| 11002    | meter_grid_injected_total  | kWh  | Meter grid energy injected (total)
-| 11004    | meter_grid_purchased_total | kWh  | Meter grid energy purchased (total)
 | 31102    | grid_feed_total            | kWh  | Grid energy injected (total)
 | 31104    | grid_purchase_total        | kWh  | Grid energy purchased (total)
 | 31106    | backup_total               | kWh  | Backup energy (total)

@@ -1,0 +1,257 @@
+title: MTEC Energybutler
+views:
+  - path: default_view
+    title: Overview
+    icon: ''
+    type: sidebar
+    badges: []
+    cards:
+      - type: history-graph
+        entities:
+          - entity: sensor.mtec_energybutler_household_power
+            name: Household
+          - entity: sensor.mtec_energybutler_pv_power
+            name: PV
+          - entity: sensor.mtec_energybutler_grid_power
+            name: Grid
+          - entity: sensor.mtec_energybutler_battery_power
+            name: Battery
+      - type: horizontal-stack
+        cards:
+          - type: entities
+            entities:
+              - entity: sensor.mtec_energybutler_inverter_operation_mode
+                name: Operation mode
+              - entity: sensor.mtec_energybutler_inverter_status
+                name: Inverter status
+              - entity: sensor.mtec_energybutler_battery_mode
+                name: Battery mode
+              - entity: sensor.mtec_energybutler_battery_soc
+                name: Battery SOC
+              - entity: sensor.mtec_energybutler_battery_soh
+                name: Battery SOH
+              - entity: sensor.mtec_energybutler_battery_voltage
+                name: Battery Voltage
+              - entity: sensor.mtec_energybutler_battery_current
+                name: Battery current
+            title: Status
+            state_color: false
+            show_header_toggle: false
+          - type: entities
+            entities:
+              - entity: sensor.mtec_energybutler_pv_power
+              - entity: sensor.mtec_energybutler_grid_power
+              - entity: sensor.mtec_energybutler_battery_power
+              - entity: sensor.mtec_energybutler_household_power
+            title: Current power consumption
+            show_header_toggle: true
+          - type: vertical-stack
+            cards:
+              - type: gauge
+                entity: sensor.mtec_energybutler_battery_soc
+                name: SOC
+                needle: true
+                segments:
+                  - from: 0
+                    color: '#db4437'
+                  - from: 30
+                    color: '#ffa600'
+                  - from: 70
+                    color: '#43a047'
+              - type: history-graph
+                name: SOC
+                entities:
+                  - entity: sensor.mtec_energybutler_battery_soc
+      - type: horizontal-stack
+        cards:
+          - type: entities
+            entities:
+              - entity: sensor.mtec_energybutler_household_energy_consumed_day
+                name: Houshold energy
+              - entity: sensor.mtec_energybutler_backup_energy_day
+                name: Backup energy
+              - entity: sensor.mtec_energybutler_pv_energy_generated_day
+                name: PV energy
+              - entity: sensor.mtec_energybutler_grid_injection_energy_day
+                name: Grid injection energy
+              - entity: sensor.mtec_energybutler_grid_purchased_energy_day
+                name: Grid purchased energy
+              - entity: sensor.mtec_energybutler_battery_charge_energy_day
+                name: Battery charge energy
+              - entity: sensor.mtec_energybutler_battery_discharge_energy_day
+                name: Battery discharge energy
+            title: Today's energy
+          - type: vertical-stack
+            cards:
+              - type: gauge
+                entity: sensor.mtec_energybutler_household_autarky_day
+                name: Autarky
+                needle: true
+                segments:
+                  - from: 0
+                    color: '#db4437'
+                  - from: 30
+                    color: '#ffa600'
+                  - from: 70
+                    color: '#43a047'
+              - type: gauge
+                entity: sensor.mtec_energybutler_own_consumption_rate_day
+                name: Own consumption rate
+                needle: true
+                segments:
+                  - from: 0
+                    color: '#db4437'
+                  - from: 30
+                    color: '#ffa600'
+                  - from: 70
+                    color: '#43a047'
+      - type: horizontal-stack
+        cards:
+          - type: entities
+            entities:
+              - entity: sensor.mtec_energybutler_household_energy_consumed_total
+                name: Houshold energy
+              - entity: sensor.mtec_energybutler_backup_energy_total
+                name: Backup energy
+              - entity: sensor.mtec_energybutler_pv_energy_generated_total
+                name: PV energy
+              - entity: sensor.mtec_energybutler_grid_energy_injected_total
+                name: Grid injection energy
+              - entity: sensor.mtec_energybutler_grid_energy_purchased_total
+                name: Grid purchased energy
+              - entity: sensor.mtec_energybutler_battery_energy_charged_total
+                name: Battery charge energy
+              - entity: sensor.mtec_energybutler_battery_energy_discharged_total
+                name: Battery discharge energy
+            title: Total energy
+          - type: vertical-stack
+            cards:
+              - type: gauge
+                entity: sensor.mtec_energybutler_household_autarky_total
+                name: Autarky
+                needle: true
+                segments:
+                  - from: 0
+                    color: '#db4437'
+                  - from: 30
+                    color: '#ffa600'
+                  - from: 70
+                    color: '#43a047'
+              - type: gauge
+                entity: sensor.mtec_energybutler_own_consumption_rate_total
+                name: Own consumption rate
+                needle: true
+                segments:
+                  - from: 0
+                    color: '#db4437'
+                  - from: 30
+                    color: '#ffa600'
+                  - from: 70
+                    color: '#43a047'
+  - title: Detail
+    path: detail
+    type: sidebar
+    badges: []
+    cards:
+      - type: horizontal-stack
+        cards:
+          - type: vertical-stack
+            cards:
+              - show_name: true
+                show_icon: false
+                show_state: true
+                type: glance
+                entities:
+                  - entity: sensor.mtec_energybutler_grid_power_phase_a
+                    name: L1
+                  - entity: sensor.mtec_energybutler_grid_power_phase_b
+                    name: L2
+                  - entity: sensor.mtec_energybutler_grid_power_phase_c
+                    name: L3
+                title: Grid power
+                columns: 3
+              - show_name: false
+                show_icon: false
+                show_state: true
+                type: glance
+                entities:
+                  - entity: sensor.mtec_energybutler_inverter_ac_voltage_phase_a
+                  - entity: sensor.mtec_energybutler_inverter_ac_voltage_phase_b
+                  - entity: sensor.mtec_energybutler_inverter_ac_voltage_phase_c
+                  - entity: sensor.mtec_energybutler_inverter_ac_current_phase_a
+                  - entity: sensor.mtec_energybutler_inverter_ac_current_phase_b
+                  - entity: sensor.mtec_energybutler_inverter_ac_current_phase_c
+                  - entity: sensor.mtec_energybutler_inverter_power_phase_a
+                  - entity: sensor.mtec_energybutler_inverter_power_phase_b
+                  - entity: sensor.mtec_energybutler_inverter_power_phase_c
+                columns: 3
+                state_color: false
+                title: Inverter AC
+              - show_name: false
+                show_icon: false
+                show_state: true
+                type: glance
+                entities:
+                  - entity: sensor.mtec_energybutler_backup_voltage_phase_a
+                  - entity: sensor.mtec_energybutler_backup_voltage_phase_b
+                  - entity: sensor.mtec_energybutler_backup_voltage_phase_c
+                  - entity: sensor.mtec_energybutler_backup_current_phase_a
+                  - entity: sensor.mtec_energybutler_backup_current_phase_b
+                  - entity: sensor.mtec_energybutler_backup_current_phase_c
+                  - entity: sensor.mtec_energybutler_backup_power_phase_a
+                  - entity: sensor.mtec_energybutler_backup_power_phase_b
+                  - entity: sensor.mtec_energybutler_backup_power_phase_c
+                  - entity: sensor.mtec_energybutler_backup_frequency_phase_a
+                  - entity: sensor.mtec_energybutler_backup_frequency_phase_c
+                  - entity: sensor.mtec_energybutler_backup_frequency_phase_b
+                title: Backup
+                columns: 3
+          - type: vertical-stack
+            cards:
+              - show_name: true
+                show_icon: false
+                show_state: true
+                type: glance
+                entities:
+                  - entity: sensor.mtec_energybutler_pv1_voltage
+                    name: PV1 (V)
+                  - entity: sensor.mtec_energybutler_pv1_current
+                    name: PV1 (A)
+                  - entity: sensor.mtec_energybutler_pv1_power
+                    name: PV1 (W)
+                  - entity: sensor.mtec_energybutler_pv2_voltage
+                    name: PV2 (V)
+                  - entity: sensor.mtec_energybutler_pv2_current
+                    name: PV2 (A)
+                  - entity: sensor.mtec_energybutler_pv2_power
+                    name: PV2 (W)
+                title: PV
+                columns: 3
+              - show_name: true
+                show_icon: false
+                show_state: true
+                type: glance
+                entities:
+                  - entity: sensor.mtec_energybutler_battery_cell_temperature_min
+                    name: Temp min (°C)
+                  - entity: sensor.mtec_energybutler_battery_cell_temperature_max
+                    name: Temp max (°C)
+                  - entity: sensor.mtec_energybutler_battery_cell_voltage_min
+                    name: Volt min
+                  - entity: sensor.mtec_energybutler_battery_cell_voltage_max
+                    name: Volt max
+                title: Battery cell details
+                columns: 2
+              - type: entities
+                entities:
+                  - entity: sensor.mtec_energybutler_grid_frequency
+                    name: Grid frequency
+                  - entity: sensor.mtec_energybutler_inverter_temperature_sensor_1
+                    name: Inverter Temp1
+                  - entity: sensor.mtec_energybutler_inverter_temperature_sensor_2
+                    name: Inverter Temp2
+                  - entity: sensor.mtec_energybutler_inverter_temperature_sensor_3
+                    name: Inverter Temp3
+                  - entity: sensor.mtec_energybutler_inverter_temperature_sensor_4
+                    name: Inverter Temp4
+                title: Inverter
