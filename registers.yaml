@@ -17,17 +17,17 @@
 #------------------------------------------------------------------
 # Calculated pseudo-registers
 
-"household":
-  name: Household power
+"consumption":
+  name: Household consumption
   unit: W
-  mqtt: household
+  mqtt: consumption
   group: now-base
   hass_device_class: power
   hass_value_template: "{{ value | round(0) }}"
   hass_state_class: measurement
 
 "consumption-day":
-  name: Household energy consumed (day)
+  name: Household consumption (day)
   unit: kWh
   mqtt: consumption_day
   group: day
@@ -54,7 +54,7 @@
   hass_state_class: measurement
 
 "consumption-total":
-  name: Household energy consumed (total)
+  name: Household consumption (total)
   unit: kWh
   mqtt: consumption_total
   group: total
@@ -327,6 +327,11 @@
   length: 2
   type: U32
   unit: h
+  mqtt: pv_generation_duration
+  group: now-pv
+  hass_device_class: duration
+  hass_value_template: "{{ value }}"
+  hass_state_class: measurement 
 
 "11028":
   name: PV power
@@ -890,11 +895,16 @@
   type: U16
 
 "33003":
-  name: BMS Pack Temperature
+  name: Battery temperature
   length: 1
   type: U16
   unit: "°C"
   scale: 10
+  mqtt: battery_temp
+  group: now-battery
+  hass_device_class: temperature
+  hass_value_template: "{{ value | round(1) }}"
+  hass_state_class: measurement 
 
 "33009":
   name: Battery cell temperature max.

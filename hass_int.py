@@ -89,7 +89,7 @@ class HassIntegration:
   def _build_sensor_array( self ):
     # build sensor registration
     for register, item in register_map.items():
-      if item["group"] and item.get("hass_device_class"): # Do not announce items without group or hass_device_class
+      if item["group"] and item.get("hass_state_class"): # Do not announce items without group or hass_state_class
         if ( (item["group"] in ["now-base", "day", "total"]) or 
           (item["group"]=="now-grid" and cfg['ENABLE_GRID_DATA']) or
           (item["group"]=="now-inverter" and cfg['ENABLE_INVERTER_DATA']) or

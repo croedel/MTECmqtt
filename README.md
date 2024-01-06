@@ -179,6 +179,21 @@ Battery -------    |                --------- house
 | 52504    | off_grid_soc_switch     |      | Off-grid SOC limit switch
 | 52505    | off_grid_soc_limit      | %    | Off-grid SOC limit
 
+### now-base
+| Register | MQTT Parameter          | Unit | Description 
+| -------- | ----------------------  | ---- | ---------------------------------------------- 
+| 10100    | inverter_date           |      | Inverter date
+| 10105    | inverter_status         |      | Inverter status
+| 11000    | grid_power              | W    | Grid power
+| 11016    | inverter                | W    | Inverter AC power
+| 11028    | pv                      | W    | PV power
+| 30230    | backup                  | W    | Backup power total
+| 30256    | battery_mode            |      | Battery mode
+| 30258    | battery                 | W    | Battery power
+| 33000    | battery_soc             | %    | Battery SOC
+| 50000    | mode                    |      | Inverter operation mode
+|          | consumption             | W    | Household consumption (*)
+
 ### now-backup
 | Register | MQTT Parameter          | Unit | Description 
 | -------- | ----------------------  | ---- | ---------------------------------------------- 
@@ -195,27 +210,13 @@ Battery -------    |                --------- house
 | 30222    | backup_frequency_c      | Hz   | Backup frequency phase C
 | 30224    | backup_c                | W    | Backup power phase C
 
-### now-base
-| Register | MQTT Parameter          | Unit | Description 
-| -------- | ----------------------  | ---- | ---------------------------------------------- 
-| 10100    | inverter_date           |      | Inverter date
-| 10105    | inverter_status         |      | Inverter status
-| 11000    | grid_power              | W    | Grid power
-| 11016    | inverter                | W    | Inverter AC power
-| 11028    | pv                      | W    | PV power
-| 30230    | backup                  | W    | Backup power total
-| 30256    | battery_mode            |      | Battery mode
-| 30258    | battery                 | W    | Battery power
-| 33000    | battery_soc             | %    | Battery SOC
-| 50000    | mode                    |      | Inverter operation mode
-|          | household               | W    | Household power (*)
-
 ### now-battery
 | Register | MQTT Parameter          | Unit | Description 
 | -------- | ----------------------  | ---- | ---------------------------------------------- 
 | 30254    | battery_voltage         | V    | Battery voltage
 | 30255    | battery_current         | A    | Battery current
 | 33001    | battery_soh             | %    | Battery SOH
+| 33003    | battery_temp            | ℃   | Battery temperature 
 | 33009    | battery_cell_t_max      | ℃   | Battery cell temperature max.
 | 33011    | battery_cell_t_min      | ℃   | Battery cell temperature min.
 | 33013    | battery_cell_v_max      | V    | Battery cell voltage max.
@@ -252,6 +253,7 @@ Battery -------    |                --------- house
 ### now-pv
 | Register | MQTT Parameter          | Unit | Description 
 | -------- | ----------------------  | ---- | ---------------------------------------------- 
+| 11022    | pv_generation_duration  | h    | PV generation time total
 | 11038    | pv_voltage_1            | V    | PV1 voltage
 | 11039    | pv_current_1            | A    | PV1 current
 | 11040    | pv_voltage_2            | V    | PV2 voltage

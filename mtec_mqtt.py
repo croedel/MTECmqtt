@@ -40,7 +40,7 @@ def read_MTEC_data( api, group ):
         if register.isnumeric():  
           pvdata[item["mqtt"]] = data[register]
         else: # non-numeric registers are deemed to be calculated pseudo-registers  
-          if register == "household":  
+          if register == "consumption":  
             pvdata[item["mqtt"]] = data["11016"]["value"] - data["11000"]["value"]  # power consumption 
           elif register == "consumption-day":
             pvdata[item["mqtt"]] = data["31005"]["value"] + data["31001"]["value"] + data["31004"]["value"] - data["31000"]["value"] - data["31003"]["value"]  # power consumption 
