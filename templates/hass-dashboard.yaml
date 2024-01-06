@@ -13,73 +13,73 @@ views:
             style:
               top: 48%
               left: 33%
-              font-size: 2em
+              font-size: 1.2em
           - type: state-label
             entity: sensor.mtec_energybutler_grid_power
             style:
               top: 48%
               left: 72%
-              font-size: 2em
+              font-size: 1.2em
           - type: state-label
             entity: sensor.mtec_energybutler_battery_power
             style:
               top: 73%
               left: 56%
-              font-size: 2em
+              font-size: 1.2em
           - type: state-label
             entity: sensor.mtec_energybutler_household_consumption
             style:
               top: 35%
               left: 56%
-              font-size: 2em
+              font-size: 1.2em
           - type: state-icon
             entity: sensor.mtec_energybutler_battery_soc
             style:
-              top: 85%
-              left: 50%
-              transform: scale(6,6) rotate(90deg)
+              top: 81%
+              left: 49%
+              transform: scale(4,4) rotate(90deg)
           - type: state-label
             entity: sensor.mtec_energybutler_battery_soc
             style:
-              top: 88%
+              top: 87%
               left: 51%
-              font-size: 2em
+              font-size: 1.2em
           - type: state-label
             entity: sensor.mtec_energybutler_household_consumption_day
             style:
               top: 9%
               left: 80%
-              font-size: 2em
+              font-size: 1.2em
           - type: state-label
             entity: sensor.mtec_energybutler_household_autarky_day
             style:
               top: 19%
               left: 79%
-              font-size: 2em
+              font-size: 1.2em
           - type: state-label
             entity: sensor.mtec_energybutler_pv_energy_generated_day
             style:
               top: 65%
               left: 16%
-              font-size: 2em
+              font-size: 1.2em
           - type: state-label
             entity: sensor.mtec_energybutler_pv_energy_generated_total
             style:
               top: 76%
               left: 18%
-              font-size: 2em
+              font-size: 1.2em
           - type: state-label
             entity: sensor.mtec_energybutler_grid_purchased_energy_day
             style:
               top: 74%
               left: 85%
-              font-size: 2em
+              font-size: 1.2em
           - type: state-label
             entity: sensor.mtec_energybutler_grid_injection_energy_day
             style:
               top: 82%
               left: 85%
-              font-size: 2em
+              font-size: 1.2em
   - path: statistics
     title: Statistics
     icon: ''

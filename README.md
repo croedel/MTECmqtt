@@ -48,13 +48,6 @@ You should be able to use it with probably any MQTT server. If you don't have on
 
 MQTT provides a light-weight publish/subscribe model which is widely used for Internet of Things messaging. MQTT connectivity is implemented in many EMS or home automation tools. 
 
-`mtec_mqtt.py` provides Home Assistant (https://www.home-assistant.io) auto-discovery, which means that Home Assistant will automatically detect and configure your MTEC Inverter. You just need to enable and configure the MQTT integration within Home Assistant and then start `mtec_mqtt.py`.  
-
-If you want to integrate the data into evcc (https://evcc.io), you might want to have a look at the `evcc.yaml` snippet in the `templates` directory. It shows how to define and use the MTEC `meters`, provided in MQTT.
-Please don't forget to replace `<MTEC_SERIAL_NO>` with the actual serial no of your Inverter.
-
-If you want to run the mqtt server as a service, you can find a `.service` template in the `templates` directory. 
-
 ## Setup & configuration
 As prerequisites, you need to have installed: 
 * Python 3.8 or higher
@@ -107,12 +100,6 @@ MQTT_TOPIC : "MTEC"         # MQTT topic name
 The other values of the `config.yaml` you probably don't need to change as of now.
 That's all you need to do!
 
-### Starting the service
-Having done that, you should already be able to start `python mtec_mytt.py` on command line.
-It will print out some debug info, so you can see what it does.
-
-You can stop the service by pressing CTRL-C or sending a SIGHUB. This will initiate a graceful shutdown. Be patient - this might take some seconds.   
-
 ### Advanced config
 Per default, the most interesting parameters are exported.
 You can easily switch on/off the export of additional data packages: 
@@ -145,9 +132,27 @@ HASS_ENABLE : True                # Enable home assistant support
 HASS_BASE_TOPIC : homeassistant   # Basis MQTT topic of home assistant
 ```
 
+## Starting the service
+Having done that, you should already be able to start `python mtec_mytt.py` on command line.
+It will print out some debug info, so you can see what it does.
+
+You can stop the service by pressing CTRL-C or sending a SIGHUB. This will initiate a graceful shutdown. Be patient - this might take some seconds.   
+
+If you want to run the mqtt server as a service, you can find a `.service` template in the `templates` directory. 
+
+### Home Assistant support
+`mtec_mqtt.py` provides Home Assistant (https://www.home-assistant.io) auto-discovery, which means that Home Assistant will automatically detect and configure your MTEC Inverter. 
+
+You just need to enable and configure the MQTT integration within Home Assistant. 
+The map view requires to install `PV_background.png` as background image. To do so, create a sub-directory called `www` in the `config` directory of your Home Assistant installation (e.g. `/home/homeassistant/.homeassistant/www/`) and copy the image to this directory.  
+
+### evcc support
+If you want to integrate the data into evcc (https://evcc.io), you might want to have a look at the `evcc.yaml` snippet in the `templates` directory. It shows how to define and use the MTEC `meters`, provided in MQTT.
+Please don't forget to replace `<MTEC_SERIAL_NO>` with the actual serial no of your Inverter.
+
 ## Data format written to MQTT
 
-The data will be written to several MQTT topics. The topic path includes the serial number of your Inverter.
+The exported data will be written to several MQTT topics. The topic path includes the serial number of your Inverter.
  
 | Sub-topic                         | Refresh frequency            |  Description 
 |---------------------------------- | --------------------------   | ---------------------------------------------- 
@@ -332,6 +337,6 @@ By specifying commandline parameters, you can:
 
 ### Templates 
 In the `templates` directory you can find some more useful templates:
-* `hass-dashboard.yaml`: A dashboard which visualizes all Inverter data within Home Assistant.
+* `hass-dashboard.yaml`: A dashboard which visualizes all Inverter data within Home Assistant. 
 * `evcc.yaml`: A yaml snippet shich shows how to integrate your Inverter into evcc.
 * `mtec_mqtt.service`: A template which shows how to create a systemctl service running `mtec_mqtt.py`  
