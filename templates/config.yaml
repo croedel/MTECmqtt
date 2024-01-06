@@ -6,7 +6,7 @@ MODBUS_SLAVE : 252              # Modbus slave id (usually no change required)
 MODBUS_TIMEOUT : 3              # Timeout for Modbus server (s)
 MODBUS_RETRIES : 3              # Retries
 
-# MQTT
+# MQTT settings
 MQTT_DISABLE : False
 MQTT_SERVER : localhost         # MQTT server 
 MQTT_PORT : 1883                # MQTT server port
@@ -28,7 +28,7 @@ ENABLE_BACKUP_DATA : False      # Extended backup data
 ENABLE_BATTERY_DATA : False     # Extended battery data
 ENABLE_PV_DATA : False          # Extended PV data
 
-# Home Assistent
+# Home Assistent support
 HASS_ENABLE : False             # Enable home assistant
 HASS_BASE_TOPIC : homeassistant # Basis MQTT topic of home assistant
 
