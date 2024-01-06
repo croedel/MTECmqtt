@@ -134,9 +134,21 @@ class MTECmodbusAPI:
     elif item.get("writable", False) == False:
       logging.error("Can't write register which is marked read-only: {}".format(register))
       return False
+
+    # check value
+    try:
+      if isinstance(value, str):
+        if "." in value:
+          value = float(value)
+        else:
+          value = int(value)  
+    except Exception as ex:
+      logging.error("Invalid numeric value: {}".format(value))
+      return False
+
     # adjust scale 
     if item["scale"] > 1:
-      value *= item["scale"]
+        value *= item["scale"]
 
     try:
       result = self.modbus_client.write_register(address=int(register), value=int(value), slave=self.slave )

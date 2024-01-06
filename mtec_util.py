@@ -43,24 +43,29 @@ def read_register_group(api):
 #-------------------------------
 def write_register(api):
   print( "-------------------------------------" )
+  print( "Current settings of w525ritable registers:" )
+  print( "Reg   Name                           Value  Unit" )
+  print( "----- ------------------------------ ------ ----" )
+  register_map_sorted = dict(sorted(register_map.items()))
+  for register, item in register_map_sorted.items():
+    if item["writable"]: 
+      data = api.read_modbus_data( registers=[register] )
+      value = ""
+      if data: 
+        value = data[register]["value"]
+      unit = item["unit"] if item["unit"] else ""
+      print("{:5s} {:30s} {:6s} {:4s} ".format(register, item["name"], str(value), unit ))
+
+  print( "" )
   register = input("Register: ")
   value = input("Value: ")
 
-  data = api.read_modbus_data( registers=[register] )
-  if data: 
-    item = data.get(register)
-    line = "Current value of register {} ({}): {} {}".format( register, item["name"], item["value"], item["unit"] )
-    print( line )
-
-  yn = input("Do you want to set it to '{}'? (y/N)".format(value))
+  print( "WARNING: Be careful when writing registers to your Inverter!" )
+  yn = input("Do you really want to set register {} to '{}'? (y/N)".format(register,value))
   if yn == "y" or yn == "Y": 
     ret = api.write_register( register=register, value=value)
     if ret == True:
-      data = api.read_modbus_data( registers=[register] )
-      if data: 
-        item = data.get(register)
-        line = "New value of register {} ({}): {} {}".format( register, item["name"], item["value"], item["unit"] )
-        print( line )
+      print("New value successfully set")  
     else:
       print("Writing failed")  
   else:

@@ -6,8 +6,8 @@ Welcome to the `M-TEC MQTT` project!
 This project enables to read data from a M-TEC Energybutler (https://www.mtec-systems.com) system and write them to a MQTT broker. 
 
 The highlights are:
-* Just install on any existing (micro-)server, e.g. Rasperry Pi or NAS server 
 * No additional hardware or modifications of your Inverter required 
+* Just install on any existing (micro-)server, e.g. Rasperry Pi or NAS server 
 * Works within you LAN - no internet connection required
 * Uses the standard communication protocol 'Modbus RTU over TCP' to read the data from the Inverter 
 * Enables frequent polling of essential data (e.g. every 10s)
@@ -184,15 +184,15 @@ Battery -------    |                --------- house
 | Register | MQTT Parameter          | Unit | Description 
 | -------- | ----------------------  | ---- | ---------------------------------------------- 
 | 10100    | inverter_date           |      | Inverter date
-| 10105    | inverter_status         |      | Inverter status
+| 10105    | inverter_status         |      | Inverter status (0=wait for on-grid, 1=self-check, 2=on-grid, 3=fault, 4=firmware update, 5=off grid)
 | 11000    | grid_power              | W    | Grid power
 | 11016    | inverter                | W    | Inverter AC power
 | 11028    | pv                      | W    | PV power
 | 30230    | backup                  | W    | Backup power total
-| 30256    | battery_mode            |      | Battery mode
+| 30256    | battery_mode            |      | Battery mode (0=Discharge, 1=Charge)
 | 30258    | battery                 | W    | Battery power
 | 33000    | battery_soc             | %    | Battery SOC
-| 50000    | mode                    |      | Inverter operation mode
+| 50000    | mode                    |      | Inverter operation mode (257=General mode, 258=Economic mode, 259=UPS mode, 512=Off grid 771=Manual mode)
 |          | consumption             | W    | Household consumption (*)
 
 ### now-backup
@@ -323,4 +323,7 @@ By specifying commandline parameters, you can:
 * Write output to a file (`-f FILENAME`)
 
 ### Home Assistant dashboard
-For users of Home Assistant, you can find a dashbaord with all the Inverter data in the templates directory: `hass-dashboard.yaml`.
+For users of Home Assistant, you can find a dashboard with all the Inverter data in the `templates` directory: `hass-dashboard.yaml`.
+
+### EVCC config
+In the `templates` directory, you can also find a snippet how to integrate your Inverter into EVCC: `evcc.yaml`
