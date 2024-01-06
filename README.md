@@ -19,7 +19,7 @@ The highlights are:
 I hope you like it and it will help you with for your EMS or home automation project :-) !
 
 ### Disclaimer 
-This project is a pure hobby project which I created by reverse-engineering different internet sources and my M-TEC Energybutler. It is *not* related to or supported by M-TEC GmbH by any means. Usage is on you own risk. I don't take any responsibility on functionality or potential damage.
+This project is a pure hobby project which I created by reverse-engineering different internet sources and my M-TEC Energybutler. It is *not* related to or supported by M-TEC GmbH by any means. Usage is completely on you own risk. I don't take any responsibility on functionality or potential damage.
 
 ### Credits
 This project would not have been possible without the really valuable pre-work of other people, especially: 
@@ -104,6 +104,12 @@ MQTT_TOPIC : "MTEC"         # MQTT topic name
 
 The other values of the `config.yaml` you probably don't need to change as of now.
 That's all you need to do!
+
+### Starting the service
+Having done that, you should be able to start `mtec_mytt.py` on command line.
+It will print out some debug info, so you can see what it does.
+
+You can stop the service by pressing CTRL-C or sending a SIGHUB. This will initiate a graceful shutdown.   
 
 ### Advanced config
 Per default, the most interesting parameters are exported.
@@ -322,8 +328,8 @@ By specifying commandline parameters, you can:
 * Request to export CSV instead of human readable (`-c`) 
 * Write output to a file (`-f FILENAME`)
 
-### Home Assistant dashboard
-For users of Home Assistant, you can find a dashboard with all the Inverter data in the `templates` directory: `hass-dashboard.yaml`.
-
-### EVCC config
-In the `templates` directory, you can also find a snippet how to integrate your Inverter into EVCC: `evcc.yaml`
+### Templates 
+In the `templates` directory you can find some more useful templates:
+* `hass-dashboard.yaml`: A dashboard which visualizes all Inverter data within Home Assistant.
+* `evcc.yaml`: A yaml snippet shich shows how to integrate your Inverter into evcc.
+* `mtec_mqtt.service`: A template which shows how to create a systemctl service running `mtec_mqtt.py`  
