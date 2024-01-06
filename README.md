@@ -19,7 +19,9 @@ The highlights are:
 I hope you like it and it will help you with for your EMS or home automation project :-) !
 
 ### Disclaimer 
-This project is a pure hobby project which I created by reverse-engineering different internet sources and my M-TEC Energybutler. It is *not* related to or supported by M-TEC GmbH by any means. Usage is completely on you own risk. I don't take any responsibility on functionality or potential damage.
+This project is a pure hobby project which I created by reverse-engineering different internet sources and my M-TEC Energybutler. It is *not* related to or supported by M-TEC GmbH by any means. 
+
+Usage is completely on you own risk. I don't take any responsibility on functionality or potential damage.
 
 ### Credits
 This project would not have been possible without the really valuable pre-work of other people, especially: 
@@ -48,7 +50,7 @@ MQTT provides a light-weight publish/subscribe model which is widely used for In
 
 `mtec_mqtt.py` provides Home Assistant (https://www.home-assistant.io) auto-discovery, which means that Home Assistant will automatically detect and configure your MTEC Inverter. You just need to enable and configure the MQTT integration within Home Assistant and then start `mtec_mqtt.py`.  
 
-If you want to integrate the data into evcc (https://evcc.io), you might want to have a look at the `èvcc.yaml` snippet in the `templates` directory. It shows how to define and use the MTEC `meters`, provided in MQTT.
+If you want to integrate the data into evcc (https://evcc.io), you might want to have a look at the `evcc.yaml` snippet in the `templates` directory. It shows how to define and use the MTEC `meters`, provided in MQTT.
 Please don't forget to replace `<MTEC_SERIAL_NO>` with the actual serial no of your Inverter.
 
 If you want to run the mqtt server as a service, you can find a `.service` template in the `templates` directory. 
@@ -229,7 +231,7 @@ Battery -------    |                --------- house
 | 33013    | battery_cell_v_max      | V    | Battery cell voltage max.
 | 33015    | battery_cell_v_min      | V    | Battery cell voltage min.
 
-# now-grid
+### now-grid
 | Register | MQTT Parameter          | Unit | Description 
 | -------- | ----------------------  | ---- | ---------------------------------------------- 
 | 10994    | grid_a                  | W    | Grid power phase A
