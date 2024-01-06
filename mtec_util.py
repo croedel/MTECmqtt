@@ -43,7 +43,7 @@ def read_register_group(api):
 #-------------------------------
 def write_register(api):
   print( "-------------------------------------" )
-  print( "Current settings of w525ritable registers:" )
+  print( "Current settings of writable registers:" )
   print( "Reg   Name                           Value  Unit" )
   print( "----- ------------------------------ ------ ----" )
   register_map_sorted = dict(sorted(register_map.items()))
