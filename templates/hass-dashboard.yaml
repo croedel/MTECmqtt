@@ -1,15 +1,95 @@
 title: MTEC Energybutler
 views:
-  - path: default_view
-    title: Overview
+  - title: Overview
+    path: overview
+    type: panel
+    badges: []
+    cards:
+      - type: picture-elements
+        image: http://automation.fritz.box:8123/local/PV_background.png
+        elements:
+          - type: state-label
+            entity: sensor.mtec_energybutler_pv_power
+            style:
+              top: 48%
+              left: 33%
+              font-size: 2em
+          - type: state-label
+            entity: sensor.mtec_energybutler_grid_power
+            style:
+              top: 48%
+              left: 72%
+              font-size: 2em
+          - type: state-label
+            entity: sensor.mtec_energybutler_battery_power
+            style:
+              top: 73%
+              left: 56%
+              font-size: 2em
+          - type: state-label
+            entity: sensor.mtec_energybutler_household_consumption
+            style:
+              top: 35%
+              left: 56%
+              font-size: 2em
+          - type: state-icon
+            entity: sensor.mtec_energybutler_battery_soc
+            style:
+              top: 85%
+              left: 50%
+              transform: scale(6,6) rotate(90deg)
+          - type: state-label
+            entity: sensor.mtec_energybutler_battery_soc
+            style:
+              top: 88%
+              left: 51%
+              font-size: 2em
+          - type: state-label
+            entity: sensor.mtec_energybutler_household_consumption_day
+            style:
+              top: 9%
+              left: 80%
+              font-size: 2em
+          - type: state-label
+            entity: sensor.mtec_energybutler_household_autarky_day
+            style:
+              top: 19%
+              left: 79%
+              font-size: 2em
+          - type: state-label
+            entity: sensor.mtec_energybutler_pv_energy_generated_day
+            style:
+              top: 65%
+              left: 16%
+              font-size: 2em
+          - type: state-label
+            entity: sensor.mtec_energybutler_pv_energy_generated_total
+            style:
+              top: 76%
+              left: 18%
+              font-size: 2em
+          - type: state-label
+            entity: sensor.mtec_energybutler_grid_purchased_energy_day
+            style:
+              top: 74%
+              left: 85%
+              font-size: 2em
+          - type: state-label
+            entity: sensor.mtec_energybutler_grid_injection_energy_day
+            style:
+              top: 82%
+              left: 85%
+              font-size: 2em
+  - path: statistics
+    title: Statistics
     icon: ''
     type: sidebar
     badges: []
     cards:
       - type: history-graph
         entities:
-          - entity: sensor.mtec_energybutler_household_power
-            name: Household
+          - entity: sensor.mtec_energybutler_household_consumption
+            name: Consumption
           - entity: sensor.mtec_energybutler_pv_power
             name: PV
           - entity: sensor.mtec_energybutler_grid_power
@@ -26,10 +106,10 @@ views:
                 name: Inverter status
               - entity: sensor.mtec_energybutler_battery_mode
                 name: Battery mode
-              - entity: sensor.mtec_energybutler_battery_soc
-                name: Battery SOC
               - entity: sensor.mtec_energybutler_battery_soh
                 name: Battery SOH
+              - entity: sensor.mtec_energybutler_battery_temperature
+                name: Battery temperature
               - entity: sensor.mtec_energybutler_battery_voltage
                 name: Battery Voltage
               - entity: sensor.mtec_energybutler_battery_current
@@ -39,10 +119,14 @@ views:
             show_header_toggle: false
           - type: entities
             entities:
+              - entity: sensor.mtec_energybutler_household_consumption
+                name: Household
               - entity: sensor.mtec_energybutler_pv_power
+                name: PV
               - entity: sensor.mtec_energybutler_grid_power
+                name: Grid
               - entity: sensor.mtec_energybutler_battery_power
-              - entity: sensor.mtec_energybutler_household_power
+                name: Battery
             title: Current power consumption
             show_header_toggle: true
           - type: vertical-stack
@@ -66,7 +150,7 @@ views:
         cards:
           - type: entities
             entities:
-              - entity: sensor.mtec_energybutler_household_energy_consumed_day
+              - entity: sensor.mtec_energybutler_household_consumption_day
                 name: Houshold energy
               - entity: sensor.mtec_energybutler_backup_energy_day
                 name: Backup energy
@@ -109,7 +193,7 @@ views:
         cards:
           - type: entities
             entities:
-              - entity: sensor.mtec_energybutler_household_energy_consumed_total
+              - entity: sensor.mtec_energybutler_household_consumption_total
                 name: Houshold energy
               - entity: sensor.mtec_energybutler_backup_energy_total
                 name: Backup energy
@@ -148,8 +232,8 @@ views:
                     color: '#ffa600'
                   - from: 70
                     color: '#43a047'
-  - title: Detail
-    path: detail
+  - title: Details
+    path: details
     type: sidebar
     badges: []
     cards:

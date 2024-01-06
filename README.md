@@ -8,12 +8,13 @@ This project enables to read data from a M-TEC Energybutler (https://www.mtec-sy
 The highlights are:
 * Just install on any existing (micro-)server, e.g. Rasperry Pi or NAS server 
 * No additional hardware or modifications of your Inverter required 
-* MQTT enables an easy integration into almost any EMS or home automation tool 
-* Home Assistant (https://www.home-assistant.io) auto discovery via MQTT 
-* Easy and prepared integration into evcc (https://evcc.io), which enables PV surplus charging 
 * Works within you LAN - no internet connection required
 * Uses the standard communication protocol 'Modbus RTU over TCP' to read the data from the Inverter 
 * Enables frequent polling of essential data (e.g. every 10s)
+* MQTT enables an easy integration into almost any EMS or home automation tool 
+* Home Assistant (https://www.home-assistant.io) auto discovery via MQTT 
+* Home Assistant demo dashboard included
+* Easy and prepared integration into evcc (https://evcc.io), which enables PV surplus charging 
 
 I hope you like it and it will help you with for your EMS or home automation project :-) !
 
@@ -310,7 +311,6 @@ You can choose between:
 
 (5) enables you to write a value to a register of your Inverter
 
-
 ### Commandline export tool
 The command-line tool `mtec_export.py` offers functionality to read data from your Inverter using Modbus and export it in various combinations and formats.
 
@@ -321,3 +321,6 @@ By specifying commandline parameters, you can:
 * Provide a customize list of Modbus registers which you would like to retrieve, e.g. `-r "33000,10105,11000"`
 * Request to export CSV instead of human readable (`-c`) 
 * Write output to a file (`-f FILENAME`)
+
+### Home Assistant dashboard
+For users of Home Assistant, you can find a dashbaord with all the Inverter data in the templates directory: `hass-dashboard.yaml`.
