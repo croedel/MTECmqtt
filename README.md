@@ -8,9 +8,9 @@ This project enables to read data from a M-TEC Energybutler (https://www.mtec-sy
 The highlights are:
 * No additional hardware or modifications of your Inverter required 
 * Just install on any existing (micro-)server, e.g. Rasperry Pi or NAS server 
-* Works within you LAN - no internet connection required
-* Uses the standard communication protocol 'Modbus RTU over TCP' to read the data from the Inverter 
-* Enables frequent polling of essential data (e.g. every 10s)
+* Works within you LAN - no internet connection required 
+* Supports more than 80 parameters
+* Enables frequent polling of data (e.g. every 10s)
 * MQTT enables an easy integration into almost any EMS or home automation tool 
 * Home Assistant (https://www.home-assistant.io) auto discovery via MQTT 
 * Home Assistant demo dashboard included
