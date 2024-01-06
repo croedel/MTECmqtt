@@ -75,8 +75,8 @@ Now download the files of *this* repository to any location of your choise.
 Then copy `config.yaml` from the `templates` directory to the project root.
 
 Now you need to configure:
-* Connect your M-TEC Inverter
-* Connect you MQTT broker
+* Connection to your M-TEC Inverter
+* Connection to your MQTT broker
  
 ### Connect your M-TEC Inverter
 In order to connect to your Inverter, you need the IP Address of your `espressif` device. 
@@ -108,10 +108,10 @@ The other values of the `config.yaml` you probably don't need to change as of no
 That's all you need to do!
 
 ### Starting the service
-Having done that, you should be able to start `mtec_mytt.py` on command line.
+Having done that, you should already be able to start `python mtec_mytt.py` on command line.
 It will print out some debug info, so you can see what it does.
 
-You can stop the service by pressing CTRL-C or sending a SIGHUB. This will initiate a graceful shutdown.   
+You can stop the service by pressing CTRL-C or sending a SIGHUB. This will initiate a graceful shutdown. Be patient - this might take some seconds.   
 
 ### Advanced config
 Per default, the most interesting parameters are exported.
@@ -137,11 +137,11 @@ REFRESH_CONFIG_H  : 24          # Refresh config data every N hours
 
 Please be aware that a frequent export of a lot of parameters increases the load on the `espressif` device of your Inverter. This might imply unwanted side effects. 
 
-If require, you can disable Home Automation auto discovery and/or configure a different MQTT base topic: 
+If you want to enable Home Assistant support, set `HASS_ENABLE: True`. 
 
 ```
 # Home Assistent
-HASS_ENABLE : True                # Enable home assistant
+HASS_ENABLE : True                # Enable home assistant support
 HASS_BASE_TOPIC : homeassistant   # Basis MQTT topic of home assistant
 ```
 

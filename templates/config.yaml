@@ -29,7 +29,7 @@ ENABLE_BATTERY_DATA : False     # Extended battery data
 ENABLE_PV_DATA : False          # Extended PV data
 
 # Home Assistent
-HASS_ENABLE : True              # Enable home assistant
+HASS_ENABLE : False             # Enable home assistant
 HASS_BASE_TOPIC : homeassistant # Basis MQTT topic of home assistant
 
 # General
