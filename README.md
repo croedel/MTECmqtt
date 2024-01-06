@@ -124,14 +124,6 @@ REFRESH_CONFIG_H  : 24          # Refresh config data every N hours
 
 Please be aware that a frequent export of a lot of parameters increases the load on the `espressif` device of your Inverter. This might imply unwanted side effects. 
 
-If you want to enable Home Assistant support, set `HASS_ENABLE: True`. 
-
-```
-# Home Assistent
-HASS_ENABLE : True                # Enable home assistant support
-HASS_BASE_TOPIC : homeassistant   # Basis MQTT topic of home assistant
-```
-
 ## Starting the service
 Having done that, you should already be able to start `python mtec_mytt.py` on command line.
 It will print out some debug info, so you can see what it does.
@@ -143,7 +135,17 @@ If you want to run the mqtt server as a service, you can find a `.service` templ
 ### Home Assistant support
 `mtec_mqtt.py` provides Home Assistant (https://www.home-assistant.io) auto-discovery, which means that Home Assistant will automatically detect and configure your MTEC Inverter. 
 
-You just need to enable and configure the MQTT integration within Home Assistant. 
+If you want to enable Home Assistant support, set `HASS_ENABLE: True` in `config.yaml`. 
+
+```
+# Home Assistent
+HASS_ENABLE : True                # Enable home assistant support
+HASS_BASE_TOPIC : homeassistant   # Basis MQTT topic of home assistant
+```
+
+As next step, you need to enable and configure the MQTT integration within Home Assistant. After that, the auto discovery should do it's job and the Inverter sensors should appear on your dashboard.
+
+If you want, you can use and install the `hass-dashboard.yaml` in `templates` for a nice data visualization. 
 The map view requires to install `PV_background.png` as background image. To do so, create a sub-directory called `www` in the `config` directory of your Home Assistant installation (e.g. `/home/homeassistant/.homeassistant/www/`) and copy the image to this directory.  
 
 ### evcc support
