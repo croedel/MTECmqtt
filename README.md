@@ -309,7 +309,7 @@ You can choose between:
 
 (4) allows you to read a sinfle register from your Inverter
 
-(5) enables you to write a value to a register of your Inverter
+(5) enables you to write a value to a register of your Inverter. WARNING: Be careful when writing data to your Inverter! This is definitively at your own risk!
 
 ### Commandline export tool
 The command-line tool `mtec_export.py` offers functionality to read data from your Inverter using Modbus and export it in various combinations and formats.
