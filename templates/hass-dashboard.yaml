@@ -13,73 +13,78 @@ views:
             style:
               top: 48%
               left: 33%
-              font-size: 1.2em
+              font-size: calc(0.5em + 1.8vw)
+              color: white
           - type: state-label
             entity: sensor.mtec_energybutler_grid_power
             style:
               top: 48%
               left: 72%
-              font-size: 1.2em
+              font-size: calc(0.5em + 1.8vw)
+              color: white
           - type: state-label
             entity: sensor.mtec_energybutler_battery_power
             style:
               top: 73%
               left: 56%
-              font-size: 1.2em
+              font-size: calc(0.5em + 1.8vw)
+              color: white
           - type: state-label
             entity: sensor.mtec_energybutler_household_consumption
             style:
               top: 35%
               left: 56%
-              font-size: 1.2em
-          - type: state-icon
-            entity: sensor.mtec_energybutler_battery_soc
-            style:
-              top: 81%
-              left: 49%
-              transform: scale(4,4) rotate(90deg)
+              font-size: calc(0.5em + 1.8vw)
+              color: white
           - type: state-label
             entity: sensor.mtec_energybutler_battery_soc
             style:
-              top: 87%
+              top: 86%
               left: 51%
-              font-size: 1.2em
+              font-size: calc(0.5em + 1.8vw)
+              color: white
           - type: state-label
             entity: sensor.mtec_energybutler_household_consumption_day
             style:
               top: 9%
               left: 80%
-              font-size: 1.2em
+              font-size: calc(0.5em + 1.8vw)
+              color: white
           - type: state-label
             entity: sensor.mtec_energybutler_household_autarky_day
             style:
               top: 19%
               left: 79%
-              font-size: 1.2em
+              font-size: calc(0.5em + 1.8vw)
+              color: white
           - type: state-label
             entity: sensor.mtec_energybutler_pv_energy_generated_day
             style:
               top: 65%
               left: 16%
-              font-size: 1.2em
+              font-size: calc(0.5em + 1.8vw)
+              color: white
           - type: state-label
             entity: sensor.mtec_energybutler_pv_energy_generated_total
             style:
               top: 76%
               left: 18%
-              font-size: 1.2em
+              font-size: calc(0.5em + 1.8vw)
+              color: white
           - type: state-label
             entity: sensor.mtec_energybutler_grid_purchased_energy_day
             style:
               top: 74%
-              left: 85%
-              font-size: 1.2em
+              left: 86%
+              font-size: calc(0.5em + 1.8vw)
+              color: white
           - type: state-label
             entity: sensor.mtec_energybutler_grid_injection_energy_day
             style:
               top: 82%
-              left: 85%
-              font-size: 1.2em
+              left: 86%
+              font-size: calc(0.5em + 1.8vw)
+              color: white
   - path: statistics
     title: Statistics
     icon: ''
@@ -104,6 +109,13 @@ views:
                 name: Operation mode
               - entity: sensor.mtec_energybutler_inverter_status
                 name: Inverter status
+              - entity: sensor.mtec_energybutler_pv_generation_time_total
+                name: PV generation time
+            title: Inverter status
+            state_color: false
+            show_header_toggle: false
+          - type: entities
+            entities:
               - entity: sensor.mtec_energybutler_battery_mode
                 name: Battery mode
               - entity: sensor.mtec_energybutler_battery_soh
@@ -111,12 +123,14 @@ views:
               - entity: sensor.mtec_energybutler_battery_temperature
                 name: Battery temperature
               - entity: sensor.mtec_energybutler_battery_voltage
-                name: Battery Voltage
+                name: Battery voltage
               - entity: sensor.mtec_energybutler_battery_current
                 name: Battery current
-            title: Status
+            title: Battery status
             state_color: false
             show_header_toggle: false
+      - type: horizontal-stack
+        cards:
           - type: entities
             entities:
               - entity: sensor.mtec_energybutler_household_consumption
@@ -331,11 +345,11 @@ views:
                   - entity: sensor.mtec_energybutler_grid_frequency
                     name: Grid frequency
                   - entity: sensor.mtec_energybutler_inverter_temperature_sensor_1
-                    name: Inverter Temp1
+                    name: Inverter temp1
                   - entity: sensor.mtec_energybutler_inverter_temperature_sensor_2
-                    name: Inverter Temp2
+                    name: Inverter temp2
                   - entity: sensor.mtec_energybutler_inverter_temperature_sensor_3
-                    name: Inverter Temp3
+                    name: Inverter temp3
                   - entity: sensor.mtec_energybutler_inverter_temperature_sensor_4
-                    name: Inverter Temp4
+                    name: Inverter temp4
                 title: Inverter
