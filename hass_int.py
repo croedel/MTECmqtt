@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Auto discovery for home assistant
-(c) 2023 by Christian Rödel 
+(c) 2024 by Christian Rödel 
 """
 
 from config import cfg, register_map

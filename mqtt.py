@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 MQTT client base implemantation
-(c) 2023 by Christian Rödel 
+(c) 2024 by Christian Rödel 
 """
 import logging
 from config import cfg
