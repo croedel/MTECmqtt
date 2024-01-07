@@ -25,15 +25,15 @@ views:
           - type: state-label
             entity: sensor.mtec_energybutler_battery_power
             style:
-              top: 73%
-              left: 56%
+              top: 71%
+              left: 57%
               font-size: calc(0.5em + 1.8vw)
               color: white
           - type: state-label
             entity: sensor.mtec_energybutler_household_consumption
             style:
               top: 35%
-              left: 56%
+              left: 58%
               font-size: calc(0.5em + 1.8vw)
               color: white
           - type: state-label
@@ -54,14 +54,14 @@ views:
             entity: sensor.mtec_energybutler_household_autarky_day
             style:
               top: 19%
-              left: 79%
+              left: 80%
               font-size: calc(0.5em + 1.8vw)
               color: white
           - type: state-label
             entity: sensor.mtec_energybutler_pv_energy_generated_day
             style:
               top: 65%
-              left: 16%
+              left: 17%
               font-size: calc(0.5em + 1.8vw)
               color: white
           - type: state-label
@@ -75,15 +75,36 @@ views:
             entity: sensor.mtec_energybutler_grid_purchased_energy_day
             style:
               top: 74%
-              left: 86%
+              left: 85%
               font-size: calc(0.5em + 1.8vw)
               color: white
           - type: state-label
             entity: sensor.mtec_energybutler_grid_injection_energy_day
             style:
               top: 82%
-              left: 86%
+              left: 85%
               font-size: calc(0.5em + 1.8vw)
+              color: white
+          - type: state-label
+            entity: sensor.mtec_energybutler_pv1_power
+            style:
+              top: 13%
+              left: 10%
+              font-size: calc(0.3em + 1.2vw)
+              color: white
+          - type: state-label
+            entity: sensor.mtec_energybutler_pv2_power
+            style:
+              top: 13%
+              left: 22%
+              font-size: calc(0.3em + 1.2vw)
+              color: white
+          - type: state-label
+            entity: sensor.mtec_energybutler_grid_frequency
+            style:
+              top: 58%
+              left: 72%
+              font-size: calc(0.3em + 1.2vw)
               color: white
   - path: statistics
     title: Statistics
