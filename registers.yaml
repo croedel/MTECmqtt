@@ -93,6 +93,7 @@
   name: Equipment info
   length: 1
   type: BYTE
+  group: config
 
 "10011":
   name: Firmware version

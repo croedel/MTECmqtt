@@ -49,79 +49,29 @@ class MTECmodbusAPI:
   def read_modbus_data(self, registers=None):
     data = {}
     logging.debug("Retrieving data...")
-    if registers == None: # fetch all registers
-      for register, item in register_map.items():
-        if register.isnumeric(): # non-numeric registers are deemed to be calculated pseudo-registers 
-          reg_data = self._read_register(register=register, item=item) 
-          if reg_data:
-            data.update( reg_data )
-    else: # fetch list of given registers
-      for register in registers:
-        item = register_map.get(register)
-        if item:
-          if register.isnumeric(): # non-numeric registers are deemed to be calculated pseudo-registers 
-            reg_data = self._read_register(register=register, item=item) 
-            if reg_data:
-              data.update( reg_data )
-        else:
-          logging.warning("Unknowd register: {} - skipped.".format(register))
-  
+
+    if registers == None: # Create liset of all (numeric) registers
+      registers = []
+      for register in register_map:
+        if register.isnumeric(): # non-numeric registers are deemed to be calculated pseudo-registers
+          registers.append(register)
+
+    cluster_list = self._get_register_clusters(registers)
+    for reg_cluster in cluster_list:
+      offset = 0
+      logging.info("Fetching data for cluster start: {}, length {}".format(reg_cluster["start"], reg_cluster["length"]))
+      rawdata = self._read_registers(reg_cluster["start"], reg_cluster["length"])
+      if rawdata:
+        for item in reg_cluster["items"]:
+          data_decoded = self._decode_rawdata(rawdata, offset, item)
+          if data_decoded:
+            register = str(reg_cluster["start"] + offset)
+            data.update( {register: data_decoded} )
+          else:
+            logging.error("Decoding error while decoding register {}".format(register))
+          offset += item["length"]
+
     logging.debug("Data retrieval completed")
-    return data
-  
-  #--------------------------------
-  def _read_register(self, register, item):
-    data = {}
-    try:
-      result = self.modbus_client.read_holding_registers(address=int(register), count=item["length"], slave=self.slave )
-    except Exception as ex:
-      logging.error("Exception while reading register {} from pymodbus: {}".format(register, ex))
-      return data
-
-    if result.isError():
-      logging.error("Error while reading register {} from pymodbus".format(register))
-      return data
-    
-    val = None
-    decoder = BinaryPayloadDecoder.fromRegisters(result.registers,byteorder=Endian.BIG, wordorder=Endian.BIG)
-    item["type"] = item["type"]
-    if item["type"] == 'U16':
-      val = decoder.decode_16bit_uint()
-    elif item["type"] == 'I16':
-      val = decoder.decode_16bit_int()
-    elif item["type"] == 'U32':
-      val = decoder.decode_32bit_uint()
-    elif item["type"] == 'I32':
-      val = decoder.decode_32bit_int()
-    elif item["type"] == 'BYTE':
-      if item["length"] == 1:
-        val = "{:02d} {:02d}".format( decoder.decode_8bit_uint(), decoder.decode_8bit_uint() )
-      elif item["length"] == 2:
-        val = "{:02d} {:02d}  {:02d} {:02d}".format( decoder.decode_8bit_uint(), decoder.decode_8bit_uint(), 
-                                                  decoder.decode_8bit_uint(), decoder.decode_8bit_uint() )
-      elif item["length"] == 4:
-        val = "{:02d} {:02d} {:02d} {:02d}  {:02d} {:02d} {:02d} {:02d}".format( decoder.decode_8bit_uint(), decoder.decode_8bit_uint(), 
-                                                  decoder.decode_8bit_uint(), decoder.decode_8bit_uint(),
-                                                  decoder.decode_8bit_uint(), decoder.decode_8bit_uint(), 
-                                                  decoder.decode_8bit_uint(), decoder.decode_8bit_uint() )
-    elif item["type"] == 'BIT':
-      if item["length"] == 1:
-        val = "{:08b}".format( decoder.decode_8bit_uint() )
-      if item["length"] == 2:
-        val = "{:08b} {:08b}".format( decoder.decode_8bit_uint(), decoder.decode_8bit_uint() )
-    elif item["type"] == 'DAT':
-      val = "{:02d}-{:02d}-{:02d} {:02d}:{:02d}:{:02d}".format( decoder.decode_8bit_uint(), decoder.decode_8bit_uint(), decoder.decode_8bit_uint(),
-                      decoder.decode_8bit_uint(), decoder.decode_8bit_uint(), decoder.decode_8bit_uint() )
-    elif item["type"] == 'STR':
-      val = decoder.decode_string(item["length"]*2).decode()
-    else:
-      logging.error("Unknown type {} to decode register {}".format(item["type"], register))
-      return data
-    
-    if val and item["scale"] > 1:
-      val /= item["scale"]
-    data[register] = { "name":item["name"], "value":val, "unit":item["unit"] } 
-
     return data
 
   #--------------------------------
@@ -162,6 +112,7 @@ class MTECmodbusAPI:
     return True
 
   #--------------------------------
+  # Helper to get a list of all registers which belong to a given group
   def get_register_list( self, group ):
     registers = []
     for register, item in register_map.items():
@@ -172,6 +123,96 @@ class MTECmodbusAPI:
       logging.error("Unknown or empty register group: {}".format(group))
       return None              
     return registers
+
+  #--------------------------------
+  # Cluster registers in order to optimize modbus traffic    
+  def _get_register_clusters( self, registers ):
+    registers.sort()
+    cluster = { 
+      "start": 0,     
+      "length": 0,
+      "items": []   
+    }
+    cluster_list = []
+    
+    for register in registers:
+      if register.isnumeric(): # ignore non-numeric pseudo registers
+        item = register_map.get(register)
+        if item:
+          if int(register) != cluster["start"] + cluster["length"]: 
+            if cluster["start"] > 0: # except for first cluster 
+              cluster_list.append(cluster)
+            cluster = { 
+              "start": int(register),     
+              "length": 0,
+              "items": []   
+            }
+          cluster["length"] += item["length"]  
+          cluster["items"].append(item)
+        else:
+          logging.warning("Unknown register: {} - skipped.".format(register))
+
+    if cluster["start"] > 0: # append last cluster
+      cluster_list.append(cluster)
+
+    return cluster_list
+  
+  #--------------------------------
+  def _read_registers(self, register, length):
+    try:
+      result = self.modbus_client.read_holding_registers(address=int(register), count=length, slave=self.slave)
+    except Exception as ex:
+      logging.error("Exception while reading register {} from pymodbus: {}".format(register, ex))
+      return None
+    if result.isError():
+      logging.error("Error while reading register {} from pymodbus".format(register))
+      return None
+    return result
+
+  #--------------------------------
+  def _decode_rawdata(self, rawdata, offset, item):
+    data = {}   
+    val = None
+    start = rawdata.registers[offset:]
+    decoder = BinaryPayloadDecoder.fromRegisters(registers=start, byteorder=Endian.BIG, wordorder=Endian.BIG)
+    item["type"] = item["type"]
+    if item["type"] == 'U16':
+      val = decoder.decode_16bit_uint()
+    elif item["type"] == 'I16':
+      val = decoder.decode_16bit_int()
+    elif item["type"] == 'U32':
+      val = decoder.decode_32bit_uint()
+    elif item["type"] == 'I32':
+      val = decoder.decode_32bit_int()
+    elif item["type"] == 'BYTE':
+      if item["length"] == 1:
+        val = "{:02d} {:02d}".format( decoder.decode_8bit_uint(), decoder.decode_8bit_uint() )
+      elif item["length"] == 2:
+        val = "{:02d} {:02d}  {:02d} {:02d}".format( decoder.decode_8bit_uint(), decoder.decode_8bit_uint(), 
+                                                  decoder.decode_8bit_uint(), decoder.decode_8bit_uint() )
+      elif item["length"] == 4:
+        val = "{:02d} {:02d} {:02d} {:02d}  {:02d} {:02d} {:02d} {:02d}".format( decoder.decode_8bit_uint(), decoder.decode_8bit_uint(), 
+                                                  decoder.decode_8bit_uint(), decoder.decode_8bit_uint(),
+                                                  decoder.decode_8bit_uint(), decoder.decode_8bit_uint(), 
+                                                  decoder.decode_8bit_uint(), decoder.decode_8bit_uint() )
+    elif item["type"] == 'BIT':
+      if item["length"] == 1:
+        val = "{:08b}".format( decoder.decode_8bit_uint() )
+      if item["length"] == 2:
+        val = "{:08b} {:08b}".format( decoder.decode_8bit_uint(), decoder.decode_8bit_uint() )
+    elif item["type"] == 'DAT':
+      val = "{:02d}-{:02d}-{:02d} {:02d}:{:02d}:{:02d}".format( decoder.decode_8bit_uint(), decoder.decode_8bit_uint(), decoder.decode_8bit_uint(),
+                      decoder.decode_8bit_uint(), decoder.decode_8bit_uint(), decoder.decode_8bit_uint() )
+    elif item["type"] == 'STR':
+      val = decoder.decode_string(item["length"]*2).decode()
+    else:
+      logging.error("Unknown type {} to decode".format(item["type"]))
+      return data
+    
+    if val and item["scale"] > 1:
+      val /= item["scale"]
+    data = { "name":item["name"], "value":val, "unit":item["unit"] } 
+    return data
 
 #--------------------------------
 # The main() function is just a demo code how to use the API

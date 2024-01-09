@@ -31,9 +31,10 @@ def read_register_group(api):
   if group=="" or group=="all":
     registers = None
   else:  
-    registers = sorted(api.get_register_list(group))
+    registers = api.get_register_list(group)
     if not registers:
       return
+    
   print( "Reading..." )
   data = api.read_modbus_data( registers=registers )
   if data: 
