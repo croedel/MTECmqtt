@@ -65,24 +65,24 @@ class MTECmodbusAPI:
             if reg_data:
               data.update( reg_data )
         else:
-          logging.warning("Unknowd register: {} - skipped.".format(register))
+          logging.warning("Unknown register: {} - skipped.".format(register))
   
     logging.debug("Data retrieval completed")
     return data
   
   #--------------------------------
   def _read_register(self, register, item):
-    data = {}
     try:
       result = self.modbus_client.read_holding_registers(address=int(register), count=item["length"], slave=self.slave )
     except Exception as ex:
       logging.error("Exception while reading register {} from pymodbus: {}".format(register, ex))
-      return data
+      return None
 
     if result.isError():
       logging.error("Error while reading register {} from pymodbus".format(register))
-      return data
+      return None
     
+    data = {}
     val = None
     decoder = BinaryPayloadDecoder.fromRegisters(result.registers,byteorder=Endian.BIG, wordorder=Endian.BIG)
     item["type"] = item["type"]
