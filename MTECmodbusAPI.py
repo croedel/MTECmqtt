@@ -5,9 +5,9 @@ Modbus API for M-TEC Energybutler
 """
 from config import cfg, register_map
 from pymodbus.client import ModbusTcpClient
-from pymodbus.transaction import ModbusRtuFramer
 from pymodbus.payload import BinaryPayloadDecoder
 from pymodbus.constants import Endian
+from pymodbus.framer import Framer
 import logging
 
 #=====================================================
@@ -25,9 +25,10 @@ class MTECmodbusAPI:
   # Connect to Modbus server
   def connect( self, ip_addr, port, slave ):
     self.slave = slave
-
-    logging.debug("Connecting to server {}:{}".format(ip_addr, port))
-    self.modbus_client = ModbusTcpClient(ip_addr, port, framer=ModbusRtuFramer, timeout=cfg["MODBUS_TIMEOUT"],
+    
+    framer = cfg.get("MODBUS_FRAMER", "rtu")
+    logging.debug("Connecting to server {}:{} (framer={})".format(ip_addr, port, framer))
+    self.modbus_client = ModbusTcpClient(ip_addr, port, framer=Framer(framer), timeout=cfg["MODBUS_TIMEOUT"],
                                          retries=cfg["MODBUS_RETRIES"], retry_on_empty=True )
 
     if self.modbus_client.connect():

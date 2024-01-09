@@ -72,25 +72,32 @@ Now you need to configure:
 * Connection to your MQTT broker
  
 ### Connect your M-TEC Inverter
-In order to connect to your Inverter, you need the IP Address of your `espressif` device. 
+In order to connect to your Inverter, you need the IP address or internal hostname of your `espressif` device. 
+If you run a FRITZ!Box, the pre-configured internal hostname `espressif.fritz.box` will probably already work out-of-the-box.
+Else you can easily adjust it like this: 
 1. Login to your internet router
 2. Look for the list of connected devices
 3. You should find a devices called `espressif`
-4. Copy the IPv4 address of this device to `config.yaml` file as value for `MODBUS_IP`
+4. Copy the IPv4 address or internal hostname of this device to `config.yaml` file as value for `MODBUS_IP`.
+
+You probably don't need to change any of the other `MODBUS_` config values.
 
 ```
 # MODBUS Server
-MODBUS_IP : "xx.xx.xx.xx"   # IP address of "espressif" modbus server
-MODBUS_PORT : 5743          # Port (usually no change required)
-MODBUS_SLAVE : 252          # Modbus slave id (usually no change required)
-MODBUS_TIMEOUT : 5          # Timeout for Modbus server (s)
+MODBUS_IP : espressif.fritz.box    # IP address / hostname of "espressif" modbus server
+MODBUS_PORT : 5743                 # Port (usually no change required)
+MODBUS_SLAVE : 252                 # Modbus slave id (usually no change required)
+MODBUS_TIMEOUT : 5                 # Timeout for Modbus server (s)
+MODBUS_FRAMER: rtu                 # Modbus Framer (usually no change required; options: 'ascii', 'binary', 'rtu', 'socket', 'tls')
 ```
+
+Hint for advanced users: If you run an external modbus adapter, connected e.g. to the EMS bus of the MTEC inverter, you might require to change the `MODBUS_FRAMER`.   
 
 ### Connect you MQTT broker
 The `MQTT_` parameters in `config.yaml` define the connection to your MQTT server.
 
 ```
-MQTT_SERVER : "localhost"   # MQTT server 
+MQTT_SERVER : localhost     # MQTT server 
 MQTT_PORT : 1883            # MQTT server port
 MQTT_LOGIN  : " "           # MQTT Login
 MQTT_PASSWORD : ""          # MQTT Password  
@@ -98,7 +105,8 @@ MQTT_TOPIC : "MTEC"         # MQTT topic name
 ```
 
 The other values of the `config.yaml` you probably don't need to change as of now.
-That's all you need to do!
+
+That's already all you need to do and you are ready to go!
 
 ### Advanced config
 Per default, the most interesting parameters are exported.
