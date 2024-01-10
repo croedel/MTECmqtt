@@ -112,23 +112,21 @@ def main():
   api = MTECmodbusAPI.MTECmodbusAPI()
   api.connect(ip_addr=cfg['MODBUS_IP'], port=cfg['MODBUS_PORT'], slave=cfg['MODBUS_SLAVE'])
 
+  # Initialize  
+  pv_config = None
+  while not pv_config:
+    pv_config = read_MTEC_data( api, "config" )
+    if not pv_config:
+      logging.warning("Cant retrieve initial config - retry in 10 s")
+      time.sleep(10)
+  
+  topic_base = cfg['MQTT_TOPIC'] + '/' + pv_config["serial_no"]["value"] + '/'  
+  if hass and not hass.is_initialized:
+    hass.initialize( pv_config["serial_no"]["value"] )
+
   # Main loop - exit on signal only
   while run_status: 
     now = datetime.now()
-
-    # Config
-    if next_read_config <= now:
-      pv_config = read_MTEC_data( api, "config" )
-      if pv_config:
-        topic_base = cfg['MQTT_TOPIC'] + '/' + pv_config["serial_no"]["value"] + '/'
-        write_to_MQTT( pv_config, topic_base + 'config/' )
-        next_read_config = datetime.now() + timedelta(hours=cfg['REFRESH_CONFIG_H'])
-        if hass and not hass.is_initialized:
-          hass.initialize( pv_config["serial_no"]["value"] )
-      if not topic_base:
-        logging.error("Cant retrieve initial config - retry in {}s".format( cfg['REFRESH_NOW_S'] ))
-        time.sleep(cfg['REFRESH_NOW_S'])
-        continue
 
     # Now 
     pvdata = read_MTEC_data( api, "now-base" )
@@ -168,6 +166,13 @@ def main():
       if pvdata:
         write_to_MQTT( pvdata, topic_base + 'total/' )
         next_read_total = datetime.now() + timedelta(minutes=cfg['REFRESH_TOTAL_M'])
+
+    # Config
+    if next_read_config <= now:
+      pvdata = read_MTEC_data( api, "config" )
+      if pvdata:
+        write_to_MQTT( pvdata, topic_base + 'config/' )
+        next_read_config = datetime.now() # + timedelta(hours=cfg['REFRESH_CONFIG_H'])
 
     logging.debug("Sleep {}s".format( cfg['REFRESH_NOW_S'] ))
     time.sleep(cfg['REFRESH_NOW_S'])

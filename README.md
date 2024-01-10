@@ -196,12 +196,6 @@ Battery -------    |                --------- house
 | -------- | ----------------------  | ---- | ---------------------------------------------- 
 | 10000    | serial_no               |      | Inverter serial number
 | 10011    | firmware_version        |      | Firmware version
-| 25100    | grid_inject_switch      |      | Grid injection limit switch
-| 25103    | grid_inject_limit       | %    | Grid injection power limit
-| 52502    | on_grid_soc_switch      |      | On-grid SOC limit switch
-| 52503    | on_grid_soc_limit       | %    | On-grid SOC limit
-| 52504    | off_grid_soc_switch     |      | Off-grid SOC limit switch
-| 52505    | off_grid_soc_limit      | %    | Off-grid SOC limit
 
 ### now-base
 | Register | MQTT Parameter          | Unit | Description 
@@ -273,6 +267,13 @@ Battery -------    |                --------- house
 | 30236    | inverter_a              | W   | Inverter power phase A
 | 30242    | inverter_b              | W   | Inverter power phase B
 | 30248    | inverter_c              | W   | Inverter power phase C
+| 25100    | grid_inject_switch      |     | Grid injection limit switch
+| 25103    | grid_inject_limit       | %   | Grid injection power limit
+| 52502    | on_grid_soc_switch      |     | On-grid SOC limit switch
+| 52503    | on_grid_soc_limit       | %   | On-grid SOC limit
+| 52504    | off_grid_soc_switch     |     | Off-grid SOC limit switch
+| 52505    | off_grid_soc_limit      | %   | Off-grid SOC limit
+
 
 ### now-pv
 | Register | MQTT Parameter          | Unit | Description 

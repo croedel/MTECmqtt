@@ -89,7 +89,7 @@ class HassIntegration:
   def _build_sensor_array( self ):
     # build sensor registration
     for register, item in register_map.items():
-      if item["group"] and item.get("hass_state_class"): # Do not announce items without group or hass_state_class
+      if item["group"] and (item.get("hass_state_class") or item.get("hass_device_class")): # Do not announce items without group or (hass_state_class or hass_device_class)
         if ( (item["group"] in ["now-base", "day", "total"]) or 
           (item["group"]=="now-grid" and cfg['ENABLE_GRID_DATA']) or
           (item["group"]=="now-inverter" and cfg['ENABLE_INVERTER_DATA']) or
@@ -100,13 +100,17 @@ class HassIntegration:
           data_item = { 
             "name": item["name"], 
             "unique_id": "MTEC_" + item["mqtt"], 
-            "device_class": item["hass_device_class"], 
             "unit_of_measurement": item["unit"],
-            "value_template": item["hass_value_template"], 
-            "state_class": item["hass_state_class"], 
             "state_topic": "MTEC/" + self.serial_no + "/" + item["group"] + "/" + item["mqtt"],
             "device": self.device_info
           }
+          if item.get("hass_device_class"):
+            data_item["device_class"] = item["hass_device_class"] 
+          if item.get("hass_value_template"):
+            data_item["value_template"] = item["hass_value_template"] 
+          if item.get("hass_state_class"):
+            data_item["state_class"] = item["hass_state_class"] 
+
           topic = cfg["HASS_BASE_TOPIC"] + "/sensor/" + "MTEC_" + item["mqtt"] + "/config"
           self.devices_array.append( [topic, json.dumps(data_item)] )  
 

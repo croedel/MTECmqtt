@@ -6,7 +6,7 @@ views:
     badges: []
     cards:
       - type: picture-elements
-        image: http://automation.fritz.box:8123/local/PV_background.png
+        image: http://automation.fritz.box:8123/local/PV_background.png?v=1
         elements:
           - type: state-label
             entity: sensor.mtec_energybutler_pv_power
@@ -130,8 +130,18 @@ views:
                 name: Operation mode
               - entity: sensor.mtec_energybutler_inverter_status
                 name: Inverter status
-              - entity: sensor.mtec_energybutler_pv_generation_time_total
-                name: PV generation time
+              - entity: sensor.mtec_energybutler_grid_injection_limit_switch
+                name: Grid injection switch
+              - entity: sensor.mtec_energybutler_grid_injection_power_limit
+                name: Grid injection limit
+              - entity: sensor.mtec_energybutler_on_grid_soc_limit_switch
+                name: On-grid SOC switch
+              - entity: sensor.mtec_energybutler_on_grid_soc_limit
+                name: On-grid SOC limit
+              - entity: sensor.mtec_energybutler_off_grid_soc_limit_switch
+                name: Off-grid SOC switch
+              - entity: sensor.mtec_energybutler_off_grid_soc_limit
+                name: Off-grid SOC limit
             title: Inverter status
             state_color: false
             show_header_toggle: false
