@@ -3,7 +3,7 @@
 MODBUS_IP : espressif.fritz.box # IP address / hostname of "espressif" modbus server
 MODBUS_PORT : 5743              # Port (usually no change required)
 MODBUS_SLAVE : 252              # Modbus slave id (usually no change required)
-MODBUS_TIMEOUT : 3              # Timeout for Modbus server (s)
+MODBUS_TIMEOUT : 5              # Timeout for Modbus server (s)
 MODBUS_RETRIES : 3              # Retries
 MODBUS_FRAMER: rtu              # Modbus Framer (usually no change required; options: 'ascii', 'binary', 'rtu', 'socket', 'tls')
 

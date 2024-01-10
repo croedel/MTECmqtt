@@ -656,7 +656,7 @@
   unit: V 
   scale: 10
   mqtt: battery_voltage
-  group: now-battery
+  group: now-base
   hass_device_class: voltage
   hass_value_template: "{{ value | round(1) }}"
   hass_state_class: measurement 
@@ -668,7 +668,7 @@
   unit: A
   scale: 10
   mqtt: battery_current
-  group: now-battery
+  group: now-base
   hass_device_class: current
   hass_value_template: "{{ value | round(1) }}"
   hass_state_class: measurement 

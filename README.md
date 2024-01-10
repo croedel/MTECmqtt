@@ -52,7 +52,7 @@ MQTT provides a light-weight publish/subscribe model which is widely used for In
 As prerequisites, you need to have installed: 
 * Python 3.8 or higher
 * PyYAML 
-* PyModbus
+* PyModbus (> Version 3.6)
 * paho-mqtt 
 
 I recommend to install it in a `venv`.
@@ -212,6 +212,8 @@ Battery -------    |                --------- house
 | 11016    | inverter                | W    | Inverter AC power
 | 11028    | pv                      | W    | PV power
 | 30230    | backup                  | W    | Backup power total
+| 30254    | battery_voltage         | V    | Battery voltage
+| 30255    | battery_current         | A    | Battery current
 | 30256    | battery_mode            |      | Battery mode (0=Discharge, 1=Charge)
 | 30258    | battery                 | W    | Battery power
 | 33000    | battery_soc             | %    | Battery SOC
@@ -237,8 +239,6 @@ Battery -------    |                --------- house
 ### now-battery
 | Register | MQTT Parameter          | Unit | Description 
 | -------- | ----------------------  | ---- | ---------------------------------------------- 
-| 30254    | battery_voltage         | V    | Battery voltage
-| 30255    | battery_current         | A    | Battery current
 | 33001    | battery_soh             | %    | Battery SOH
 | 33003    | battery_temp            | ℃   | Battery temperature 
 | 33009    | battery_cell_t_max      | ℃   | Battery cell temperature max.

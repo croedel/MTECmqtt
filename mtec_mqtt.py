@@ -45,7 +45,7 @@ def read_MTEC_data( api, group ):
           elif register == "consumption-day":
             pvdata[item["mqtt"]] = data["31005"]["value"] + data["31001"]["value"] + data["31004"]["value"] - data["31000"]["value"] - data["31003"]["value"]  # power consumption 
           elif register == "autarky-day":
-            pvdata[item["mqtt"]] = 100*(1 - (data["31001"]["value"] / pvdata["consumption_day"])) if pvdata["consumption_day"]>0 else 0 
+            pvdata[item["mqtt"]] = 100*(1 - (data["31001"]["value"] / pvdata["consumption_day"])) if pvdata["consumption_day"]>0 else 0
           elif register == "ownconsumption-day":
             pvdata[item["mqtt"]] = 100*(1-data["31000"]["value"] / data["31005"]["value"]) if data["31005"]["value"]>0 else 0
           elif register == "consumption-total":
@@ -56,6 +56,9 @@ def read_MTEC_data( api, group ):
             pvdata[item["mqtt"]] = 100*(1-data["31102"]["value"] / data["31112"]["value"]) if data["31112"]["value"]>0 else 0
           else:  
             logging.warning("Unknown calculated pseudo-register: {}".format(register))
+
+          if pvdata[item["mqtt"]] < 0: # Avoid to report negative values, which might occur in some edge cases  
+            pvdata[item["mqtt"]] = 0 
  
   except Exception as e:
     logging.warning("Retrieved Modbus data is incomplete: {}".format(str(e)))
