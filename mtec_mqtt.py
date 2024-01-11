@@ -172,7 +172,7 @@ def main():
       pvdata = read_MTEC_data( api, "config" )
       if pvdata:
         write_to_MQTT( pvdata, topic_base + 'config/' )
-        next_read_config = datetime.now() # + timedelta(hours=cfg['REFRESH_CONFIG_H'])
+        next_read_config = datetime.now() + timedelta(hours=cfg['REFRESH_CONFIG_H'])
 
     logging.debug("Sleep {}s".format( cfg['REFRESH_NOW_S'] ))
     time.sleep(cfg['REFRESH_NOW_S'])
