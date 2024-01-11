@@ -9,6 +9,7 @@
 #  writable: True 
 #  mqtt: serial_no
 #  group: config
+#  hass_component_type: sensor
 #  hass_device_class: battery
 #  hass_value_template: "{{ value | round(1) }}"
 #  hass_state_class: measurement 
@@ -969,9 +970,10 @@
   type: U16
   writable: True 
   mqtt: grid_inject_switch 
-  group: now-inverter
-  hass_device_class: enum
-  hass_value_template: "{% if value=='0' %}OFF{% elif value=='1' %}ON{% else %}Unknown{% endif %}"
+  group: config
+  hass_component_type: binary_sensor
+  hass_payload_on: "1"
+  hass_payload_off: "0"  
 
 "25103":
   name: Grid injection power limit
@@ -981,7 +983,7 @@
   scale: 10
   writable: True 
   mqtt: grid_inject_limit 
-  group: now-inverter
+  group: config
   hass_value_template: "{{ value | round(1) }}"
   hass_state_class: measurement 
 
@@ -991,10 +993,10 @@
   type: U16
   writable: True 
   mqtt: on_grid_soc_switch 
-  group: now-inverter
-  hass_device_class: enum
-  hass_value_template: "{% if value=='0' %}OFF{% elif value=='1' %}ON{% else %}Unknown{% endif %}"
-
+  group: config
+  hass_component_type: binary_sensor
+  hass_payload_on: "1"
+  hass_payload_off: "0"  
 
 "52503":
   name: On-grid SOC limit
@@ -1004,7 +1006,7 @@
   scale: 10
   writable: True 
   mqtt: on_grid_soc_limit 
-  group: now-inverter
+  group: config
   hass_value_template: "{{ value | round(1) }}"
   hass_state_class: measurement 
 
@@ -1014,9 +1016,10 @@
   type: U16
   writable: True 
   mqtt: off_grid_soc_switch 
-  group: now-inverter
-  hass_device_class: enum
-  hass_value_template: "{% if value=='0' %}OFF{% elif value=='1' %}ON{% else %}Unknown{% endif %}"
+  group: config
+  hass_component_type: binary_sensor
+  hass_payload_on: "1"
+  hass_payload_off: "0"  
 
 "52505":
   name: Off-grid SOC limit  
@@ -1026,7 +1029,7 @@
   scale: 10
   writable: True 
   mqtt: off_grid_soc_limit 
-  group: now-inverter
+  group: config
   hass_value_template: "{{ value | round(1) }}"
   hass_state_class: measurement 
 

@@ -130,20 +130,20 @@ views:
                 name: Operation mode
               - entity: sensor.mtec_energybutler_inverter_status
                 name: Inverter status
-              - entity: sensor.mtec_energybutler_grid_injection_limit_switch
+              - entity: binary_sensor.mtec_energybutler_grid_injection_limit_switch
                 name: Grid injection switch
               - entity: sensor.mtec_energybutler_grid_injection_power_limit
                 name: Grid injection limit
-              - entity: sensor.mtec_energybutler_on_grid_soc_limit_switch
+              - entity: binary_sensor.mtec_energybutler_on_grid_soc_limit_switch
                 name: On-grid SOC switch
               - entity: sensor.mtec_energybutler_on_grid_soc_limit
                 name: On-grid SOC limit
-              - entity: sensor.mtec_energybutler_off_grid_soc_limit_switch
+              - entity: binary_sensor.mtec_energybutler_off_grid_soc_limit_switch
                 name: Off-grid SOC switch
               - entity: sensor.mtec_energybutler_off_grid_soc_limit
                 name: Off-grid SOC limit
             title: Inverter status
-            state_color: false
+            state_color: true
             show_header_toggle: false
           - type: entities
             entities:

@@ -16,10 +16,6 @@ class HassIntegration:
     # name                        unique_id                   payload_press              
 #    [ "Set general mode",         "MTEC_load_battery_btn",    "load_battery_from_grid" ],
   ]
-  switches = [
-    # name                        unique_id                     
-#    [ "Load battery from grid",   "MTEC_load_battery_btn" ],
-  ]
 
   #-------------------------------------------------
   def __init__(self):
@@ -35,10 +31,10 @@ class HassIntegration:
       "name": "MTEC Energybutler", 
       "manufacturer": "MTEC", 
       "model": "Energybutler",
-      "sw_version": "V0.1" 
+      "via_device": "MTECmqtt" 
     }  
     self.devices_array.clear()
-    self._build_sensor_array()
+    self._build_devices_array()
     self._build_automation_array()
     self.send_discovery_info()
     self.is_initialized = True  
@@ -69,50 +65,67 @@ class HassIntegration:
       topic = cfg["HASS_BASE_TOPIC"] + "/button/" + item[1] + "/config"
       self.devices_array.append( [topic, json.dumps(data_item)] )  
 
-    # Switches
-    for item in self.switches:
-      data_item = { 
-        "name": item[0], 
-        "unique_id": item[1], 
-        "payload_on": "ON",
-        "payload_off": "OFF",
-        "state_on": "ON",
-        "state_off": "OFF",
-        "state_topic": "MTEC/" + self.serial_no + "/automations/" + item[1],
-        "command_topic": "MTEC/" + self.serial_no + "/automations/" + item[1] + "/command",
-        "device": self.device_info
-      }
-      topic = cfg["HASS_BASE_TOPIC"] + "/switch/" + item[1] + "/config"
-      self.devices_array.append( [topic, json.dumps(data_item)] )  
-
   #---------------------------------------------------
-  def _build_sensor_array( self ):
-    # build sensor registration
+  # build discovery data for devices
+  def _build_devices_array( self ):
     for register, item in register_map.items():
-      if item["group"] and (item.get("hass_state_class") or item.get("hass_device_class")): # Do not announce items without group or (hass_state_class or hass_device_class)
-        if ( (item["group"] in ["now-base", "day", "total"]) or 
+      # Do registration if there is a "hass_" config entry
+      do_hass_registration = False
+      for key in item.keys():
+        if "hass_" in key:
+          do_hass_registration = True
+          break
+
+      if item["group"] and do_hass_registration: 
+        if ( (item["group"] in ["now-base", "day", "total", "config"]) or 
           (item["group"]=="now-grid" and cfg['ENABLE_GRID_DATA']) or
           (item["group"]=="now-inverter" and cfg['ENABLE_INVERTER_DATA']) or
           (item["group"]=="now-backup" and cfg['ENABLE_BACKUP_DATA']) or
           (item["group"]=="now-battery" and cfg['ENABLE_BATTERY_DATA']) or
           (item["group"]=="now-pv" and cfg['ENABLE_PV_DATA']) 
-        ):        
-          data_item = { 
-            "name": item["name"], 
-            "unique_id": "MTEC_" + item["mqtt"], 
-            "unit_of_measurement": item["unit"],
-            "state_topic": "MTEC/" + self.serial_no + "/" + item["group"] + "/" + item["mqtt"],
-            "device": self.device_info
-          }
-          if item.get("hass_device_class"):
-            data_item["device_class"] = item["hass_device_class"] 
-          if item.get("hass_value_template"):
-            data_item["value_template"] = item["hass_value_template"] 
-          if item.get("hass_state_class"):
-            data_item["state_class"] = item["hass_state_class"] 
+        ):
+          component_type = item.get("hass_component_type", "sensor")
+          if component_type == "sensor":
+            self._append_sensor(item)   
+          if component_type == "binary_sensor":
+            self._append_binary_sensor(item)   
 
-          topic = cfg["HASS_BASE_TOPIC"] + "/sensor/" + "MTEC_" + item["mqtt"] + "/config"
-          self.devices_array.append( [topic, json.dumps(data_item)] )  
+  #---------------------------------------------------
+  def _append_sensor( self, item ):               
+    data_item = { 
+      "name": item["name"], 
+      "unique_id": "MTEC_" + item["mqtt"], 
+      "unit_of_measurement": item["unit"],
+      "state_topic": "MTEC/" + self.serial_no + "/" + item["group"] + "/" + item["mqtt"],
+      "device": self.device_info
+    }
+    if item.get("hass_device_class"):
+      data_item["device_class"] = item["hass_device_class"] 
+    if item.get("hass_value_template"):
+      data_item["value_template"] = item["hass_value_template"] 
+    if item.get("hass_state_class"):
+      data_item["state_class"] = item["hass_state_class"] 
+
+    topic = cfg["HASS_BASE_TOPIC"] + "/sensor/" + "MTEC_" + item["mqtt"] + "/config"
+    self.devices_array.append( [topic, json.dumps(data_item)] )  
+
+#---------------------------------------------------
+  def _append_binary_sensor( self, item ):               
+    data_item = { 
+      "name": item["name"], 
+      "unique_id": "MTEC_" + item["mqtt"], 
+      "state_topic": "MTEC/" + self.serial_no + "/" + item["group"] + "/" + item["mqtt"],
+      "device": self.device_info
+    }
+    if item.get("hass_device_class"):
+      data_item["device_class"] = item["hass_device_class"] 
+    if item.get("hass_payload_on"):
+      data_item["payload_on"] = item["hass_payload_on"] 
+    if item.get("hass_payload_off"):
+      data_item["payload_off"] = item["hass_payload_off"] 
+
+    topic = cfg["HASS_BASE_TOPIC"] + "/binary_sensor/" + "MTEC_" + item["mqtt"] + "/config"
+    self.devices_array.append( [topic, json.dumps(data_item)] )  
 
 #---------------------------------------------------
 # Testcode only
