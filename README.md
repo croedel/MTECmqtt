@@ -127,7 +127,7 @@ The `REFRESH_` parameters define how frequently the data gets fetched from your 
 REFRESH_NOW_S     : 10          # Refresh current data every N seconds
 REFRESH_DAY_M     : 5           # Refresh dayly statistic every N minutes
 REFRESH_TOTAL_M   : 5           # Refresh total statistic every N minutes
-REFRESH_CONFIG_H  : 24          # Refresh config data every N hours
+REFRESH_CONFIG_M  : 60          # Refresh config data every N minutes
 ```
 
 Please be aware that a frequent export of a lot of parameters increases the load on the `espressif` device of your Inverter. This might imply unwanted side effects. 
@@ -166,7 +166,7 @@ The exported data will be written to several MQTT topics. The topic path include
  
 | Sub-topic                         | Refresh frequency            |  Description 
 |---------------------------------- | --------------------------   | ---------------------------------------------- 
-| MTEC/<serial_number>/config       | `REFRESH_CONFIG_H` hours     | Relatively static config values     
+| MTEC/<serial_number>/config       | `REFRESH_CONFIG_M` minutes   | Relatively static config values     
 | MTEC/<serial_number>/now-base     | `REFRESH_NOW_S` seconds      | Current base data      
 | MTEC/<serial_number>/now-grid     | `REFRESH_NOW_S` seconds      | Current extended grid data      
 | MTEC/<serial_number>/now-inverter | `REFRESH_NOW_S` seconds      | Current extended inverter data      

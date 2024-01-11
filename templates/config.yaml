@@ -20,7 +20,7 @@ MQTT_FLOAT_FORMAT : "{:.3f}"    # Defines how to format float values
 REFRESH_NOW_S     : 10          # Refresh "now" data every N seconds
 REFRESH_DAY_M     : 5           # Refresh "day" statistic every N minutes
 REFRESH_TOTAL_M   : 5           # Refresh "total" statistic every N minutes
-REFRESH_CONFIG_H  : 1           # Refresh "config" data every N hours
+REFRESH_CONFIG_M  : 60          # Refresh "config" data every N minutes
 
 # Define which extended data shall get included
 ENABLE_GRID_DATA : False        # Extended grid data
