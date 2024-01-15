@@ -10,6 +10,7 @@ The highlights are:
 * Just install on any existing (micro-)server, e.g. Rasperry Pi or NAS server 
 * Works within you LAN - no internet connection required 
 * Supports more than 80 parameters
+* Clustered reading of sequential register to reduce modbus traffic and load 
 * Enables frequent polling of data (e.g. every 10s)
 * MQTT enables an easy integration into almost any EMS or home automation tool 
 * Home Assistant (https://www.home-assistant.io) auto discovery via MQTT 
@@ -202,6 +203,7 @@ Battery -------    |                --------- house
 | 52503    | on_grid_soc_limit       | %    | On-grid SOC limit
 | 52504    | off_grid_soc_switch     |      | Off-grid SOC limit switch
 | 52505    | off_grid_soc_limit      | %    | Off-grid SOC limit
+|          | api_date                |      | Local date of MTECmqtt server
 
 ### now-base
 | Register | MQTT Parameter          | Unit | Description 

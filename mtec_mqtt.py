@@ -31,9 +31,7 @@ def read_MTEC_data( api, group ):
   now = datetime.now()
   data = api.read_modbus_data(registers=registers)
   pvdata = {}
-  try:
-    pvdata["api_date"] = now.strftime("%Y-%m-%d %H:%M:%S") # Local time of this server
-    # assign all data
+  try: # assign all data
     for register in registers:
       item = register_map[register]
       if item["mqtt"]:
@@ -54,10 +52,12 @@ def read_MTEC_data( api, group ):
             pvdata[item["mqtt"]] = 100*(1 - (data["31104"]["value"] / pvdata["consumption_total"])) if pvdata["consumption_total"]>0 else 0
           elif register == "ownconsumption-total":
             pvdata[item["mqtt"]] = 100*(1-data["31102"]["value"] / data["31112"]["value"]) if data["31112"]["value"]>0 else 0
+          elif register == "api-date":    
+            pvdata[item["mqtt"]] = now.strftime("%Y-%m-%d %H:%M:%S") # Local time of this server
           else:  
             logging.warning("Unknown calculated pseudo-register: {}".format(register))
 
-          if pvdata[item["mqtt"]] < 0: # Avoid to report negative values, which might occur in some edge cases  
+          if isinstance(pvdata[item["mqtt"]], float) and pvdata[item["mqtt"]] < 0: # Avoid to report negative values, which might occur in some edge cases  
             pvdata[item["mqtt"]] = 0 
  
   except Exception as e:
