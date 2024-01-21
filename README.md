@@ -126,6 +126,7 @@ The `REFRESH_` parameters define how frequently the data gets fetched from your 
 
 ```
 REFRESH_NOW_S     : 10          # Refresh current data every N seconds
+REFRESH_NOWEXT_S  : 30          # Refresh "now-" extended data every N seconds
 REFRESH_DAY_M     : 5           # Refresh dayly statistic every N minutes
 REFRESH_TOTAL_M   : 5           # Refresh total statistic every N minutes
 REFRESH_CONFIG_M  : 60          # Refresh config data every N minutes
@@ -169,11 +170,11 @@ The exported data will be written to several MQTT topics. The topic path include
 |---------------------------------- | --------------------------   | ---------------------------------------------- 
 | MTEC/<serial_number>/config       | `REFRESH_CONFIG_M` minutes   | Relatively static config values     
 | MTEC/<serial_number>/now-base     | `REFRESH_NOW_S` seconds      | Current base data      
-| MTEC/<serial_number>/now-grid     | `REFRESH_NOW_S` seconds      | Current extended grid data      
-| MTEC/<serial_number>/now-inverter | `REFRESH_NOW_S` seconds      | Current extended inverter data      
-| MTEC/<serial_number>/now-backup   | `REFRESH_NOW_S` seconds      | Current extended backup data      
-| MTEC/<serial_number>/now-battery  | `REFRESH_NOW_S` seconds      | Current extended battery data      
-| MTEC/<serial_number>/now-pv       | `REFRESH_NOW_S` seconds      | Current extended PV data      
+| MTEC/<serial_number>/now-grid     | `REFRESH_NOWEXT_S` seconds   | Current extended grid data      
+| MTEC/<serial_number>/now-inverter | `REFRESH_NOWEXT_S` seconds   | Current extended inverter data      
+| MTEC/<serial_number>/now-backup   | `REFRESH_NOWEXT_S` seconds   | Current extended backup data      
+| MTEC/<serial_number>/now-battery  | `REFRESH_NOWEXT_S` seconds   | Current extended battery data      
+| MTEC/<serial_number>/now-pv       | `REFRESH_NOWEXT_S` seconds   | Current extended PV data      
 | MTEC/<serial_number>/day          | `REFRESH_DAY_M` minutes      | Daily statistics     
 | MTEC/<serial_number>/total        | `REFRESH_TOTAL_M` minutes    | Lifetime statistics     
 

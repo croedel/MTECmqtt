@@ -101,6 +101,7 @@ def main():
   next_read_config = datetime.now()
   next_read_day = datetime.now()
   next_read_total = datetime.now()
+  next_read_nowext = datetime.now()
   topic_base = None
   
   if cfg["HASS_ENABLE"]:
@@ -128,30 +129,34 @@ def main():
   while run_status: 
     now = datetime.now()
 
-    # Now 
+    # Now base
     pvdata = read_MTEC_data( api, "now-base" )
     if pvdata:
       write_to_MQTT( pvdata, topic_base + 'now-base/' )
-    if cfg['ENABLE_GRID_DATA']:
-      pvdata = read_MTEC_data( api, "now-grid" )
-      if pvdata:
-        write_to_MQTT( pvdata, topic_base + 'now-grid/' )
-    if cfg['ENABLE_INVERTER_DATA']:
-      pvdata = read_MTEC_data( api, "now-inverter" )
-      if pvdata:
-        write_to_MQTT( pvdata, topic_base + 'now-inverter/' )
-    if cfg['ENABLE_BACKUP_DATA']:
-      pvdata = read_MTEC_data( api, "now-backup" )
-      if pvdata:
-        write_to_MQTT( pvdata, topic_base + 'now-backup/' )
-    if cfg['ENABLE_BATTERY_DATA']:
-      pvdata = read_MTEC_data( api, "now-battery" )
-      if pvdata:
-        write_to_MQTT( pvdata, topic_base + 'now-battery/' )
-    if cfg['ENABLE_PV_DATA']:
-      pvdata = read_MTEC_data( api, "now-pv" )
-      if pvdata:
-        write_to_MQTT( pvdata, topic_base + 'now-pv/' )
+
+    # Now extended
+    if next_read_nowext <= now:
+      if cfg['ENABLE_GRID_DATA']:
+        pvdata = read_MTEC_data( api, "now-grid" )
+        if pvdata:
+          write_to_MQTT( pvdata, topic_base + 'now-grid/' )
+      if cfg['ENABLE_INVERTER_DATA']:
+        pvdata = read_MTEC_data( api, "now-inverter" )
+        if pvdata:
+          write_to_MQTT( pvdata, topic_base + 'now-inverter/' )
+      if cfg['ENABLE_BACKUP_DATA']:
+        pvdata = read_MTEC_data( api, "now-backup" )
+        if pvdata:
+          write_to_MQTT( pvdata, topic_base + 'now-backup/' )
+      if cfg['ENABLE_BATTERY_DATA']:
+        pvdata = read_MTEC_data( api, "now-battery" )
+        if pvdata:
+          write_to_MQTT( pvdata, topic_base + 'now-battery/' )
+      if cfg['ENABLE_PV_DATA']:
+        pvdata = read_MTEC_data( api, "now-pv" )
+        if pvdata:
+          write_to_MQTT( pvdata, topic_base + 'now-pv/' )
+      next_read_nowext = datetime.now() + timedelta(seconds=cfg['REFRESH_NOWEXT_S'])
 
     # Day
     if next_read_day <= now:

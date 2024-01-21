@@ -18,6 +18,7 @@ MQTT_FLOAT_FORMAT : "{:.3f}"    # Defines how to format float values
 
 # Refresh interval
 REFRESH_NOW_S     : 10          # Refresh "now" data every N seconds
+REFRESH_NOWEXT_S  : 30          # Refresh "now-" extended data every N seconds
 REFRESH_DAY_M     : 5           # Refresh "day" statistic every N minutes
 REFRESH_TOTAL_M   : 5           # Refresh "total" statistic every N minutes
 REFRESH_CONFIG_M  : 60          # Refresh "config" data every N minutes
