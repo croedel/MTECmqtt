@@ -5,6 +5,7 @@ MQTT client base implemantation
 """
 import logging
 from config import cfg
+import time
 
 try:
   import paho.mqtt.client as mqttcl
@@ -21,6 +22,9 @@ def on_mqtt_message(mqttclient, userdata, message):
     msg = message.payload.decode("utf-8")
     topic = message.topic.split("/")
     if msg == "online" and userdata:
+      gracetime = cfg.get("HASS_BIRTH_GRACETIME", 15)
+      logging.info("Received HASS online message. Sending discovery info in {} sec".format(gracetime))
+      time.sleep(gracetime) # dirty workaround: hass requires some grace period for being ready to receive discovery info
       userdata.send_discovery_info()
   except Exception as e:
     logging.warning("Error while handling MQTT message: {}".format(str(e)))

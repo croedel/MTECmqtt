@@ -151,6 +151,7 @@ If you want to enable Home Assistant support, set `HASS_ENABLE: True` in `config
 # Home Assistent
 HASS_ENABLE : True                # Enable home assistant support
 HASS_BASE_TOPIC : homeassistant   # Basis MQTT topic of home assistant
+HASS_BIRTH_GRACETIME : 15         # Give HASS some time to get ready after the birth message was received
 ```
 
 As next step, you need to enable and configure the MQTT integration within Home Assistant. After that, the auto discovery should do it's job and the Inverter sensors should appear on your dashboard.

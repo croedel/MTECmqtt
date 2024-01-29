@@ -33,6 +33,7 @@ ENABLE_PV_DATA : False          # Extended PV data
 # Home Assistent support
 HASS_ENABLE : False             # Enable home assistant
 HASS_BASE_TOPIC : homeassistant # Basis MQTT topic of home assistant
+HASS_BIRTH_GRACETIME : 15       # Give HASS some time to get ready after the birth message was received
 
 # General
 DEBUG : False                   # Set to True to get verbose debug messages
