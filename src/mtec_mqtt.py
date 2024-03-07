@@ -9,13 +9,13 @@ import logging
 FORMAT = '[%(levelname)s] %(message)s'
 logging.basicConfig(format=FORMAT, level=logging.INFO)
 
-from config import cfg, register_map
+from mtecmqtt.config import cfg, register_map
 from datetime import datetime, timedelta
 import time
 import signal
-import mqtt
-import MTECmodbusAPI
-import hass_int
+from mtecmqtt.mqtt import mqtt_start, mqtt_stop, mqtt_publish
+from mtecmqtt.MTECmodbusAPI import MTECmodbusAPI
+from mtecmqtt.hass_int import HassIntegration
 
 #----------------------------------
 def signal_handler(signal_number, frame):
@@ -84,7 +84,7 @@ def write_to_MQTT( pvdata, base_topic ):
         payload = "{:d}".format( data )
       else:
         payload = data  
-    mqtt.mqtt_publish( topic, payload )
+    mqtt_publish( topic, payload )
 
 #==========================================
 def main():
@@ -105,12 +105,12 @@ def main():
   topic_base = None
   
   if cfg["HASS_ENABLE"]:
-    hass = hass_int.HassIntegration()
+    hass = HassIntegration()
   else:
     hass = None
   
-  mqttclient = mqtt.mqtt_start( hass )
-  api = MTECmodbusAPI.MTECmodbusAPI()
+  mqttclient = mqtt_start( hass )
+  api = MTECmodbusAPI()
   api.connect(ip_addr=cfg['MODBUS_IP'], port=cfg['MODBUS_PORT'], slave=cfg['MODBUS_SLAVE'])
 
   # Initialize  
@@ -186,7 +186,7 @@ def main():
   if hass:
     hass.send_unregister_info()
   api.disconnect()
-  mqtt.mqtt_stop(mqttclient)
+  mqtt_stop(mqttclient)
   logging.info("Exiting")
  
 #---------------------------------------------------

@@ -4,7 +4,7 @@ MQTT client base implemantation
 (c) 2024 by Christian Rödel 
 """
 import logging
-from config import cfg
+from mtecmqtt.config import cfg
 import time
 
 try:

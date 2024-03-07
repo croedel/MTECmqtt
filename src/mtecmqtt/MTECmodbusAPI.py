@@ -3,7 +3,7 @@
 Modbus API for M-TEC Energybutler
 (c) 2023 by Christian Rödel 
 """
-from config import cfg, register_map
+from mtecmqtt.config import cfg, register_map
 from pymodbus.client import ModbusTcpClient
 from pymodbus.payload import BinaryPayloadDecoder
 from pymodbus.constants import Endian

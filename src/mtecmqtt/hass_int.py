@@ -4,10 +4,10 @@ Auto discovery for home assistant
 (c) 2024 by Christian Rödel 
 """
 
-from config import cfg, register_map
+from mtecmqtt.config import cfg, register_map
 import logging
 import json
-import mqtt
+from mtecmqtt.mqtt import mqtt_publish
 
 #---------------------------------------------------
 class HassIntegration:
@@ -43,13 +43,13 @@ class HassIntegration:
   def send_discovery_info( self ):
     logging.info('Sending home assistant discovery info')
     for device in self.devices_array:
-      mqtt.mqtt_publish( topic=device[0], payload=device[1] ) 
+      mqtt_publish( topic=device[0], payload=device[1] ) 
 
   #---------------------------------------------------
   def send_unregister_info( self ):
     logging.info('Sending info to unregister from home assistant')
     for device in self.devices_array:
-      mqtt.mqtt_publish( topic=device[0], payload="" ) 
+      mqtt_publish( topic=device[0], payload="" ) 
 
   #---------------------------------------------------
   def _build_automation_array( self ):

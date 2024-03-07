@@ -29,6 +29,7 @@ This project would not have been possible without the really valuable pre-work o
 * https://www.photovoltaikforum.com/thread/206243-erfahrungen-mit-m-tec-energy-butler-hybrid-wechselrichter
 * https://forum.iobroker.net/assets/uploads/files/1681811699113-20221125_mtec-energybutler_modbus_rtu_protkoll.pdf
 * https://smarthome.exposed/wattsonic-hybrid-inverter-gen3-modbus-rtu-protocol
+* The Home Assistant "blue theme" background was thankfully provided by Enrico from redK! Webdesign & Content Management
 
 ### Compatibility
 The project was developed using my `M-TEC Energybutler 8kW-3P-3G25`, but I assume that it will also work with other Energybutler GEN3 versions (https://www.mtec-systems.com/batteriespeicher/energy-butler-11-bis-30-kwh/).
@@ -44,35 +45,59 @@ It seems that there are at least three more Inverter products on the market whic
 
 ## MQTT server
 The MQTT server `mtec_mqtt.py` connects to the espressif Modbus server of you M-TEC inverter, retrieves relevant data, and writes them to a MQTT broker (https://mqtt.org/) of your choice. 
-
-You should be able to use it with probably any MQTT server. If you don't have one yet, you might want to try https://mosquitto.org/.
-
 MQTT provides a light-weight publish/subscribe model which is widely used for Internet of Things messaging. MQTT connectivity is implemented in many EMS or home automation tools. 
 
 ## Setup & configuration
-As prerequisites, you need to have installed: 
-* Python 3.8 or higher
-* PyYAML 
-* PyModbus (> Version 3.6)
-* paho-mqtt 
+### Prerequesits
+Please make sure you have installed Python 3.8 or higher.
 
-I recommend to install it in a `venv`.
-The python modules can be installed easily by using `pip`:
+As said before, the projects communicated using MQTT. That means, you require a MQTT server. If you don't have one yet, you might want to try https://mosquitto.org/. 
+You can easily install it like this:
 
 ```
-pip install pyyaml
-pip install PyModbus
-pip install paho-mqtt
+sudo apt install mosquitto mosquitto-clients
 ```
 
-Now download the files of *this* repository to any location of your choise.
-Then copy `config.yaml` from the `templates` directory to the project root.
+### Installation
+The basic installation requires following steps:
+1. Create a new directory for the installation (e.g. within your HOME directory)
+2. Create and activate a virtual python environment for the project
+3. Download the MTECmqtt project from github
+4. Execute the project setup.py 
 
-Now you need to configure:
-* Connection to your M-TEC Inverter
-* Connection to your MQTT broker
- 
-### Connect your M-TEC Inverter
+On a Linux system, just copy following commands - line by line - to your shell:
+
+```
+mkdir mtecmqtt && cd mtecmqtt && python3 -m venv . && source bin/activate
+wget https://github.com/croedel/MTECmqtt/archive/refs/heads/main.zip && unzip main.zip && rm main.zip
+cd MTECmqtt-main && python3 setup.py install && cd ..
+```
+
+This should be all you need to do for a standard setup! 
+Let's try if it works. The following command should return a list of some basic parameters of your inverter.
+
+```
+mtec_export.py -g now-base
+```
+
+As a next step, you should try to start the MQTT server. It will print out some debug info, so you can see what it does.
+
+```
+mtec_mqtt.py
+```
+
+You can stop the service by pressing CTRL-C or sending a SIGHUB. This will initiate a graceful shutdown. Be patient - this might take a few seconds.   
+
+If you want, you now can install a systemd autostart script for the MQTT server. This script requires root rights (e.g. executing it with sudo).
+
+```
+sudo bin/install_systemd_service.sh 
+```
+
+### Advanced configuration 
+This section give you more information about all configuration options. But don't be afraid - it should only be relevant for advanced use cases.
+
+#### Connect your M-TEC Inverter
 In order to connect to your Inverter, you need the IP address or internal hostname of your `espressif` device. 
 If you run a FRITZ!Box, the pre-configured internal hostname `espressif.fritz.box` will probably already work out-of-the-box.
 Else you can easily adjust it like this: 
@@ -94,7 +119,7 @@ MODBUS_FRAMER: rtu                 # Modbus Framer (usually no change required; 
 
 Hint for advanced users: If you run an external modbus adapter, connected e.g. to the EMS bus of the MTEC inverter, you might require to change the `MODBUS_FRAMER`.   
 
-### Connect you MQTT broker
+#### Connect you MQTT broker
 The `MQTT_` parameters in `config.yaml` define the connection to your MQTT server.
 
 ```
@@ -109,7 +134,7 @@ The other values of the `config.yaml` you probably don't need to change as of no
 
 That's already all you need to do and you are ready to go!
 
-### Advanced config
+#### More configuration options
 Per default, the most interesting parameters are exported.
 You can easily switch on/off the export of additional data packages: 
 
@@ -133,14 +158,7 @@ REFRESH_CONFIG_M  : 60          # Refresh config data every N minutes
 ```
 
 Please be aware that a frequent export of a lot of parameters increases the load on the `espressif` device of your Inverter. This might imply unwanted side effects. 
-
-## Starting the service
-Having done that, you should already be able to start `python mtec_mytt.py` on command line.
-It will print out some debug info, so you can see what it does.
-
-You can stop the service by pressing CTRL-C or sending a SIGHUB. This will initiate a graceful shutdown. Be patient - this might take some seconds.   
-
-If you want to run the mqtt server as a service, you can find a `.service` template in the `templates` directory. 
+ 
 
 ### Home Assistant support
 `mtec_mqtt.py` provides Home Assistant (https://www.home-assistant.io) auto-discovery, which means that Home Assistant will automatically detect and configure your MTEC Inverter. 
@@ -156,8 +174,14 @@ HASS_BIRTH_GRACETIME : 15         # Give HASS some time to get ready after the b
 
 As next step, you need to enable and configure the MQTT integration within Home Assistant. After that, the auto discovery should do it's job and the Inverter sensors should appear on your dashboard.
 
-If you want, you can use and install the `hass-dashboard.yaml` in `templates` for a nice data visualization. 
-The map view requires to install `PV_background.png` as background image. To do so, create a sub-directory called `www` in the `config` directory of your Home Assistant installation (e.g. `/home/homeassistant/.homeassistant/www/`) and copy the image to this directory.  
+If you want, you can use and install one of the Home Assistant dashboards in `templates` for a nice data visualization.
+The map view requires to install a background image. To do so, create a sub-directory called `www` in the `config` directory of your Home Assistant installation (e.g. `/home/homeassistant/.homeassistant/www/`) and copy the image to this directory.
+
+There are two versions you can chose from:
+| Theme       | Dashboard                    | Image
+|-------------|--------------------          | ---------------------
+| Dark theme  | hass-dashboard.yaml          | PV_background.png
+| Blue theme  | hass-dashboard-blue.yaml     | PV_background-blue.png
 
 ### evcc support
 If you want to integrate the data into evcc (https://evcc.io), you might want to have a look at the `evcc.yaml` snippet in the `templates` directory. It shows how to define and use the MTEC `meters`, provided in MQTT.
@@ -351,6 +375,5 @@ By specifying commandline parameters, you can:
 
 ### Templates 
 In the `templates` directory you can find some more useful templates:
-* `hass-dashboard.yaml`: A dashboard which visualizes all Inverter data within Home Assistant. 
 * `evcc.yaml`: A yaml snippet shich shows how to integrate your Inverter into evcc.
 * `mtec_mqtt.service`: A template which shows how to create a systemctl service running `mtec_mqtt.py`  

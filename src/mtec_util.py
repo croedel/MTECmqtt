@@ -7,8 +7,8 @@ import logging
 FORMAT = '[%(levelname)s] %(message)s'
 logging.basicConfig(format=FORMAT, level=logging.INFO)
 
-from config import cfg, register_map, register_groups
-import MTECmodbusAPI
+from mtecmqtt.config import cfg, register_map, register_groups
+from mtecmqtt.MTECmodbusAPI import MTECmodbusAPI
 
 #-------------------------------
 def read_register(api):
@@ -108,7 +108,7 @@ def list_register_config_by_groups(api):
 
 #-------------------------------
 def main(): 
-  api = MTECmodbusAPI.MTECmodbusAPI()
+  api = MTECmodbusAPI()
   api.connect( ip_addr=cfg['MODBUS_IP'], port=cfg['MODBUS_PORT'], slave=cfg['MODBUS_SLAVE'] )
 
   while True:

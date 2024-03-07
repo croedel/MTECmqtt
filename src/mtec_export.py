@@ -3,10 +3,10 @@
 This tool enables to query MTECmodbusapi and export the data in various ways.
 (c) 2024 by Christian Rödel 
 """
-from config import cfg, register_groups
+from mtecmqtt.config import cfg, register_groups
 import argparse
 import sys
-import MTECmodbusAPI
+from mtecmqtt.MTECmodbusAPI import MTECmodbusAPI
 
 #-----------------------------
 def parse_options():
@@ -25,7 +25,7 @@ def parse_options():
 #-------------------------------
 def main():
   args = parse_options()
-  api = MTECmodbusAPI.MTECmodbusAPI()
+  api = MTECmodbusAPI()
   print( "Reading data..." )
 
   # redirect stdout to file (if defined as command line parameter)

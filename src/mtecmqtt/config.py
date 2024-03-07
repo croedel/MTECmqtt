@@ -4,30 +4,50 @@ Read YAML config files
 """
 import yaml
 import os
+import sys
 import logging
 
 #----------------------------------------
 # Read configuration from YAML file
 def init_config():
-  cfg = {}
-  try:
-    fname_conf = os.path.join(BASE_DIR, "config.yaml")
-    with open(fname_conf, 'r', encoding='utf-8') as f_conf:
-      cfg = yaml.safe_load(f_conf)
-  except yaml.YAMLError as err:
-    logging.error("Couldn't read config YAML file {}: {}".format(f_conf, str(err)) )
+  # Look in different locations for config.yaml file
+  conf_files = []
+  cfg_path = os.environ.get('XDG_CONFIG_HOME') or os.environ.get('APPDATA')
+  if cfg_path: # Usually something like ~/.config/mtecmqtt/config.yaml resp. 'C:\\Users\\xxxx\\AppData\\Roaming'
+    conf_files.append(os.path.join(cfg_path, "mtecmqtt", "config.yaml"))  
+  else:
+    conf_files.append(os.path.join(os.path.expanduser("~"), ".config", "mtecmqtt", "config.yaml"))  # ~/.config/mtecmqtt/config.yaml
+  conf_files.append(os.path.join(os.path.expanduser("~"), "mtecmqtt", "config.yaml"))  # ~/mtecmqtt/config.yaml
+  
+  cfg = False
+  for fname_conf in conf_files:
+    try:
+      with open(fname_conf, 'r', encoding='utf-8') as f_conf:
+        cfg = yaml.safe_load(f_conf)
+        logging.info("Using config YAML file: {}".format(fname_conf) )      
+        break
+    except IOError as err:
+      logging.debug("Couldn't open config YAML file: {}".format(str(err)) )
+    except yaml.YAMLError as err:
+      logging.debug("Couldn't read config YAML file {}: {}".format(fname_conf, str(err)) )
+
   return cfg  
 
 #----------------------------------------
 # Read inverter registers and their mapping from YAML file
 def init_register_map():
+  BASE_DIR = os.path.dirname(__file__) # Base installation directory
   try:
     fname_regs = os.path.join(BASE_DIR, "registers.yaml")
     with open(fname_regs, 'r', encoding='utf-8') as f_regs:
       r_map = yaml.safe_load(f_regs)
+  except IOError as err:
+    logging.fatal("Couldn't open registers YAML file: {}".format(str(err)))
+    sys.exit(1)
   except yaml.YAMLError as err:
-    logging.error("Couldn't read registers YAML file {}: {}".format(f_regs, str(err)) )
-
+    logging.fatal("Couldn't read config YAML file {}: {}".format(fname_regs, str(err)) )
+    sys.exit(1)
+    
   # Syntax checks 
   register_map = {}
   p_mandatory = [
@@ -67,8 +87,10 @@ def init_register_map():
 
 #----------------------------------------
 logging.basicConfig( level=logging.INFO, format="[%(levelname)s] %(filename)s: %(message)s" )
-BASE_DIR = os.path.dirname(__file__) # Base installation directory
 cfg = init_config()
+if not cfg:
+  logging.fatal("Couldn't open config YAML file")
+  sys.exit(1)
 register_map, register_groups = init_register_map()
 
 #--------------------------------------
