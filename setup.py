@@ -42,7 +42,7 @@ def createConfig():
 print("Configuration of MTECmqtt started")
 
 setup(
-    name = "MTECmqtt",
+    name = "MTECmqtt - read data from a M-TEC Energybutler system and write them to a MQTT broker.",
     version = "1.0",
     author = "Christian Rödel",
     install_requires = ["pyyaml", "PyModbus", "paho-mqtt" ],

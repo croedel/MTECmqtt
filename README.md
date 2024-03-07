@@ -59,29 +59,30 @@ sudo apt install mosquitto mosquitto-clients
 ```
 
 ### Installation
-The basic installation requires following steps:
-1. Create a new directory for the installation (e.g. within your HOME directory)
-2. Create and activate a virtual python environment for the project
-3. Download the MTECmqtt project from github
-4. Execute the project setup.py 
+The basic installation requires only following 3 steps:
 
-On a Linux system, just copy following commands - line by line - to your shell:
-
+(1) Create a new directory for the installation (e.g. within your HOME directory) and create and activate a virtual python environment for the project.
 ```
 mkdir mtecmqtt && cd mtecmqtt && python3 -m venv . && source bin/activate
+```
+
+(2) Download the MTECmqtt project from github
+```
 wget https://github.com/croedel/MTECmqtt/archive/refs/heads/main.zip && unzip main.zip && rm main.zip
+```
+
+(3) Execute the project setup.py 
+```
 cd MTECmqtt-main && python3 setup.py install && cd ..
 ```
 
 This should be all you need to do for a standard setup! 
 Let's try if it works. The following command should return a list of some basic parameters of your inverter.
-
 ```
 mtec_export.py -g now-base
 ```
 
 As a next step, you should try to start the MQTT server. It will print out some debug info, so you can see what it does.
-
 ```
 mtec_mqtt.py
 ```
@@ -89,7 +90,6 @@ mtec_mqtt.py
 You can stop the service by pressing CTRL-C or sending a SIGHUB. This will initiate a graceful shutdown. Be patient - this might take a few seconds.   
 
 If you want, you now can install a systemd autostart script for the MQTT server. This script requires root rights (e.g. executing it with sudo).
-
 ```
 sudo bin/install_systemd_service.sh 
 ```
