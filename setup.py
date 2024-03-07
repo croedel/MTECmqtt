@@ -1,5 +1,6 @@
 import os
 import socket
+import sys
 from setuptools import setup, find_packages
 
 #-----------------------
@@ -40,6 +41,11 @@ def createConfig():
 #--------------------------
 
 print("Configuration of MTECmqtt started")
+if sys.version_info[0]>=3 and sys.version_info[1]>=8:
+  print("Python version is >= 3.8: OK")
+else:
+  print("FATAL: Python version >=3.8 required")
+  sys.exit(1)
 
 setup(
     name = "MTECmqtt - read data from a M-TEC Energybutler system and write them to a MQTT broker.",

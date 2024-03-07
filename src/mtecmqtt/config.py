@@ -17,6 +17,7 @@ def init_config():
     conf_files.append(os.path.join(cfg_path, "mtecmqtt", "config.yaml"))  
   else:
     conf_files.append(os.path.join(os.path.expanduser("~"), ".config", "mtecmqtt", "config.yaml"))  # ~/.config/mtecmqtt/config.yaml
+  conf_files.append(os.path.join(os.getcwd(), "config.yaml"))  # CWD/config.yaml
   conf_files.append(os.path.join(os.path.expanduser("~"), "mtecmqtt", "config.yaml"))  # ~/mtecmqtt/config.yaml
   
   cfg = False

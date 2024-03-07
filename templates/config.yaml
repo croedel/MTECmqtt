@@ -17,18 +17,10 @@ MQTT_TOPIC : MTEC               # MQTT topic name
 MQTT_FLOAT_FORMAT : "{:.3f}"    # Defines how to format float values
 
 # Refresh interval
-REFRESH_NOW_S     : 10          # Refresh "now" data every N seconds
-REFRESH_NOWEXT_S  : 30          # Refresh "now-" extended data every N seconds
-REFRESH_DAY_M     : 5           # Refresh "day" statistic every N minutes
-REFRESH_TOTAL_M   : 5           # Refresh "total" statistic every N minutes
-REFRESH_CONFIG_M  : 60          # Refresh "config" data every N minutes
-
-# Define which extended data shall get included
-ENABLE_GRID_DATA : False        # Extended grid data
-ENABLE_INVERTER_DATA : False    # Extended inverter data
-ENABLE_BACKUP_DATA : False      # Extended backup data
-ENABLE_BATTERY_DATA : False     # Extended battery data
-ENABLE_PV_DATA : False          # Extended PV data
+REFRESH_NOW     : 10            # Refresh "now" data every N seconds
+REFRESH_DAY     : 300           # Refresh "day" statistic every N seconds
+REFRESH_TOTAL   : 310           # Refresh "total" statistic every N seconds
+REFRESH_CONFIG  : 3605          # Refresh "config" data every N seconds
 
 # Home Assistent support
 HASS_ENABLE : False             # Enable home assistant

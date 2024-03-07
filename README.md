@@ -135,30 +135,14 @@ The other values of the `config.yaml` you probably don't need to change as of no
 That's already all you need to do and you are ready to go!
 
 #### More configuration options
-Per default, the most interesting parameters are exported.
-You can easily switch on/off the export of additional data packages: 
-
-```
-# Define which extended data shall get included
-ENABLE_GRID_DATA : False         # Extended grid data
-ENABLE_INVERTER_DATA : False     # Extended inverter data
-ENABLE_BACKUP_DATA : False       # Extended backup data
-ENABLE_BATTERY_DATA : False      # Extended battery data
-ENABLE_PV_DATA : False           # Extended PV data
-```
-
 The `REFRESH_` parameters define how frequently the data gets fetched from your Inverter
 
 ```
-REFRESH_NOW_S     : 10          # Refresh current data every N seconds
-REFRESH_NOWEXT_S  : 30          # Refresh "now-" extended data every N seconds
-REFRESH_DAY_M     : 5           # Refresh dayly statistic every N minutes
-REFRESH_TOTAL_M   : 5           # Refresh total statistic every N minutes
-REFRESH_CONFIG_M  : 60          # Refresh config data every N minutes
-```
-
-Please be aware that a frequent export of a lot of parameters increases the load on the `espressif` device of your Inverter. This might imply unwanted side effects. 
- 
+REFRESH_NOW     : 10          # Refresh current data every N seconds
+REFRESH_DAY     : 300         # Refresh daily statistic every N seconds
+REFRESH_TOTAL   : 300         # Refresh total statistic every N seconds
+REFRESH_CONFIG  : 3600        # Refresh config data every N seconds
+``` 
 
 ### Home Assistant support
 `mtec_mqtt.py` provides Home Assistant (https://www.home-assistant.io) auto-discovery, which means that Home Assistant will automatically detect and configure your MTEC Inverter. 
@@ -193,15 +177,15 @@ The exported data will be written to several MQTT topics. The topic path include
  
 | Sub-topic                         | Refresh frequency            |  Description 
 |---------------------------------- | --------------------------   | ---------------------------------------------- 
-| MTEC/<serial_number>/config       | `REFRESH_CONFIG_M` minutes   | Relatively static config values     
-| MTEC/<serial_number>/now-base     | `REFRESH_NOW_S` seconds      | Current base data      
-| MTEC/<serial_number>/now-grid     | `REFRESH_NOWEXT_S` seconds   | Current extended grid data      
-| MTEC/<serial_number>/now-inverter | `REFRESH_NOWEXT_S` seconds   | Current extended inverter data      
-| MTEC/<serial_number>/now-backup   | `REFRESH_NOWEXT_S` seconds   | Current extended backup data      
-| MTEC/<serial_number>/now-battery  | `REFRESH_NOWEXT_S` seconds   | Current extended battery data      
-| MTEC/<serial_number>/now-pv       | `REFRESH_NOWEXT_S` seconds   | Current extended PV data      
-| MTEC/<serial_number>/day          | `REFRESH_DAY_M` minutes      | Daily statistics     
-| MTEC/<serial_number>/total        | `REFRESH_TOTAL_M` minutes    | Lifetime statistics     
+| MTEC/<serial_number>/config       | `REFRESH_CONFIG` seconds     | Relatively static config values     
+| MTEC/<serial_number>/now-base     | `REFRESH_NOW` seconds        | Current base data      
+| MTEC/<serial_number>/now-grid     | `REFRESH_NOWEXT` seconds     | Current extended grid data      
+| MTEC/<serial_number>/now-inverter | `REFRESH_NOWEXT` seconds     | Current extended inverter data      
+| MTEC/<serial_number>/now-backup   | `REFRESH_NOWEXT` seconds     | Current extended backup data      
+| MTEC/<serial_number>/now-battery  | `REFRESH_NOWEXT` seconds     | Current extended battery data      
+| MTEC/<serial_number>/now-pv       | `REFRESH_NOWEXT` seconds     | Current extended PV data      
+| MTEC/<serial_number>/day          | `REFRESH_DAY` seconds        | Daily statistics     
+| MTEC/<serial_number>/total        | `REFRESH_TOTAL` seconds      | Lifetime statistics     
 
 All `float` values will be written according to the configured `MQTT_FLOAT_FORMAT`. The default is a format with 3 decimal digits.
 

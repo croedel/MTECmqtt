@@ -101,7 +101,7 @@ def main():
   next_read_config = datetime.now()
   next_read_day = datetime.now()
   next_read_total = datetime.now()
-  next_read_nowext = datetime.now()
+  now_ext_idx = 0
   topic_base = None
   
   if cfg["HASS_ENABLE"]:
@@ -134,53 +134,56 @@ def main():
     if pvdata:
       write_to_MQTT( pvdata, topic_base + 'now-base/' )
 
-    # Now extended
-    if next_read_nowext <= now:
-      if cfg['ENABLE_GRID_DATA']:
-        pvdata = read_MTEC_data( api, "now-grid" )
-        if pvdata:
-          write_to_MQTT( pvdata, topic_base + 'now-grid/' )
-      if cfg['ENABLE_INVERTER_DATA']:
-        pvdata = read_MTEC_data( api, "now-inverter" )
-        if pvdata:
-          write_to_MQTT( pvdata, topic_base + 'now-inverter/' )
-      if cfg['ENABLE_BACKUP_DATA']:
-        pvdata = read_MTEC_data( api, "now-backup" )
-        if pvdata:
-          write_to_MQTT( pvdata, topic_base + 'now-backup/' )
-      if cfg['ENABLE_BATTERY_DATA']:
-        pvdata = read_MTEC_data( api, "now-battery" )
-        if pvdata:
-          write_to_MQTT( pvdata, topic_base + 'now-battery/' )
-      if cfg['ENABLE_PV_DATA']:
-        pvdata = read_MTEC_data( api, "now-pv" )
-        if pvdata:
-          write_to_MQTT( pvdata, topic_base + 'now-pv/' )
-      next_read_nowext = datetime.now() + timedelta(seconds=cfg['REFRESH_NOWEXT_S'])
+    # Now extended - read groups in a round robin - one per loop
+    if now_ext_idx == 0:
+      pvdata = read_MTEC_data( api, "now-grid" )
+      if pvdata:
+        write_to_MQTT( pvdata, topic_base + 'now-grid/' )
+    elif now_ext_idx == 1:
+      pvdata = read_MTEC_data( api, "now-inverter" )
+      if pvdata:
+        write_to_MQTT( pvdata, topic_base + 'now-inverter/' )
+    elif now_ext_idx == 2:
+      pvdata = read_MTEC_data( api, "now-backup" )
+      if pvdata:
+        write_to_MQTT( pvdata, topic_base + 'now-backup/' )
+    elif now_ext_idx == 3:
+      pvdata = read_MTEC_data( api, "now-battery" )
+      if pvdata:
+        write_to_MQTT( pvdata, topic_base + 'now-battery/' )
+    elif now_ext_idx == 4:
+      pvdata = read_MTEC_data( api, "now-pv" )
+      if pvdata:
+        write_to_MQTT( pvdata, topic_base + 'now-pv/' )
+    
+    if now_ext_idx >= 4:
+      now_ext_idx = 0
+    else:  
+      now_ext_idx += 1
 
     # Day
     if next_read_day <= now:
       pvdata = read_MTEC_data( api, "day" )
       if pvdata:
         write_to_MQTT( pvdata, topic_base + 'day/' )
-        next_read_day = datetime.now() + timedelta(minutes=cfg['REFRESH_DAY_M'])
+        next_read_day = datetime.now() + timedelta(seconds=cfg['REFRESH_DAY'])
 
     # Total
     if next_read_total <= now:
       pvdata = read_MTEC_data( api, "total" )
       if pvdata:
         write_to_MQTT( pvdata, topic_base + 'total/' )
-        next_read_total = datetime.now() + timedelta(minutes=cfg['REFRESH_TOTAL_M'])
+        next_read_total = datetime.now() + timedelta(seconds=cfg['REFRESH_TOTAL'])
 
     # Config
     if next_read_config <= now:
       pvdata = read_MTEC_data( api, "config" )
       if pvdata:
         write_to_MQTT( pvdata, topic_base + 'config/' )
-        next_read_config = datetime.now() + timedelta(minutes=cfg['REFRESH_CONFIG_M'])
+        next_read_config = datetime.now() + timedelta(seconds=cfg['REFRESH_CONFIG'])
 
-    logging.debug("Sleep {}s".format( cfg['REFRESH_NOW_S'] ))
-    time.sleep(cfg['REFRESH_NOW_S'])
+    logging.debug("Sleep {}s".format( cfg['REFRESH_NOW'] ))
+    time.sleep(cfg['REFRESH_NOW'])
 
   # clean up
   if hass:
