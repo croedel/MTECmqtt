@@ -14,7 +14,7 @@ except Exception as e:
   logging.warning("MQTT not set up because of: {}".format(e))
     
 # ============ MQTT ================
-def on_mqtt_connect(mqttclient, userdata, flags, rc):
+def on_mqtt_connect(mqttclient, userdata, flags, rc, prop):
   logging.info("Connected to MQTT broker")
 
 def on_mqtt_message(mqttclient, userdata, message):
@@ -31,7 +31,7 @@ def on_mqtt_message(mqttclient, userdata, message):
 
 def mqtt_start( hass=None ): 
   try: 
-    client = mqttcl.Client()
+    client = mqttcl.Client(mqttcl.CallbackAPIVersion.VERSION2)
     client.user_data_set(hass) # register home automation instance
     client.username_pw_set(cfg['MQTT_LOGIN'], cfg['MQTT_PASSWORD']) 
     client.connect(cfg['MQTT_SERVER'], cfg['MQTT_PORT'], keepalive = 60) 

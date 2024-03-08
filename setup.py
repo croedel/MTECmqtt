@@ -48,7 +48,8 @@ else:
   sys.exit(1)
 
 setup(
-    name = "MTECmqtt - read data from a M-TEC Energybutler system and write them to a MQTT broker.",
+    name = "MTECmqtt",
+    description = "Read data from a M-TEC Energybutler system and write them to a MQTT broker",
     version = "1.0",
     author = "Christian Rödel",
     install_requires = ["pyyaml", "PyModbus", "paho-mqtt" ],

@@ -77,18 +77,11 @@ class HassIntegration:
           break
 
       if item["group"] and do_hass_registration: 
-        if ( (item["group"] in ["now-base", "day", "total", "config"]) or 
-          (item["group"]=="now-grid" and cfg['ENABLE_GRID_DATA']) or
-          (item["group"]=="now-inverter" and cfg['ENABLE_INVERTER_DATA']) or
-          (item["group"]=="now-backup" and cfg['ENABLE_BACKUP_DATA']) or
-          (item["group"]=="now-battery" and cfg['ENABLE_BATTERY_DATA']) or
-          (item["group"]=="now-pv" and cfg['ENABLE_PV_DATA']) 
-        ):
-          component_type = item.get("hass_component_type", "sensor")
-          if component_type == "sensor":
-            self._append_sensor(item)   
-          if component_type == "binary_sensor":
-            self._append_binary_sensor(item)   
+        component_type = item.get("hass_component_type", "sensor")
+        if component_type == "sensor":
+          self._append_sensor(item)   
+        if component_type == "binary_sensor":
+          self._append_binary_sensor(item)   
 
   #---------------------------------------------------
   def _append_sensor( self, item ):               
