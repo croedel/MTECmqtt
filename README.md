@@ -1,7 +1,7 @@
 # M-TEC MQTT
 
 ## Introduction
-Welcome to the `M-TEC MQTT` project!
+Welcome to the `MTECmqtt` project!
 
 This project enables to read data from a M-TEC Energybutler (https://www.mtec-systems.com) system and write them to a MQTT broker. 
 
@@ -43,15 +43,13 @@ It seems that there are at least three more Inverter products on the market whic
 | Daxtromn  | https://daxtromn-power.com/products/ |
 
 
-## MQTT server
-The MQTT server `mtec_mqtt` connects to the espressif Modbus server of you M-TEC inverter, retrieves relevant data, and writes them to a MQTT broker (https://mqtt.org/) of your choice. 
-MQTT provides a light-weight publish/subscribe model which is widely used for Internet of Things messaging. MQTT connectivity is implemented in many EMS or home automation tools. 
+
 
 ## Setup & configuration
-### Prerequesits
-Please make sure you have installed Python 3.8 or higher.
-
-As said before, the projects communicated using MQTT. That means, you require a MQTT server. If you don't have one yet, you might want to try https://mosquitto.org/. 
+### Prerequisites
+The MTECmqtt project connects to the espressif Modbus server of you M-TEC inverter, retrieves relevant data, and writes them to a MQTT broker (https://mqtt.org/) of your choice. MQTT provides a light-weight publish/subscribe model which is widely used for Internet of Things messaging. MQTT connectivity is implemented in many EMS or home automation tools. 
+That means, you obviously require a MQTT server. 
+If you don't have one yet, you might want to try https://mosquitto.org/. 
 You can easily install it like this:
 
 ```
@@ -59,28 +57,23 @@ sudo apt install mosquitto mosquitto-clients
 ```
 
 ### Installation
-The basic installation requires only following 3 steps:
+The basic installation requires only following 2 steps:
 
 (1) Create a new directory for the installation (e.g. within your HOME directory) and create and activate a virtual python environment for the project.
 ```
 mkdir mtecmqtt && cd mtecmqtt && python3 -m venv . && source bin/activate
 ```
 
-(2) Download the MTECmqtt project from github
+(2) Install the MTECmqtt project from github
 ```
-wget https://github.com/croedel/MTECmqtt/archive/refs/heads/main.zip && unzip main.zip && rm main.zip
-```
-
-(3) Execute the project setup.py 
-```
-cd MTECmqtt-main && python3 setup.py install && cd ..
+pip3 install https://github.com/croedel/MTECmqtt/archive/refs/heads/main.zip
 ```
 
 This is all you need to do for a standard setup! 
 
 As a next step, we can try to start the MQTT server. It will print out some debug info, so you can see what it does.
 ```
-mtec_mqtt.py
+mtec_mqtt
 ```
 You can stop the service by pressing CTRL-C or sending a SIGHUB. This will initiate a graceful shutdown. Please be patient - this might take a few seconds.
 
@@ -96,6 +89,9 @@ sudo systemctl status mtec_mqtt
 
 ### Advanced configuration 
 This section give you more information about all configuration options. But don't be afraid - it should only be relevant for advanced use cases.
+
+The installer will create a `config.yaml` file in the default location of your OS.
+For a Linux system it's probably `~/.config/mtecmqtt/config.yaml`, on Windowns something like `C:\Users\xxxxx\AppData\Roaming\config.yaml`
 
 #### Connect your M-TEC Inverter
 In order to connect to your Inverter, you need the IP address or internal hostname of your `espressif` device. 
