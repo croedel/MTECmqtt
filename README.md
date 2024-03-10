@@ -44,7 +44,7 @@ It seems that there are at least three more Inverter products on the market whic
 
 
 ## MQTT server
-The MQTT server `mtec_mqtt.py` connects to the espressif Modbus server of you M-TEC inverter, retrieves relevant data, and writes them to a MQTT broker (https://mqtt.org/) of your choice. 
+The MQTT server `mtec_mqtt` connects to the espressif Modbus server of you M-TEC inverter, retrieves relevant data, and writes them to a MQTT broker (https://mqtt.org/) of your choice. 
 MQTT provides a light-weight publish/subscribe model which is widely used for Internet of Things messaging. MQTT connectivity is implemented in many EMS or home automation tools. 
 
 ## Setup & configuration
@@ -76,22 +76,22 @@ wget https://github.com/croedel/MTECmqtt/archive/refs/heads/main.zip && unzip ma
 cd MTECmqtt-main && python3 setup.py install && cd ..
 ```
 
-This should be all you need to do for a standard setup! 
-Let's try if it works. The following command should return a list of some basic parameters of your inverter.
-```
-mtec_export.py -g now-base
-```
+This is all you need to do for a standard setup! 
 
-As a next step, you should try to start the MQTT server. It will print out some debug info, so you can see what it does.
+As a next step, we can try to start the MQTT server. It will print out some debug info, so you can see what it does.
 ```
 mtec_mqtt.py
 ```
+You can stop the service by pressing CTRL-C or sending a SIGHUB. This will initiate a graceful shutdown. Please be patient - this might take a few seconds.
 
-You can stop the service by pressing CTRL-C or sending a SIGHUB. This will initiate a graceful shutdown. Be patient - this might take a few seconds.   
-
-If you want, you now can install a systemd autostart script for the MQTT server. This script requires root rights (e.g. executing it with sudo).
+Starting the service in a shell - as we just did - will not create a permanent running service and is probably only useful for testing. If you want a permanently running service, you need to install a systemd autostart script for `mtec_mytt.py`. The following command does this job:
 ```
 sudo bin/install_systemd_service.sh 
+```
+
+To check if the service is running smoothly, you can execute:
+```
+sudo systemctl status mtec_mqtt
 ```
 
 ### Advanced configuration 

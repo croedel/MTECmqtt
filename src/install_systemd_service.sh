@@ -19,7 +19,7 @@ Restart=always
 WantedBy=multi-user.target
 "
 
-echo "Installing systemd service"
+echo "MTECmqtt: Installing systemd service to auto-start mtec_mqtt"
 
 if [ $(id -u) != "0" ]; then
   echo "This script required root rights. Please restart using 'sudo'"

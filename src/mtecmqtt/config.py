@@ -6,19 +6,69 @@ import yaml
 import os
 import sys
 import logging
+import socket
 
 #----------------------------------------
+# Create new config file
+def create_config_file():
+  print("Creating config.yaml")
+
+  # Resolve hostname
+  try:
+    ip_addr=socket.gethostbyname('espressif')
+    print("Found espressif server: {}".format(ip_addr))
+  except socket.error:
+    print("Couldn't find espressif server")
+    ip_addr=input("Please enter IP address of espressif server: ")
+
+  opt=input("Enable HomeAssistant support? (y/N): ")
+  if opt.lower()=='y':
+    hass_cfg="HASS_ENABLE : True"
+  else:    
+    hass_cfg="HASS_ENABLE : False"
+
+  # Read template 
+  try:
+    BASE_DIR = os.path.dirname(__file__) # Base installation directory
+    templ_fname = os.path.join(BASE_DIR, "config-template.yaml")
+    with open(templ_fname, "r") as file: 
+      data = file.read()   
+  except Exception as ex:
+    print("ERROR - Couldn't read 'config-template.yaml': {}".format(ex))
+    return False
+
+  # Customize
+  data = data.replace('HASS_ENABLE : False', hass_cfg) 
+  data = data.replace('MODBUS_IP : espressif', 'MODBUS_IP : "' + ip_addr +'"') 
+
+  # Write customized config
+  cfg_path = os.environ.get('XDG_CONFIG_HOME') or os.environ.get('APPDATA')
+  if cfg_path: # Usually something like ~/.config/mtecmqtt/config.yaml resp. 'C:\\Users\\xxxx\\AppData\\Roaming'
+    cfg_fname = os.path.join(cfg_path, "mtecmqtt", "config.yaml")  
+  else:
+    cfg_fname = os.path.join(os.path.expanduser("~"), ".config", "mtecmqtt", "config.yaml")  # ~/.config/mtecmqtt/config.yaml
+
+  try:
+    os.makedirs(os.path.dirname(cfg_fname), exist_ok=True)
+    with open(cfg_fname, "w") as file: 
+      file.write(data) 
+  except Exception as ex:
+    logging.error("ERROR - Couldn't write {}: {}".format(cfg_fname, ex))
+    return False
+
+  logging.info("Successfully created {}".format(cfg_fname))
+  return True
+
 # Read configuration from YAML file
 def init_config():
   # Look in different locations for config.yaml file
   conf_files = []
+  conf_files.append(os.path.join(os.getcwd(), "config.yaml"))  # CWD/config.yaml
   cfg_path = os.environ.get('XDG_CONFIG_HOME') or os.environ.get('APPDATA')
   if cfg_path: # Usually something like ~/.config/mtecmqtt/config.yaml resp. 'C:\\Users\\xxxx\\AppData\\Roaming'
     conf_files.append(os.path.join(cfg_path, "mtecmqtt", "config.yaml"))  
   else:
     conf_files.append(os.path.join(os.path.expanduser("~"), ".config", "mtecmqtt", "config.yaml"))  # ~/.config/mtecmqtt/config.yaml
-  conf_files.append(os.path.join(os.getcwd(), "config.yaml"))  # CWD/config.yaml
-  conf_files.append(os.path.join(os.path.expanduser("~"), "mtecmqtt", "config.yaml"))  # ~/mtecmqtt/config.yaml
   
   cfg = False
   for fname_conf in conf_files:
@@ -90,8 +140,15 @@ def init_register_map():
 logging.basicConfig( level=logging.INFO, format="[%(levelname)s] %(filename)s: %(message)s" )
 cfg = init_config()
 if not cfg:
-  logging.fatal("Couldn't open config YAML file")
-  sys.exit(1)
+  if create_config_file():  # Create a new config
+    cfg = init_config()
+    if not cfg:
+      logging.fatal("Couldn't open config YAML file")
+      sys.exit(1)
+  else:
+    logging.fatal("Couldn't create config YAML file")
+    sys.exit(1)
+
 register_map, register_groups = init_register_map()
 
 #--------------------------------------
