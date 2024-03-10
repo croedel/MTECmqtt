@@ -1,0 +1,38 @@
+[build-system]
+requires = ["setuptools >= 61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "MTECmqtt"
+description = "Read data from a M-TEC Energybutler system and write them to a MQTT broker"
+version = "2.0.0"
+dependencies = [
+  "pyyaml", 
+  "PyModbus", 
+  "paho-mqtt", 
+]  
+requires-python = ">=3.8"
+authors = [
+  {name = "Christian Rödel", email = "christian@roedel.info"},
+]
+readme = "README.md"
+license = {file = "LICENSE"}
+keywords = ["MTEC", "PV", "mqtt", "inverter"]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Programming Language :: Python :: 3.8"
+]
+
+[project.urls]
+Repository = "https://github.com/croedel/MTECmqtt"
+
+[project.scripts]
+mtec_mqtt = "mtecmqtt.mtec_mqtt:main"
+mtec_export = "mtecmqtt.mtec_export:main"
+mtec_util = "mtecmqtt.mtec_util:main" 
+
+[tool.setuptools]
+script-files = ["src/install_systemd_service.sh"]
+
+[tool.setuptools.package-data]
+mtecmqtt = ["*.yaml"]
