@@ -5,11 +5,10 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "MTECmqtt"
 description = "Read data from a M-TEC Energybutler system and write them to a MQTT broker"
-version = "2.0.0"
 dependencies = [
   "pyyaml", 
-  "PyModbus", 
-  "paho-mqtt", 
+  "PyModbus > 3.6", 
+  "paho-mqtt >= 2.0", 
 ]  
 requires-python = ">=3.8"
 authors = [
@@ -22,6 +21,7 @@ classifiers = [
   "Development Status :: 4 - Beta",
   "Programming Language :: Python :: 3.8"
 ]
+dynamic = ["version"]
 
 [project.urls]
 Repository = "https://github.com/croedel/MTECmqtt"
@@ -33,6 +33,9 @@ mtec_util = "mtecmqtt.mtec_util:main"
 
 [tool.setuptools]
 script-files = ["src/install_systemd_service.sh"]
+
+[tool.setuptools.dynamic]
+version = {attr = "mtecmqtt.__version__"}
 
 [tool.setuptools.package-data]
 mtecmqtt = ["*.yaml"]
