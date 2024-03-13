@@ -19,6 +19,13 @@ The highlights are:
 
 I hope you like it and it will help you with for your EMS or home automation project :-) !
 
+### Changelog
+
+#### V2.0 - 13.03.2024
+* Re-packaged supporting a simplified installation
+* Optimized register scanning
+* Removed some over complicated configuration options in config.yaml  
+
 ### Disclaimer 
 This project is a pure hobby project which I created by reverse-engineering different internet sources and my M-TEC Energybutler. It is *not* related to or supported by M-TEC GmbH by any means. 
 
@@ -43,8 +50,6 @@ It seems that there are at least three more Inverter products on the market whic
 | Daxtromn  | https://daxtromn-power.com/products/ |
 
 
-
-
 ## Setup & configuration
 ### Prerequisites
 The MTECmqtt project connects to the espressif Modbus server of you M-TEC inverter, retrieves relevant data, and writes them to a MQTT broker (https://mqtt.org/) of your choice. MQTT provides a light-weight publish/subscribe model which is widely used for Internet of Things messaging. MQTT connectivity is implemented in many EMS or home automation tools. 
@@ -66,7 +71,7 @@ mkdir mtecmqtt && cd mtecmqtt && python3 -m venv . && source bin/activate
 
 (2) Install the MTECmqtt project from github
 ```
-pip3 install https://github.com/croedel/MTECmqtt/archive/refs/heads/main.zip
+pip install https://github.com/croedel/MTECmqtt/archive/refs/heads/main.zip
 ```
 
 This is all you need to do for a standard setup! 
@@ -141,7 +146,7 @@ REFRESH_CONFIG  : 3600        # Refresh config data every N seconds
 ``` 
 
 ### Home Assistant support
-`mtec_mqtt.py` provides Home Assistant (https://www.home-assistant.io) auto-discovery, which means that Home Assistant will automatically detect and configure your MTEC Inverter. 
+`mtec_mqtt` provides Home Assistant (https://www.home-assistant.io) auto-discovery, which means that Home Assistant will automatically detect and configure your MTEC Inverter. 
 
 If you want to enable Home Assistant support, set `HASS_ENABLE: True` in `config.yaml`. 
 
@@ -168,7 +173,6 @@ If you want to integrate the data into evcc (https://evcc.io), you might want to
 Please don't forget to replace `<MTEC_SERIAL_NO>` with the actual serial no of your Inverter.
 
 ## Data format written to MQTT
-
 The exported data will be written to several MQTT topics. The topic path includes the serial number of your Inverter.
  
 | Sub-topic                         | Refresh frequency            |  Description 
@@ -323,7 +327,7 @@ Battery -------    |                --------- house
 ## What else you can find in the project?
 
 ### Modbus Utility
-`mtec_util.py` is an small inteative tool which enable to list the supported parameters and read and write registers of your Inverter.
+`mtec_util` is an small inteative tool which enable to list the supported parameters and read and write registers of your Inverter.
 You can choose between:
 
  * 1: List all known registers
@@ -343,7 +347,7 @@ You can choose between:
 (5) enables you to write a value to a register of your Inverter. WARNING: Be careful when writing data to your Inverter! This is definitively at your own risk!
 
 ### Commandline export tool
-The command-line tool `mtec_export.py` offers functionality to read data from your Inverter using Modbus and export it in various combinations and formats.
+The command-line tool `mtec_export` offers functionality to read data from your Inverter using Modbus and export it in various combinations and formats.
 
 As default, it will connect to your device and retrieve a list of all known Modbus registers in a human readable format.
 
@@ -352,8 +356,3 @@ By specifying commandline parameters, you can:
 * Provide a customize list of Modbus registers which you would like to retrieve, e.g. `-r "33000,10105,11000"`
 * Request to export CSV instead of human readable (`-c`) 
 * Write output to a file (`-f FILENAME`)
-
-### Templates 
-In the `templates` directory you can find some more useful templates:
-* `evcc.yaml`: A yaml snippet shich shows how to integrate your Inverter into evcc.
-* `mtec_mqtt.service`: A template which shows how to create a systemctl service running `mtec_mqtt.py`  
