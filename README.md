@@ -62,14 +62,39 @@ sudo apt install mosquitto mosquitto-clients
 ```
 
 ### Installation
-The basic installation requires only following 2 steps:
+The basic installation requires only following 4 steps:
 
-(1) Create a new directory for the installation (e.g. within your HOME directory) and create and activate a virtual python environment for the project.
+(1) Check your Python installation
 ```
-mkdir mtecmqtt && cd mtecmqtt && python3 -m venv . && source bin/activate
+python -V
+```
+If this returns something like `Python 3.8.x`, you can just continue with the next step.
+
+If it return `command not found`, or `Python 2.x`, try
+```
+python3 -V
+```
+If this returns something like `Python 3.8.x`, remember that you need to use `python3` and continue.
+
+If both command return `command not found`, you need to install python3 on you system before you can continue
+
+
+(2) Create a new directory for the installation (e.g. within your HOME directory)
+```
+mkdir mtecmqtt && cd mtecmqtt
 ```
 
-(2) Install the MTECmqtt project from github
+(3) Create and activate a virtual python environment for the project
+```
+python -m venv . && source bin/activate
+```
+If you remembered you require `python3`, use this instead:
+```
+python3 -m venv . && source bin/activate
+```
+
+
+(4) Install the MTECmqtt project from github
 ```
 pip install https://github.com/croedel/MTECmqtt/archive/refs/heads/main.zip
 ```
