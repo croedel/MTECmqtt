@@ -101,6 +101,8 @@ pip install https://github.com/croedel/MTECmqtt/archive/refs/heads/main.zip
 
 This is all you need to do for a standard setup! 
 
+_IMPORTANT:_ M-TEC changed their Modbus port with firmware V27.52.4.0. If you run that version or a newer one, you need to change the `MODBUS_PORT` in the `config.yaml` to 502 !  
+
 As a next step, we can try to start the MQTT server. It will print out some debug info, so you can see what it does.
 ```
 mtec_mqtt
@@ -134,10 +136,12 @@ Else you can easily adjust it like this:
 
 You probably don't need to change any of the other `MODBUS_` config values.
 
+_IMPORTANT:_ M-TEC changed their Modbus port with firmware V27.52.4.0. If you run that version or a newer one, you need to change the `MODBUS_PORT` in the `config.yaml` to 502 !  
+
 ```
 # MODBUS Server
 MODBUS_IP : espressif.fritz.box    # IP address / hostname of "espressif" modbus server
-MODBUS_PORT : 5743                 # Port (usually no change required)
+MODBUS_PORT : 5743                 # Port (IMPORTANT: you need to change this to 502 for firmware versions newer than 27.52.4.0) 
 MODBUS_SLAVE : 252                 # Modbus slave id (usually no change required)
 MODBUS_TIMEOUT : 5                 # Timeout for Modbus server (s)
 MODBUS_FRAMER: rtu                 # Modbus Framer (usually no change required; options: 'ascii', 'binary', 'rtu', 'socket', 'tls')
