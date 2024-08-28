@@ -3,11 +3,11 @@
 Modbus API for M-TEC Energybutler
 (c) 2023 by Christian Rödel 
 """
-from mtecmqtt.config import cfg, register_map
+from config import cfg, register_map
+#from mtecmqtt.config import cfg, register_map
 from pymodbus.client import ModbusTcpClient
 from pymodbus.payload import BinaryPayloadDecoder
 from pymodbus.constants import Endian
-from pymodbus.framer import Framer
 import logging
 
 #=====================================================
@@ -29,8 +29,8 @@ class MTECmodbusAPI:
     
     framer = cfg.get("MODBUS_FRAMER", "rtu")
     logging.debug("Connecting to server {}:{} (framer={})".format(ip_addr, port, framer))
-    self.modbus_client = ModbusTcpClient(ip_addr, port, framer=Framer(framer), timeout=cfg["MODBUS_TIMEOUT"],
-                                         retries=cfg["MODBUS_RETRIES"], retry_on_empty=True )
+    self.modbus_client = ModbusTcpClient(ip_addr, port=port, framer=framer, timeout=cfg["MODBUS_TIMEOUT"],
+                                         retries=cfg["MODBUS_RETRIES"] )
 
     if self.modbus_client.connect():
       logging.debug("Successfully connected to server {}:{}".format(ip_addr, port))
