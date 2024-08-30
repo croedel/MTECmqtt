@@ -103,23 +103,33 @@ def main():
   next_read_total = datetime.now()
   now_ext_idx = 0
   topic_base = None
-  
+
+  api = MTECmodbusAPI()
+  connected = api.connect(ip_addr=cfg['MODBUS_IP'], port=cfg['MODBUS_PORT'], slave=cfg['MODBUS_SLAVE'])
+  if not connected:
+    # try alternative port (defaults to 502)
+    connected = api.connect(ip_addr=cfg['MODBUS_IP'], port=cfg.get('MODBUS_PORT2',"502"), slave=cfg['MODBUS_SLAVE'])
+    if not connected:    
+      logging.fatal( "Can't connect to MODBUS server: {}:{} slave {}".format(cfg['MODBUS_IP'], cfg['MODBUS_PORT'], cfg['MODBUS_SLAVE']) )
+      return
+
   if cfg["HASS_ENABLE"]:
     hass = HassIntegration()
   else:
     hass = None
-  
   mqttclient = mqtt_start( hass )
-  api = MTECmodbusAPI()
-  api.connect(ip_addr=cfg['MODBUS_IP'], port=cfg['MODBUS_PORT'], slave=cfg['MODBUS_SLAVE'])
 
   # Initialize  
   pv_config = None
-  while not pv_config:
+  while run_status and not pv_config:
     pv_config = read_MTEC_data( api, "config" )
     if not pv_config:
       logging.warning("Cant retrieve initial config - retry in 10 s")
       time.sleep(10)
+  
+  if not pv_config:
+    logging.fatal("Cant retrieve initial config.")
+    return
   
   topic_base = cfg['MQTT_TOPIC'] + '/' + pv_config["serial_no"]["value"] + '/'  
   if hass and not hass.is_initialized:

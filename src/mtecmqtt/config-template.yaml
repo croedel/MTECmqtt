@@ -1,7 +1,8 @@
 ---
 # M-TEC espressif MODBUS server
 MODBUS_IP : espressif           # IP address / hostname of "espressif" modbus server
-MODBUS_PORT : 5743              # Port (IMPORTANT: you need to change this to 502 for firmware versions newer than 27.52.4.0)
+MODBUS_PORT : 5743              # Port for firmware < V27.52.4.0
+MODBUS_PORT2 : 502              # Port for firmware > V27.52.4.0
 MODBUS_SLAVE : 252              # Modbus slave id (usually no change required)
 MODBUS_TIMEOUT : 5              # Timeout for Modbus server (s)
 MODBUS_RETRIES : 3              # Retries
