@@ -32,7 +32,7 @@ class MTECmodbusAPI:
                                          retries=cfg["MODBUS_RETRIES"] )
 
     if self.modbus_client.connect():
-      logging.debug("Successfully connected to server {}:{}".format(ip_addr, port))
+      logging.info("Successfully connected to server {}:{}".format(ip_addr, port))
       return True
     else:
       logging.error("Couldn't connect to server {}:{}".format(ip_addr, port))
