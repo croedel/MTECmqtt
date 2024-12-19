@@ -23,7 +23,7 @@ def on_mqtt_connect(mqttclient, userdata, flags, rc, prop):
 def on_mqtt_disconnect(mqttclient, userdata, rc):
   logging.warning("MQTT broker disconnected: rc={}".format(rc))
   
-def on_mqtt_subscribe(mqttclient, userdata, mid, granted_qos):
+def on_mqtt_subscribe(client, userdata, mid, reason_code_list, properties):
   logging.info("MQTT broker subscribed to mid {}".format(mid))
 
 def on_mqtt_message(mqttclient, userdata, message):
