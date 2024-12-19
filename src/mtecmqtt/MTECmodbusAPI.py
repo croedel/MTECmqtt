@@ -5,7 +5,6 @@ Modbus API for M-TEC Energybutler
 """
 from mtecmqtt.config import cfg, register_map
 from pymodbus.client import ModbusTcpClient
-from pymodbus.payload import BinaryPayloadDecoder
 from pymodbus.constants import Endian
 import logging
 
@@ -188,37 +187,48 @@ class MTECmodbusAPI:
   def _decode_rawdata(self, rawdata, offset, item):
     try:
       val = None
-      start = rawdata.registers[offset:]
-      decoder = BinaryPayloadDecoder.fromRegisters(registers=start, byteorder=Endian.BIG, wordorder=Endian.BIG)
       if item["type"] == 'U16':
-        val = decoder.decode_16bit_uint()
+        reg = rawdata.registers[offset:offset+1]
+        val = self.modbus_client.convert_from_registers(registers=reg, data_type=self.modbus_client.DATATYPE.UINT16)
       elif item["type"] == 'I16':
-        val = decoder.decode_16bit_int()
+        reg = rawdata.registers[offset:offset+1]
+        val = self.modbus_client.convert_from_registers(registers=reg, data_type=self.modbus_client.DATATYPE.INT16)
       elif item["type"] == 'U32':
-        val = decoder.decode_32bit_uint()
+        reg = rawdata.registers[offset:offset+2]
+        val = self.modbus_client.convert_from_registers(registers=reg, data_type=self.modbus_client.DATATYPE.UINT32)
       elif item["type"] == 'I32':
-        val = decoder.decode_32bit_int()
+        reg = rawdata.registers[offset:offset+2]
+        val = self.modbus_client.convert_from_registers(registers=reg, data_type=self.modbus_client.DATATYPE.INT32)
       elif item["type"] == 'BYTE':
         if item["length"] == 1:
-          val = "{:02d} {:02d}".format( decoder.decode_8bit_uint(), decoder.decode_8bit_uint() )
+          reg1 = int(rawdata.registers[offset])
+          val = "{:02d} {:02d}".format( reg1>>8, reg1&0xff )
         elif item["length"] == 2:
-          val = "{:02d} {:02d}  {:02d} {:02d}".format( decoder.decode_8bit_uint(), decoder.decode_8bit_uint(), 
-                                                    decoder.decode_8bit_uint(), decoder.decode_8bit_uint() )
+          reg1 = int(rawdata.registers[offset])
+          reg2 = int(rawdata.registers[offset+1])
+          val = "{:02d} {:02d}  {:02d} {:02d}".format( reg1>>8, reg1&0xff, reg2>>8, reg2&0xff )
         elif item["length"] == 4:
-          val = "{:02d} {:02d} {:02d} {:02d}  {:02d} {:02d} {:02d} {:02d}".format( decoder.decode_8bit_uint(), decoder.decode_8bit_uint(), 
-                                                    decoder.decode_8bit_uint(), decoder.decode_8bit_uint(),
-                                                    decoder.decode_8bit_uint(), decoder.decode_8bit_uint(), 
-                                                    decoder.decode_8bit_uint(), decoder.decode_8bit_uint() )
+          reg1 = int(rawdata.registers[offset])
+          reg2 = int(rawdata.registers[offset+1])
+          reg3 = int(rawdata.registers[offset+2])
+          reg4 = int(rawdata.registers[offset+3])
+          val = "{:02d} {:02d} {:02d} {:02d}  {:02d} {:02d} {:02d} {:02d}".format( reg1>>8, reg1&0xff, reg2>>8, reg2&0xff, reg3>>8, reg3&0xff, reg4>>8, reg4&0xff )
       elif item["type"] == 'BIT':
         if item["length"] == 1:
-          val = "{:08b}".format( decoder.decode_8bit_uint() )
+          reg1 = int(rawdata.registers[offset])
+          val = "{:08b}".format( reg1 )
         if item["length"] == 2:
-          val = "{:08b} {:08b}".format( decoder.decode_8bit_uint(), decoder.decode_8bit_uint() )
+          reg1 = int(rawdata.registers[offset])
+          reg2 = int(rawdata.registers[offset+1])
+          val = "{:08b} {:08b}".format( reg1, reg2 )
       elif item["type"] == 'DAT':
-        val = "{:02d}-{:02d}-{:02d} {:02d}:{:02d}:{:02d}".format( decoder.decode_8bit_uint(), decoder.decode_8bit_uint(), decoder.decode_8bit_uint(),
-                        decoder.decode_8bit_uint(), decoder.decode_8bit_uint(), decoder.decode_8bit_uint() )
+          reg1 = int(rawdata.registers[offset])
+          reg2 = int(rawdata.registers[offset+1])
+          reg3 = int(rawdata.registers[offset+2])
+          val = "{:02d}-{:02d}-{:02d} {:02d}:{:02d}:{:02d}".format( reg1>>8, reg1&0xff, reg2>>8, reg2&0xff, reg3>>8, reg3&0xff ) 
       elif item["type"] == 'STR':
-        val = decoder.decode_string(item["length"]*2).decode()
+        reg = rawdata.registers[offset:offset+item["length"]*2+1]
+        val = self.modbus_client.convert_from_registers(registers=reg, data_type=self.modbus_client.DATATYPE.STRING)
       else:
         logging.error("Unknown type {} to decode".format(item["type"]))
         return None

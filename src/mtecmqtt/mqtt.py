@@ -15,7 +15,16 @@ except Exception as e:
     
 # ============ MQTT ================
 def on_mqtt_connect(mqttclient, userdata, flags, rc, prop):
-  logging.info("Connected to MQTT broker")
+  if rc == 0:
+    logging.info("Connected to MQTT broker")
+  else:
+    logging.error("Error while connecting to MQTT broker: rc={}".format(rc))
+
+def on_mqtt_disconnect(mqttclient, userdata, rc):
+  logging.warning("MQTT broker disconnected: rc={}".format(rc))
+  
+def on_mqtt_subscribe(mqttclient, userdata, mid, granted_qos):
+  logging.info("MQTT broker subscribed to mid {}".format(mid))
 
 def on_mqtt_message(mqttclient, userdata, message):
   try:
@@ -34,11 +43,13 @@ def mqtt_start( hass=None ):
     client = mqttcl.Client(mqttcl.CallbackAPIVersion.VERSION2)
     client.user_data_set(hass) # register home automation instance
     client.username_pw_set(cfg['MQTT_LOGIN'], cfg['MQTT_PASSWORD']) 
+    client.on_connect = on_mqtt_connect
+    client.on_disconnect = on_mqtt_disconnect
+    client.on_message = on_mqtt_message
+    client.on_subscribe = on_mqtt_subscribe
     client.connect(cfg['MQTT_SERVER'], cfg['MQTT_PORT'], keepalive = 60) 
     if hass:
       client.subscribe(cfg["HASS_BASE_TOPIC"]+"/status", qos=0)
-    client.on_connect = on_mqtt_connect
-    client.on_message = on_mqtt_message
     client.loop_start()
     logging.info('MQTT server started')
     return client
