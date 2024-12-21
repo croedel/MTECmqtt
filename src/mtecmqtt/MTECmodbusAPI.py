@@ -3,6 +3,7 @@
 Modbus API for M-TEC Energybutler
 (c) 2023 by Christian Rödel 
 """
+from datetime import datetime, timedelta
 from mtecmqtt.config import cfg, register_map
 from pymodbus.client import ModbusTcpClient
 from pymodbus.constants import Endian
@@ -14,6 +15,7 @@ class MTECmodbusAPI:
   def __init__( self ):
     self.modbus_client = None
     self.slave = 0
+    self.last_reconnect = None
     self._cluster_cache = {}
     logging.debug("API initialized")
 
@@ -39,15 +41,22 @@ class MTECmodbusAPI:
 
   #-------------------------------------------------
   # Re-connect to Modbus server
-  def reconnect( self ):
-    logging.debug("Re-connecting to Modbus server")
-    self.disconnect()
-    if self.modbus_client.connect():
-      logging.info("Successfully re-connected to Modbus server")
-      return True
-    else:
-      logging.error("Couldn't re-connect to Modbus server")
-      return False
+  def reconnect( self, forced=False ):
+    if forced:
+      self.disconnect()
+
+    if self.modbus_client and not self.modbus_client.is_socket_open(): 
+      # re-connect required
+      now = datetime.now()
+      if self.last_reconnect and now < self.last_reconnect+timedelta(seconds=30): 
+        logging.debug("Re-connecting to Modbus server")
+        self.last_reconnect = now
+        if self.modbus_client.connect():
+          logging.info("Successfully re-connected to Modbus server")
+          return True
+        else:
+          logging.error("Couldn't re-connect to Modbus server")
+          return False
 
   #-------------------------------------------------
   # Disconnect from Modbus server
