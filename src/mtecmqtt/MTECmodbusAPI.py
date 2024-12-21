@@ -38,6 +38,18 @@ class MTECmodbusAPI:
       return False
 
   #-------------------------------------------------
+  # Re-connect to Modbus server
+  def reconnect( self ):
+    logging.debug("Re-connecting to Modbus server")
+    self.disconnect()
+    if self.modbus_client.connect():
+      logging.info("Successfully re-connected to Modbus server")
+      return True
+    else:
+      logging.error("Couldn't re-connect to Modbus server")
+      return False
+
+  #-------------------------------------------------
   # Disconnect from Modbus server
   def disconnect( self ):
     if self.modbus_client and self.modbus_client.is_socket_open():
@@ -173,6 +185,7 @@ class MTECmodbusAPI:
       result = self.modbus_client.read_holding_registers(address=int(register), count=length, slave=self.slave)
     except Exception as ex:
       logging.error("Exception while reading register {}, length {} from pymodbus: {}".format(register, length, ex))
+      self.reconnect()
       return None
     if result.isError():
       logging.error("Error while reading register {}, length {} from pymodbus".format(register, length))
