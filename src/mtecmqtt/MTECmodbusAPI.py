@@ -30,7 +30,7 @@ class MTECmodbusAPI:
     self.ip_addr = ip_addr
     self.port = port
     self.slave = slave
-    self._connect()
+    return self._connect()
 
   #-------------------------------------------------
   def _connect(self):
