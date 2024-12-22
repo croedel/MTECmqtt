@@ -14,7 +14,9 @@ class MTECmodbusAPI:
   #-------------------------------------------------
   def __init__( self ):
     self.modbus_client = None
-    self.slave = 0
+    self.ip_addr = None
+    self.port = None
+    self.slave = None
     self.last_reconnect = None
     self._cluster_cache = {}
     logging.debug("API initialized")
@@ -25,18 +27,23 @@ class MTECmodbusAPI:
   #-------------------------------------------------
   # Connect to Modbus server
   def connect( self, ip_addr, port, slave ):
+    self.ip_addr = ip_addr
+    self.port = port
     self.slave = slave
-    
+    self._connect()
+
+  #-------------------------------------------------
+  def _connect(self):
     framer = cfg.get("MODBUS_FRAMER", "rtu")
-    logging.debug("Connecting to server {}:{} (framer={})".format(ip_addr, port, framer))
-    self.modbus_client = ModbusTcpClient(ip_addr, port=port, framer=framer, timeout=cfg["MODBUS_TIMEOUT"],
+    logging.debug("Connecting to server {}:{} (framer={})".format(self.ip_addr, self.port, framer))
+    self.modbus_client = ModbusTcpClient(self.ip_addr, port=self.port, framer=framer, timeout=cfg["MODBUS_TIMEOUT"],
                                          retries=cfg["MODBUS_RETRIES"] )
 
     if self.modbus_client.connect():
-      logging.info("Successfully connected to server {}:{}".format(ip_addr, port))
+      logging.info("Successfully connected to server {}:{}".format(self.ip_addr, self.port))
       return True
     else:
-      logging.error("Couldn't connect to server {}:{}".format(ip_addr, port))
+      logging.error("Couldn't connect to server {}:{}".format(self.ip_addr, self.port))
       return False
 
   #-------------------------------------------------
@@ -47,9 +54,8 @@ class MTECmodbusAPI:
 
     if self.modbus_client:
       if self.modbus_client.is_socket_open() and self.modbus_client.connected:
-        logging.info("Modbus server is connected - re-connect not necessary")
-      else:
-        # re-connect required
+        logging.debug("Modbus server is connected - re-connect not necessary")
+      else: # re-connect required
         now = datetime.now()
         if self.last_reconnect and now < self.last_reconnect+timedelta(seconds=30): 
           logging.info("Re-connecting to Modbus server")
@@ -58,6 +64,8 @@ class MTECmodbusAPI:
             logging.info("Successfully re-connected to Modbus server")
           else:
             logging.error("Couldn't re-connect to Modbus server")
+    else:
+      self._connect()
 
   #-------------------------------------------------
   # Disconnect from Modbus server
@@ -85,6 +93,7 @@ class MTECmodbusAPI:
   def read_modbus_data(self, registers=None):
     data = {}
     logging.debug("Retrieving data...")
+    self.reconnect()
 
     if registers == None: # Create liset of all (numeric) registers
       registers = []
@@ -196,7 +205,6 @@ class MTECmodbusAPI:
       result = self.modbus_client.read_holding_registers(address=int(register), count=length, slave=self.slave)
     except Exception as ex:
       logging.error("Exception while reading register {}, length {} from pymodbus: {}".format(register, length, ex))
-      self.reconnect()
       return None
     if result.isError():
       logging.error("Error while reading register {}, length {} from pymodbus".format(register, length))
