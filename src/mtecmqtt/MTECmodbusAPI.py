@@ -16,7 +16,6 @@ class MTECmodbusAPI:
     self.modbus_client = None
     self.last_reconnect = None
     self._cluster_cache = {}
-    self.connected = False
     self.slave = cfg['MODBUS_SLAVE']
     logging.debug("API initialized")
 
@@ -27,16 +26,16 @@ class MTECmodbusAPI:
   # Connect to Modbus server
   def connect(self):
     # try with configured port
-    self.connected = self._connect(ip_addr=cfg['MODBUS_IP'], port=cfg['MODBUS_PORT'], framer=cfg.get("MODBUS_FRAMER", "rtu"),
+    connected = self._connect(ip_addr=cfg['MODBUS_IP'], port=cfg['MODBUS_PORT'], framer=cfg.get("MODBUS_FRAMER", "rtu"),
                                timeout=cfg["MODBUS_TIMEOUT"], retries=cfg["MODBUS_RETRIES"])
-    if not self.connected:
+    if not connected:
       # try alternative port (defaults to 502)
-      self.connected = self._connect(ip_addr=cfg['MODBUS_IP'], port=cfg.get('MODBUS_PORT2',"502"), framer=cfg.get("MODBUS_FRAMER", "rtu"),
+      connected = self._connect(ip_addr=cfg['MODBUS_IP'], port=cfg.get('MODBUS_PORT2',"502"), framer=cfg.get("MODBUS_FRAMER", "rtu"),
                                timeout=cfg["MODBUS_TIMEOUT"], retries=cfg["MODBUS_RETRIES"])
-      if not self.connected:    
-        logging.fatal( "Can't connect to MODBUS server: {}:{} slave {}".format(cfg['MODBUS_IP'], cfg['MODBUS_PORT'], cfg['MODBUS_SLAVE']) )
+      if not connected:    
+        logging.fatal( "Can't connect to MODBUS server: {}".format(cfg['MODBUS_IP']) )
 
-    return self.connected      
+    return connected      
 
   #-------------------------------------------------
   def _connect(self, ip_addr, port, framer, timeout, retries):
@@ -73,9 +72,10 @@ class MTECmodbusAPI:
   #-------------------------------------------------
   # Disconnect from Modbus server
   def disconnect( self ):
-    logging.info("Disconnecting from Modbus server")
-    if self.modbus_client and self.modbus_client.is_socket_open():
-      self.modbus_client.close()
+    if self.modbus_client: 
+      logging.info("Disconnecting from Modbus server")
+      if self.modbus_client.is_socket_open():
+        self.modbus_client.close()
       self.modbus_client = None
       logging.debug("Successfully disconnected from Modbus server")
 
