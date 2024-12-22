@@ -105,13 +105,9 @@ def main():
   topic_base = None
 
   api = MTECmodbusAPI()
-  connected = api.connect(ip_addr=cfg['MODBUS_IP'], port=cfg['MODBUS_PORT'], slave=cfg['MODBUS_SLAVE'])
-  if not connected:
-    # try alternative port (defaults to 502)
-    connected = api.connect(ip_addr=cfg['MODBUS_IP'], port=cfg.get('MODBUS_PORT2',"502"), slave=cfg['MODBUS_SLAVE'])
-    if not connected:    
-      logging.fatal( "Can't connect to MODBUS server: {}:{} slave {}".format(cfg['MODBUS_IP'], cfg['MODBUS_PORT'], cfg['MODBUS_SLAVE']) )
-      return
+  if not api.connect():
+    logging.fatal("Can't connect to MODBUS server - exiting")
+    return
 
   if cfg["HASS_ENABLE"]:
     hass = HassIntegration()
