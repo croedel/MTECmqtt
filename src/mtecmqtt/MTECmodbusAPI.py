@@ -45,25 +45,27 @@ class MTECmodbusAPI:
     if forced:
       self.disconnect()
 
-    if self.modbus_client and not self.modbus_client.is_socket_open(): 
-      # re-connect required
-      now = datetime.now()
-      if self.last_reconnect and now < self.last_reconnect+timedelta(seconds=30): 
-        logging.debug("Re-connecting to Modbus server")
-        self.last_reconnect = now
-        if self.modbus_client.connect():
-          logging.info("Successfully re-connected to Modbus server")
-          return True
-        else:
-          logging.error("Couldn't re-connect to Modbus server")
-          return False
+    if self.modbus_client:
+      if self.modbus_client.is_socket_open() and self.modbus_client.connected:
+        logging.info("Modbus server is connected - re-connect not necessary")
+      else:
+        # re-connect required
+        now = datetime.now()
+        if self.last_reconnect and now < self.last_reconnect+timedelta(seconds=30): 
+          logging.info("Re-connecting to Modbus server")
+          self.last_reconnect = now
+          if self.modbus_client.connect():
+            logging.info("Successfully re-connected to Modbus server")
+          else:
+            logging.error("Couldn't re-connect to Modbus server")
 
   #-------------------------------------------------
   # Disconnect from Modbus server
   def disconnect( self ):
+    logging.info("Disconnecting from Modbus server")
     if self.modbus_client and self.modbus_client.is_socket_open():
       self.modbus_client.close()
-      logging.debug("Successfully disconnected from server")
+      logging.debug("Successfully disconnected from Modbus server")
 
 #--------------------------------
   # Get a list of all registers which belong to a given group
