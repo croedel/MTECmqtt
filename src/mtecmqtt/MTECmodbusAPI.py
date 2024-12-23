@@ -51,33 +51,30 @@ class MTECmodbusAPI:
       return False
 
   #-------------------------------------------------
-  # Check Modbus server connection
-  def check_connection(self):
-    if self.modbus_client:
-      if self.modbus_client.is_socket_open() and self.modbus_client.connected:
-        logging.debug("Modbus server is connected - all good")
-      else: 
-        # re-connect required
-        now = datetime.now()
-        if self.last_reconnect and now < self.last_reconnect+timedelta(seconds=30): 
-          logging.info("Trying to re-connect to Modbus server")
-          self.last_reconnect = now
-          if self.modbus_client.connect():
-            logging.info("Successfully re-connected to Modbus server")
-          else:
-            logging.error("Couldn't re-connect to Modbus server")
-    else:
-      self.connect()
-
-  #-------------------------------------------------
   # Disconnect from Modbus server
   def disconnect( self ):
     if self.modbus_client: 
       logging.info("Disconnecting from Modbus server")
-      if self.modbus_client.is_socket_open():
-        self.modbus_client.close()
+      try:
+        if self.modbus_client.is_socket_open():
+          self.modbus_client.close()
+      except Exception as ex:
+        logging.debug("Exception while diconnecting: {}".format(ex))  
       self.modbus_client = None
       logging.debug("Successfully disconnected from Modbus server")
+
+  #-------------------------------------------------
+  # restart Modbus server connection
+  def reconnect(self):
+    now = datetime.now()
+    if not self.last_reconnect or now > self.last_reconnect+timedelta(seconds=30): 
+      logging.info("Trying to re-connect to Modbus server")
+      self.last_reconnect = now
+      self.disconnect()
+      if self.connect():
+        logging.info("Successfully re-connected to Modbus server")
+      else:
+        logging.error("Couldn't re-connect to Modbus server")
 
 #--------------------------------
   # Get a list of all registers which belong to a given group
@@ -97,7 +94,6 @@ class MTECmodbusAPI:
   def read_modbus_data(self, registers=None):
     data = {}
     logging.debug("Retrieving data...")
-    self.check_connection()
 
     if registers == None: # Create liset of all (numeric) registers
       registers = []
@@ -209,6 +205,7 @@ class MTECmodbusAPI:
       result = self.modbus_client.read_holding_registers(address=int(register), count=length, slave=self.slave)
     except Exception as ex:
       logging.error("Exception while reading register {}, length {} from pymodbus: {}".format(register, length, ex))
+      self.reconnect()
       return None
     if result.isError():
       logging.error("Error while reading register {}, length {} from pymodbus".format(register, length))
