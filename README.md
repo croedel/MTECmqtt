@@ -99,14 +99,14 @@ python3 -m venv . && source bin/activate
 pip install https://github.com/croedel/MTECmqtt/archive/refs/heads/main.zip
 ```
 
-This is all you need to do for a standard setup! 
-
-_IMPORTANT:_ M-TEC changed their Modbus port with firmware V27.52.4.0. If you run that version or a newer one, you need to change the `MODBUS_PORT` in the `config.yaml` to 502 !  
-
-As a next step, we can try to start the MQTT server. It will print out some debug info, so you can see what it does.
+As a next step, we can try to start the MQTT server. 
 ```
 mtec_mqtt
 ```
+Starting it for the first time will create your `config.yaml` file. Please review and (if necessary) adapt it you needs (see below for details).
+
+Subsequent invocations will run the actual server. It will print out some debug info, so you can see what it does.
+
 You can stop the service by pressing CTRL-C or sending a SIGHUB. This will initiate a graceful shutdown. Please be patient - this might take a few seconds.
 
 Starting the service in a shell - as we just did - will not create a permanent running service and is probably only useful for testing. If you want a permanently running service, you need to install a systemd autostart script for `mtec_mytt.py`. The following command does this job:

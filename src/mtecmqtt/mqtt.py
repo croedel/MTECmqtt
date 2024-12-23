@@ -42,7 +42,8 @@ def mqtt_start( hass=None ):
   try: 
     client = mqttcl.Client(mqttcl.CallbackAPIVersion.VERSION2)
     client.user_data_set(hass) # register home automation instance
-    client.username_pw_set(cfg['MQTT_LOGIN'], cfg['MQTT_PASSWORD']) 
+    if cfg['MQTT_LOGIN']:
+      client.username_pw_set(cfg['MQTT_LOGIN'], cfg['MQTT_PASSWORD']) 
     client.on_connect = on_mqtt_connect
     client.on_disconnect = on_mqtt_disconnect
     client.on_message = on_mqtt_message
@@ -68,7 +69,9 @@ def mqtt_publish( topic, payload ):
   if cfg['MQTT_DISABLE']: # Don't do anything - just logg
     logging.info("- {}: {}".format(topic, str(payload)))
   else:  
-    auth = { 'username': cfg['MQTT_LOGIN'], 'password': cfg['MQTT_PASSWORD'] }  
+    auth = None
+    if cfg['MQTT_LOGIN']:
+      auth = { 'username': cfg['MQTT_LOGIN'], 'password': cfg['MQTT_PASSWORD'] }  
     logging.debug("- {}: {}".format(topic, str(payload)))
     try:
       publish.single(topic, payload=payload, hostname=cfg['MQTT_SERVER'], port=cfg['MQTT_PORT'], auth=auth)

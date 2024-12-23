@@ -140,14 +140,20 @@ def init_register_map():
 logging.basicConfig( level=logging.INFO, format="[%(levelname)s] %(filename)s: %(message)s" )
 cfg = init_config()
 if not cfg:
+  logging.info("No config.yaml found - creating new one from template.")
   if create_config_file():  # Create a new config
     cfg = init_config()
     if not cfg:
-      logging.fatal("Couldn't open config YAML file")
+      logging.fatal("Couldn't open fresh created config YAML file")
       sys.exit(1)
+    else:
+      logging.warning("Please edit and adapt freshly created config.yaml. Restart afterwards.")
+      sys.exit(0)      
   else:
-    logging.fatal("Couldn't create config YAML file")
+    logging.fatal("Couldn't create config YAML file from templare")
     sys.exit(1)
+
+
 
 register_map, register_groups = init_register_map()
 
