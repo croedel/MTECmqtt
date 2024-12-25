@@ -7,6 +7,7 @@ name = "MTECmqtt"
 description = "Read data from a M-TEC Energybutler system and write them to a MQTT broker"
 dependencies = [
   "pyyaml", 
+  "requests", 
   "PyModbus > 3.8", 
   "paho-mqtt >= 2.1", 
 ]  
