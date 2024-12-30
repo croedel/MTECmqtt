@@ -1,3 +1,3 @@
 # MTECmqtt
 __all__ = ["config", "mqtt", "hass_int", "MTECmodbusAPI"] 
-__version__ = "2.0.6"
+__version__ = "2.1.0"

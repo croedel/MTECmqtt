@@ -19,13 +19,6 @@ The highlights are:
 
 I hope you like it and it will help you with for your EMS or home automation project :-) !
 
-### Changelog
-
-#### V2.0 - 13.03.2024
-* Re-packaged supporting a simplified installation
-* Optimized register scanning
-* Removed some over complicated configuration options in config.yaml  
-
 ### Disclaimer 
 This project is a pure hobby project which I created by reverse-engineering different internet sources and my M-TEC Energybutler. It is *not* related to or supported by M-TEC GmbH by any means. 
 
