@@ -110,7 +110,7 @@ def list_register_config_by_groups(api):
 #-------------------------------
 def main(): 
   api = MTECmodbusAPI()
-  api.connect( ip_addr=cfg['MODBUS_IP'], port=cfg['MODBUS_PORT'], slave=cfg['MODBUS_SLAVE'] )
+  api.connect()
 
   while True:
     print( "=====================================" )
